@@ -1,0 +1,356 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum UserRole {
+  ADMIN
+  HSEQ_MANAGER
+  OPERATIONS
+  CLIENT
+  VIEWER
+}
+
+enum WorkOrderStatus {
+  nueva
+  planificada
+  en_proceso
+  detenida
+  revision
+  completada
+  cerrada
+}
+
+enum Priority {
+  baja
+  media
+  alta
+  critica
+}
+
+enum HseqType {
+  inspeccion
+  incidente
+  accion_correctiva
+  capacitacion
+  permiso_trabajo
+  matriz_riesgo
+}
+
+enum Norm {
+  ISO_45001
+  ISO_9001
+  ISO_14001
+  DS_44
+}
+
+enum HseqStatus {
+  abierto
+  en_revision
+  cerrado
+  vencido
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  rut       String   @unique
+  address   String?
+  phone     String?
+  email     String?
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clients  Client[]
+  projects Project[]
+  users    User[]
+  workers  Worker[]
+  equipment Equipment[]
+  materials Material[]
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          UserRole
+  active        Boolean   @default(true)
+  companyId     String?
+  clientId      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company       Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  client        Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  sessions      Session[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id          String   @id @default(uuid())
+  companyId   String
+  name        String
+  rut         String?
+  industry    String?
+  address     String?
+  phone       String?
+  email       String?
+  paymentTerm Int?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contacts    Contact[]
+  workOrders  WorkOrder[]
+  projects    Project[]
+  users       User[]
+}
+
+model Contact {
+  id       String  @id @default(uuid())
+  clientId String
+  name     String
+  role     String?
+  email    String?
+  phone    String?
+  isMain   Boolean @default(false)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  companyId   String
+  clientId    String?
+  name        String
+  code        String?
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      String   @default("activo")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company    Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client     Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  workOrders WorkOrder[]
+  ganttTasks GanttTask[]
+}
+
+model WorkOrder {
+  id                String          @id @default(uuid())
+  code              String          @unique
+  title             String
+  description       String?
+  status            WorkOrderStatus @default(nueva)
+  priority          Priority        @default(media)
+  startDate         DateTime?
+  dueDate           DateTime?
+  completedAt       DateTime?
+  progress          Float           @default(0)
+  responsibleId     String?
+  clientId          String?
+  projectId         String?
+  estimatedCost     Float?
+  actualCost        Float?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  client       Client?          @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  project      Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  responsible  Worker?          @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  tasks        WorkOrderTask[]
+  assignments  WorkerAssignment[]
+  documents    Document[]
+  auditLogs    AuditLog[]
+  ganttTasks   GanttTask[]
+}
+
+model WorkOrderTask {
+  id          String   @id @default(uuid())
+  workOrderId String
+  title       String
+  description String?
+  progress    Float    @default(0)
+  completed   Boolean  @default(false)
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+}
+
+model Worker {
+  id              String   @id @default(uuid())
+  companyId       String
+  name            String
+  rut             String   @unique
+  position        String
+  specialty       String?
+  status          String   @default("activo")
+  certifications  String?
+  criticalExpires DateTime?
+  phone           String?
+  email           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company      Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ledOrders    WorkOrder[]
+  assignments  WorkerAssignment[]
+  hseqRecords  HseqRecord[]
+}
+
+model WorkerAssignment {
+  id          String   @id @default(uuid())
+  workerId    String
+  workOrderId String
+  startDate   DateTime?
+  endDate     DateTime?
+  hours       Float?
+  createdAt   DateTime @default(now())
+
+  worker    Worker    @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([workerId, workOrderId])
+}
+
+model GanttTask {
+  id          String   @id @default(uuid())
+  projectId   String
+  workOrderId String?
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  progress    Float    @default(0)
+  status      String   @default("pendiente")
+  dependencies String?
+  responsible String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workOrder   WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+}
+
+model Equipment {
+  id          String   @id @default(uuid())
+  companyId   String
+  name        String
+  code        String?  @unique
+  type        String?
+  status      String   @default("disponible")
+  lastService DateTime?
+  nextService DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Material {
+  id          String   @id @default(uuid())
+  companyId   String
+  name        String
+  code        String?  @unique
+  unit        String?
+  stock       Float    @default(0)
+  minStock    Float?
+  cost        Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id           String   @id @default(uuid())
+  workOrderId  String?
+  hseqRecordId String?
+  name         String
+  url          String
+  type         String?
+  public       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  workOrder  WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  hseqRecord HseqRecord? @relation(fields: [hseqRecordId], references: [id], onDelete: Cascade)
+}
+
+model HseqRecord {
+  id                 String     @id @default(uuid())
+  companyId          String
+  type               HseqType
+  norm               Norm
+  description        String
+  responsibleId      String?
+  date               DateTime   @default(now())
+  dueDate            DateTime?
+  status             HseqStatus @default(abierto)
+  evidenceDocumental String?
+  signatureRequired  Boolean    @default(false)
+  signed             Boolean    @default(false)
+  signedAt           DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  responsible Worker?    @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  actions     HseqAction[]
+  documents   Document[]
+}
+
+model HseqAction {
+  id             String   @id @default(uuid())
+  hseqRecordId   String
+  description    String
+  responsible    String?
+  dueDate        DateTime?
+  completed      Boolean  @default(false)
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  hseqRecord HseqRecord @relation(fields: [hseqRecordId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entity     String
+  entityId   String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+
+  user   User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  workOrder WorkOrder? @relation(fields: [entityId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
