@@ -75,7 +75,8 @@ model Company {
 
 model User {
   id            String    @id @default(uuid())
-  email         String    @unique
+  email         String?   @unique
+  rut           String?   @unique
   name          String
   password      String
   role          UserRole

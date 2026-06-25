@@ -10,10 +10,28 @@ import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = React.useState("");
+  const [rut, setRut] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Formateador simple de RUT (opcional, remueve puntos y guiones para mandar al backend, o lo deja igual)
+  const formatRut = (value: string) => {
+    let raw = value.replace(/[^0-9kK]/g, "");
+    if (raw.length > 1) {
+      raw = raw.slice(0, -1) + "-" + raw.slice(-1);
+    }
+    // Formateo con puntos opcional
+    const parts = raw.split('-');
+    if (parts[0].length > 3) {
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    return parts.join('-');
+  };
+
+  const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRut(formatRut(e.target.value));
+  };
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -22,7 +40,7 @@ export function LoginForm() {
 
     try {
       const result = await signIn("credentials", {
-        email,
+        rut,
         password,
         redirect: false,
         callbackUrl: "/dashboard",
@@ -53,29 +71,31 @@ export function LoginForm() {
       )}
 
       <div className="space-y-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-steel">
-          Correo electrónico
+        <label htmlFor="rut" className="text-sm font-medium text-steel">
+          RUT
         </label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
           <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
+            id="rut"
+            name="rut"
+            type="text"
             required
-            placeholder="usuario@boilercomp.cl"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="12.345.678-9"
+            value={rut}
+            onChange={handleRutChange}
             className="pl-10"
           />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-steel">
-          Contraseña
-        </label>
+        <div className="flex justify-between items-center">
+          <label htmlFor="password" className="text-sm font-medium text-steel">
+            Contraseña
+          </label>
+          <span className="text-xs text-steel/60 italic">Solo para Administradores</span>
+        </div>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
           <Input
@@ -83,7 +103,6 @@ export function LoginForm() {
             name="password"
             type="password"
             autoComplete="current-password"
-            required
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

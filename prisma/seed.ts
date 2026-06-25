@@ -285,16 +285,16 @@ async function main() {
   console.log("Creando usuarios demo...");
   const hashedPassword = await bcryptjs.hash(DEMO_PASSWORD, 10);
   const users = [
-    { email: "gerencia@boilercomp.com", name: "Gerencia BOILER COMP", role: UserRole.ADMIN, companyId: boilerComp.id },
-    { email: "admin@boilercomp.com", name: "Administrador Sistema", role: UserRole.ADMIN, companyId: boilerComp.id },
-    { email: "hseq@boilercomp.com", name: "Gerente HSEQ", role: UserRole.HSEQ_MANAGER, companyId: boilerComp.id },
-    { email: "ops@boilercomp.com", name: "Jefe Operaciones", role: UserRole.OPERATIONS, companyId: boilerComp.id },
-    { email: "cliente1@ejemplo.com", name: "Usuario Cliente Demo", role: UserRole.CLIENT, clientId: clients[0].id },
-    { email: "viewer@boilercomp.com", name: "Visualizador", role: UserRole.VIEWER, companyId: boilerComp.id },
+    { email: "gerencia@boilercomp.com", rut: "11.111.111-1", name: "Gerencia BOILER COMP", role: UserRole.ADMIN, companyId: boilerComp.id },
+    { email: "admin@boilercomp.com", rut: "22.222.222-2", name: "Administrador Sistema", role: UserRole.ADMIN, companyId: boilerComp.id },
+    { email: "hseq@boilercomp.com", rut: "33.333.333-3", name: "Gerente HSEQ", role: UserRole.HSEQ_MANAGER, companyId: boilerComp.id },
+    { email: "ops@boilercomp.com", rut: "44.444.444-4", name: "Jefe Operaciones", role: UserRole.OPERATIONS, companyId: boilerComp.id },
+    { email: "cliente1@ejemplo.com", rut: "55.555.555-5", name: "Usuario Cliente Demo", role: UserRole.CLIENT, clientId: clients[0].id },
+    { email: "viewer@boilercomp.com", rut: "66.666.666-6", name: "Visualizador", role: UserRole.VIEWER, companyId: boilerComp.id },
   ];
   for (const u of users) {
-    await prisma.user.create({ data: { email: u.email, name: u.name, password: hashedPassword, role: u.role, active: true, companyId: u.companyId || undefined, clientId: u.clientId || undefined } });
-    console.log(` ${u.role.padEnd(18)} | ${u.email}`);
+    await prisma.user.create({ data: { email: u.email, rut: u.rut, name: u.name, password: hashedPassword, role: u.role, active: true, companyId: u.companyId || undefined, clientId: u.clientId || undefined } });
+    console.log(` ${u.role.padEnd(18)} | RUT: ${u.rut} | ${u.email}`);
   }
   console.log("");
 
