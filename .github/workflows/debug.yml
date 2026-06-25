@@ -1,0 +1,13 @@
+name: Debug CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello from GitHub Actions"
+      - run: echo "Testing runner"
+      - run: cat /etc/os-release
