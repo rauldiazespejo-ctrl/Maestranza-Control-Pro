@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { workerSchema, type WorkerFormData } from "@/lib/validations/worker";
-import { auth } from "@/lib/auth";
+import { auth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : null;
@@ -35,7 +35,10 @@ export async function getWorkerById(id: string) {
 
 export async function createWorker(data: WorkerFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para crear trabajadores");
+  }
 
   const parsed = workerSchema.parse(data);
   const worker = await prisma.worker.create({
@@ -56,7 +59,10 @@ export async function createWorker(data: WorkerFormData) {
 
 export async function updateWorker(id: string, data: WorkerFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para actualizar trabajadores");
+  }
 
   const parsed = workerSchema.parse(data);
   const worker = await prisma.worker.update({
@@ -77,7 +83,10 @@ export async function updateWorker(id: string, data: WorkerFormData) {
 
 export async function deleteWorker(id: string) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
+    throw new Error("No tienes permisos para eliminar trabajadores");
+  }
   await prisma.worker.delete({ where: { id } });
   revalidatePath("/trabajadores");
 }

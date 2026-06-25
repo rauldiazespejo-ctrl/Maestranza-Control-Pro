@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { clientSchema, type ClientFormData } from "@/lib/validations/client";
-import { auth } from "@/lib/auth";
+import { auth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getClients(search?: string) {
   const where: Record<string, unknown> = {};
@@ -30,7 +30,10 @@ export async function getClientById(id: string) {
 
 export async function createClient(data: ClientFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para crear clientes");
+  }
 
   const parsed = clientSchema.parse(data);
   const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
@@ -52,7 +55,10 @@ export async function createClient(data: ClientFormData) {
 
 export async function updateClient(id: string, data: ClientFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para actualizar clientes");
+  }
 
   const parsed = clientSchema.parse(data);
   const client = await prisma.client.update({
@@ -70,7 +76,10 @@ export async function updateClient(id: string, data: ClientFormData) {
 
 export async function deleteClient(id: string) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
+    throw new Error("No tienes permisos para eliminar clientes");
+  }
   await prisma.client.delete({ where: { id } });
   revalidatePath("/clientes");
 }

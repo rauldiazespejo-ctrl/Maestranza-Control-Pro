@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -90,6 +91,10 @@ model User {
   sessions      Session[]
   auditLogs     AuditLog[]
   notifications Notification[]
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([role])
 }
 
 model Session {
@@ -100,6 +105,8 @@ model Session {
   createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Client {
@@ -121,6 +128,8 @@ model Client {
   workOrders  WorkOrder[]
   projects    Project[]
   users       User[]
+
+  @@index([companyId])
 }
 
 model Contact {
@@ -133,6 +142,8 @@ model Contact {
   isMain   Boolean @default(false)
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
 }
 
 model Project {
@@ -152,6 +163,10 @@ model Project {
   client     Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
   workOrders WorkOrder[]
   ganttTasks GanttTask[]
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([status])
 }
 
 model WorkOrder {
@@ -181,6 +196,15 @@ model WorkOrder {
   documents    Document[]
   auditLogs    AuditLog[]
   ganttTasks   GanttTask[]
+
+  // ── Performance indexes for dashboard queries ──
+  @@index([status])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([responsibleId])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@index([status, dueDate])
 }
 
 model WorkOrderTask {
@@ -195,6 +219,9 @@ model WorkOrderTask {
   updatedAt   DateTime @updatedAt
 
   workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@index([workOrderId])
+  @@index([completed])
 }
 
 model Worker {
@@ -216,6 +243,9 @@ model Worker {
   ledOrders    WorkOrder[]
   assignments  WorkerAssignment[]
   hseqRecords  HseqRecord[]
+
+  @@index([companyId])
+  @@index([status])
 }
 
 model WorkerAssignment {
@@ -231,6 +261,8 @@ model WorkerAssignment {
   workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 
   @@unique([workerId, workOrderId])
+  @@index([workerId])
+  @@index([workOrderId])
 }
 
 model GanttTask {
@@ -249,6 +281,12 @@ model GanttTask {
 
   project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   workOrder   WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([workOrderId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
 }
 
 model Equipment {
@@ -264,6 +302,9 @@ model Equipment {
   updatedAt   DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
 }
 
 model Material {
@@ -279,6 +320,8 @@ model Material {
   updatedAt   DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }
 
 model Document {
@@ -293,6 +336,9 @@ model Document {
 
   workOrder  WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   hseqRecord HseqRecord? @relation(fields: [hseqRecordId], references: [id], onDelete: Cascade)
+
+  @@index([workOrderId])
+  @@index([hseqRecordId])
 }
 
 model HseqRecord {
@@ -315,6 +361,15 @@ model HseqRecord {
   responsible Worker?    @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
   actions     HseqAction[]
   documents   Document[]
+
+  // ── Critical indexes for HSEQ dashboard alerts ──
+  @@index([companyId])
+  @@index([responsibleId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([norm])
+  @@index([type])
+  @@index([status, dueDate])
 }
 
 model HseqAction {
@@ -329,6 +384,10 @@ model HseqAction {
   updatedAt      DateTime @updatedAt
 
   hseqRecord HseqRecord @relation(fields: [hseqRecordId], references: [id], onDelete: Cascade)
+
+  @@index([hseqRecordId])
+  @@index([dueDate])
+  @@index([completed])
 }
 
 model AuditLog {
@@ -342,6 +401,12 @@ model AuditLog {
 
   user   User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   workOrder WorkOrder? @relation(fields: [entityId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityId])
+  @@index([entity])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model Notification {
@@ -353,4 +418,7 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
 }

@@ -3,6 +3,30 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import type { UserRole } from "@prisma/client";
+
+// ── RBAC roles ──────────────────────────────────────────────────────
+export type Role = UserRole;
+
+export const MANAGEABLE_ROLES:  Role[] = ["ADMIN"];
+export const HSEQ_ROLES:        Role[] = ["ADMIN", "HSEQ_MANAGER"];
+export const OPERATIONS_ROLES:  Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"];
+export const WRITE_ROLES:       Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"];
+export const READ_ROLES:        Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS", "CLIENT", "VIEWER"];
+
+export function requireRole(role: Role | undefined, allowed: Role[]): void {
+  if (!role || !allowed.includes(role)) {
+    throw new Error("No tienes permisos para realizar esta acción");
+  }
+}
+
+/** Get authenticated session or throw — use in server actions */
+export async function requireAuth(requiredRoles: Role[] = READ_ROLES) {
+  const session = await auth();
+  if (!session?.user) throw new Error("No autenticado");
+  requireRole(session.user.role as Role, requiredRoles);
+  return session;
+}
 
 const credentialsSchema = z.object({
   email: z.string().email(),

@@ -3,22 +3,27 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
 const databaseUrl = process.env.DATABASE_URL ?? "";
+const isProduction = process.env.NODE_ENV === "production";
 
 function createPrismaClient() {
-  // Use PG adapter for PostgreSQL (Neon)
+  // PostgreSQL (Neon / producción)
   if (databaseUrl.startsWith("postgresql://") || databaseUrl.startsWith("postgres://")) {
     const pool = new pg.Pool({
       connectionString: databaseUrl,
-      ssl: databaseUrl.includes("sslmode=require") || databaseUrl.includes("neon.tech")
-        ? { rejectUnauthorized: false }
-        : undefined,
+      ssl: {
+        // Producción: Neon tiene certificado válido — no necesitas rejectUnauthorized: false
+        // Desarrollo local: usa rejectUnauthorized: false si sslmode=require
+        rejectUnauthorized: !isProduction,
+      },
       connectionTimeoutMillis: 30000,
+      idleTimeoutMillis: 30000,
+      max: 10,
     });
     const adapter = new PrismaPg(pool);
     return new PrismaClient({ adapter });
   }
 
-  // Fallback: native Prisma client for SQLite (local dev)
+  // Fallback: SQLite local (desarrollo)
   return new PrismaClient();
 }
 

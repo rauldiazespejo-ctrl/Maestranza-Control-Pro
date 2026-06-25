@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { hseqRecordSchema, type HseqRecordFormData } from "@/lib/validations/hseq";
-import { auth } from "@/lib/auth";
+import { auth, HSEQ_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
@@ -30,7 +30,10 @@ export async function getHseqRecordById(id: string) {
 
 export async function createHseqRecord(data: HseqRecordFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!HSEQ_ROLES.includes(session.user.role as typeof HSEQ_ROLES[number])) {
+    throw new Error("No tienes permisos para crear registros HSEQ");
+  }
 
   const parsed = hseqRecordSchema.parse(data);
   const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
@@ -54,7 +57,10 @@ export async function createHseqRecord(data: HseqRecordFormData) {
 
 export async function updateHseqRecord(id: string, data: HseqRecordFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!HSEQ_ROLES.includes(session.user.role as typeof HSEQ_ROLES[number])) {
+    throw new Error("No tienes permisos para actualizar registros HSEQ");
+  }
 
   const parsed = hseqRecordSchema.parse(data);
   const record = await prisma.hseqRecord.update({
@@ -77,7 +83,10 @@ export async function updateHseqRecord(id: string, data: HseqRecordFormData) {
 
 export async function deleteHseqRecord(id: string) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
+    throw new Error("No tienes permisos para eliminar registros HSEQ");
+  }
   await prisma.hseqRecord.delete({ where: { id } });
   revalidatePath("/hseq");
 }

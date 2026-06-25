@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { workOrderSchema, type WorkOrderFormData } from "@/lib/validations/workorder";
-import { auth } from "@/lib/auth";
+import { auth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
@@ -49,7 +49,10 @@ export async function getWorkOrderById(id: string) {
 
 export async function createWorkOrder(data: WorkOrderFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para crear órdenes de trabajo");
+  }
 
   const parsed = workOrderSchema.parse(data);
   const order = await prisma.workOrder.create({
@@ -81,7 +84,10 @@ export async function createWorkOrder(data: WorkOrderFormData) {
 
 export async function updateWorkOrder(id: string, data: WorkOrderFormData) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para actualizar órdenes de trabajo");
+  }
 
   const parsed = workOrderSchema.parse(data);
   const order = await prisma.workOrder.update({
@@ -114,7 +120,10 @@ export async function updateWorkOrder(id: string, data: WorkOrderFormData) {
 
 export async function deleteWorkOrder(id: string) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
+    throw new Error("No tienes permisos para eliminar órdenes de trabajo");
+  }
 
   await prisma.workOrder.delete({ where: { id } });
   revalidatePath("/ordenes");
@@ -122,7 +131,10 @@ export async function deleteWorkOrder(id: string) {
 
 export async function updateWorkOrderStatus(id: string, status: string) {
   const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  if (!session?.user) throw new Error("No autenticado");
+  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
+    throw new Error("No tienes permisos para cambiar el estado de órdenes");
+  }
 
   const order = await prisma.workOrder.update({
     where: { id },
