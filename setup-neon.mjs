@@ -27,7 +27,7 @@ async function main() {
       "CREATE TYPE \"Norm\" AS ENUM ('ISO_45001', 'ISO_9001', 'ISO_14001', 'DS_44')",
       "CREATE TYPE \"HseqStatus\" AS ENUM ('abierto', 'en_revision', 'cerrado', 'vencido')",
     ]) {
-      try { await client.query(`DO $$ BEGIN ${e}; EXCEPTION WHEN duplicate_object THEN null; END $$`); } catch (_) {}
+      try { await client.query(`DO $$ BEGIN ${e}; EXCEPTION WHEN duplicate_object THEN null; END $$`); } catch {}
     }
 
     // Tables
@@ -86,7 +86,7 @@ async function main() {
       'ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE',
     ];
     for (const fk of fks) {
-      try { await client.query(fk); } catch (_) {}
+      try { await client.query(fk); } catch {}
     }
     console.log('FKs applied!');
 

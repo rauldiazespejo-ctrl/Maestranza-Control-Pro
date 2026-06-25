@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { GanttClient } from "@/components/gantt/GanttClient";
 import { getGanttTasks } from "@/lib/actions/gantt";
-import { prisma } from "@/lib/db";
+import { getProjects } from "@/lib/actions/projects";
+import { getWorkOrders } from "@/lib/actions/workorders";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
@@ -16,8 +17,8 @@ export default async function GanttPage({
   const params = await searchParams;
   const [tasks, projects, workOrders] = await Promise.all([
     getGanttTasks({ projectId: params.projectId, status: params.status }),
-    prisma.project.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    prisma.workOrder.findMany({ select: { id: true, code: true, title: true }, orderBy: { code: "asc" } }),
+    getProjects(),
+    getWorkOrders(),
   ]);
 
   return (

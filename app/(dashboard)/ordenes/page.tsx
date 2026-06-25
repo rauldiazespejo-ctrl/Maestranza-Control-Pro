@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import { OrdenesClient } from "@/components/ordenes/OrdenesClient";
 import { getWorkOrders } from "@/lib/actions/workorders";
-import { prisma } from "@/lib/db";
+import { getClients } from "@/lib/actions/clients";
+import { getWorkers } from "@/lib/actions/workers";
+import { getProjects } from "@/lib/actions/projects";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
@@ -20,9 +22,9 @@ export default async function OrdenesPage({
       status: params.status,
       priority: params.priority,
     }),
-    prisma.client.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    prisma.worker.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    prisma.project.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    getClients(),
+    getWorkers(),
+    getProjects(),
   ]);
 
   return (

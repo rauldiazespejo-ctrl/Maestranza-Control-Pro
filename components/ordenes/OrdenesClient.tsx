@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Search, Pencil, Trash2, Eye, X, Calendar, User, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -198,57 +200,57 @@ export function OrdenesClient({ orders, clients, workers, projects }: Props) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Código</label>
+              <Label className="mb-2 block">Código</Label>
               <Input {...register("code")} placeholder="OT-2026-001" />
               {errors.code && <p className="mt-1 text-xs text-fire-bright">{errors.code.message}</p>}
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Título</label>
+              <Label className="mb-2 block">Título</Label>
               <Input {...register("title")} placeholder="Título de la orden" />
               {errors.title && <p className="mt-1 text-xs text-fire-bright">{errors.title.message}</p>}
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-steel">Descripción</label>
-            <textarea {...register("description")} rows={3} className="w-full rounded-md border border-border-subtle bg-navy-dark px-3 py-2 text-sm text-white placeholder-steel/50 focus:border-fire focus:outline-none" />
+            <Label className="mb-2 block">Descripción</Label>
+            <Textarea {...register("description")} rows={3} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Estado</label>
+              <Label className="mb-2 block">Estado</Label>
               <Select {...register("status")}>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Prioridad</label>
+              <Label className="mb-2 block">Prioridad</Label>
               <Select {...register("priority")}>{Object.entries(priorityLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Cliente</label>
+              <Label className="mb-2 block">Cliente</Label>
               <Select {...register("clientId")}><option value="">Sin cliente</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Proyecto</label>
+              <Label className="mb-2 block">Proyecto</Label>
               <Select {...register("projectId")}><option value="">Sin proyecto</option>{projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Responsable</label>
+              <Label className="mb-2 block">Responsable</Label>
               <Select {...register("responsibleId")}><option value="">Sin responsable</option>{workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Avance (%)</label>
+              <Label className="mb-2 block">Avance (%)</Label>
               <Input type="number" {...register("progress")} min={0} max={100} />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-steel">Inicio</label><Input type="date" {...register("startDate")} /></div>
-            <div><label className="mb-1 block text-xs font-medium text-steel">Compromiso</label><Input type="date" {...register("dueDate")} /></div>
+            <div><Label className="mb-2 block">Inicio</Label><Input type="date" {...register("startDate")} /></div>
+            <div><Label className="mb-2 block">Compromiso</Label><Input type="date" {...register("dueDate")} /></div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-steel">Costo estimado</label><Input type="number" step="0.01" {...register("estimatedCost")} /></div>
-            <div><label className="mb-1 block text-xs font-medium text-steel">Costo real</label><Input type="number" step="0.01" {...register("actualCost")} /></div>
+            <div><Label className="mb-2 block">Costo estimado</Label><Input type="number" step="0.01" {...register("estimatedCost")} /></div>
+            <div><Label className="mb-2 block">Costo real</Label><Input type="number" step="0.01" {...register("actualCost")} /></div>
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="ghost" onClick={() => { setIsOpen(false); setEditing(null); }}>Cancelar</Button>
@@ -306,7 +308,7 @@ function OrderCard({
     <Card
       className={cn(
         "group cursor-pointer transition-all duration-200",
-        hovered && "border-[rgba(232,179,58,0.3)] shadow-[var(--shadow-industrial-lg)]"
+        hovered && "border-gold/30 shadow-[var(--shadow-industrial-lg)]"
       )}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

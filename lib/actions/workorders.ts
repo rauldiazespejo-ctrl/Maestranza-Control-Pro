@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { workOrderSchema, type WorkOrderFormData } from "@/lib/validations/workorder";
-import { auth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
@@ -15,10 +15,17 @@ export async function getWorkOrders(filters?: {
   clientId?: string;
   search?: string;
 }) {
+  const session = await requireAuth(READ_ROLES);
   const where: Record<string, unknown> = {};
+
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    where.clientId = session.user.clientId;
+  } else if (filters?.clientId) {
+    where.clientId = filters.clientId;
+  }
+
   if (filters?.status) where.status = filters.status;
   if (filters?.priority) where.priority = filters.priority;
-  if (filters?.clientId) where.clientId = filters.clientId;
   if (filters?.search) {
     where.OR = [
       { code: { contains: filters.search } },
@@ -34,8 +41,15 @@ export async function getWorkOrders(filters?: {
 }
 
 export async function getWorkOrderById(id: string) {
-  return prisma.workOrder.findUnique({
-    where: { id },
+  const session = await requireAuth(READ_ROLES);
+  const where: Record<string, unknown> = { id };
+  
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    where.clientId = session.user.clientId;
+  }
+
+  const workOrder = await prisma.workOrder.findFirst({
+    where,
     include: {
       client: true,
       responsible: true,
@@ -45,14 +59,13 @@ export async function getWorkOrderById(id: string) {
       documents: true,
     },
   });
+
+  if (!workOrder) throw new Error("Orden de trabajo no encontrada o sin acceso");
+  return workOrder;
 }
 
 export async function createWorkOrder(data: WorkOrderFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para crear órdenes de trabajo");
-  }
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workOrderSchema.parse(data);
   const order = await prisma.workOrder.create({
@@ -83,11 +96,7 @@ export async function createWorkOrder(data: WorkOrderFormData) {
 }
 
 export async function updateWorkOrder(id: string, data: WorkOrderFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para actualizar órdenes de trabajo");
-  }
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workOrderSchema.parse(data);
   const order = await prisma.workOrder.update({
@@ -119,23 +128,13 @@ export async function updateWorkOrder(id: string, data: WorkOrderFormData) {
 }
 
 export async function deleteWorkOrder(id: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
-    throw new Error("No tienes permisos para eliminar órdenes de trabajo");
-  }
-
+  await requireAuth(MANAGEABLE_ROLES);
   await prisma.workOrder.delete({ where: { id } });
   revalidatePath("/ordenes");
 }
 
 export async function updateWorkOrderStatus(id: string, status: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para cambiar el estado de órdenes");
-  }
-
+  await requireAuth(OPERATIONS_ROLES);
   const order = await prisma.workOrder.update({
     where: { id },
     data: { status: status as WorkOrderFormData["status"] },

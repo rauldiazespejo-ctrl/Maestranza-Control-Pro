@@ -3,16 +3,23 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { ganttTaskSchema, type GanttTaskFormData } from "@/lib/validations/gantt";
-import { auth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDate(value: string) {
   return new Date(value);
 }
 
 export async function getGanttTasks(filters?: { projectId?: string; status?: string }) {
+  const session = await requireAuth(READ_ROLES);
+
   const where: Record<string, unknown> = {};
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    where.project = { clientId: session.user.clientId };
+  }
+
   if (filters?.projectId) where.projectId = filters.projectId;
   if (filters?.status) where.status = filters.status;
+
   return prisma.ganttTask.findMany({
     where,
     include: { project: { include: { client: true } }, workOrder: true },
@@ -21,11 +28,8 @@ export async function getGanttTasks(filters?: { projectId?: string; status?: str
 }
 
 export async function createGanttTask(data: GanttTaskFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para crear tareas Gantt");
-  }
+  const session = await requireAuth(OPERATIONS_ROLES);
+  
   const parsed = ganttTaskSchema.parse(data);
   const task = await prisma.ganttTask.create({
     data: {
@@ -38,19 +42,18 @@ export async function createGanttTask(data: GanttTaskFormData) {
       dependencies: parsed.dependencies,
     },
   });
+
   await prisma.auditLog.create({
     data: { userId: session.user.id, action: "CREATE", entity: "GanttTask", entityId: task.id },
   });
+
   revalidatePath("/gantt");
   return task;
 }
 
 export async function updateGanttTask(id: string, data: GanttTaskFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para actualizar tareas Gantt");
-  }
+  const session = await requireAuth(OPERATIONS_ROLES);
+
   const parsed = ganttTaskSchema.parse(data);
   const task = await prisma.ganttTask.update({
     where: { id },
@@ -64,19 +67,17 @@ export async function updateGanttTask(id: string, data: GanttTaskFormData) {
       dependencies: parsed.dependencies,
     },
   });
+
   await prisma.auditLog.create({
     data: { userId: session.user.id, action: "UPDATE", entity: "GanttTask", entityId: task.id },
   });
+
   revalidatePath("/gantt");
   return task;
 }
 
 export async function deleteGanttTask(id: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
-    throw new Error("No tienes permisos para eliminar tareas Gantt");
-  }
+  await requireAuth(MANAGEABLE_ROLES);
   await prisma.ganttTask.delete({ where: { id } });
   revalidatePath("/gantt");
 }

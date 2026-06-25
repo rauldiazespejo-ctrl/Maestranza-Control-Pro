@@ -283,7 +283,7 @@ async function main() {
 
   // Usuarios demo
   console.log("Creando usuarios demo...");
-  const hashedPassword = await bcrypt.hash(DEMO_PASSWORD, 10);
+  const hashedPassword = await bcryptjs.hash(DEMO_PASSWORD, 10);
   const users = [
     { email: "gerencia@boilercomp.com", name: "Gerencia BOILER COMP", role: UserRole.ADMIN, companyId: boilerComp.id },
     { email: "admin@boilercomp.com", name: "Administrador Sistema", role: UserRole.ADMIN, companyId: boilerComp.id },

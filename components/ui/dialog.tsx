@@ -20,6 +20,8 @@ export function Dialog({ open, onClose, title, description, children, className 
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} />
       <div
+        role="dialog"
+        aria-modal="true"
         className={cn(
           "surface-glass relative z-10 w-full max-w-lg rounded-lg p-6",
           className

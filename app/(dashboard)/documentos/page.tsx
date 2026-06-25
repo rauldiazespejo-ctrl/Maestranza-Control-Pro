@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { DocumentosClient } from "@/components/documentos/DocumentosClient";
 import { getDocuments } from "@/lib/actions/documents";
-import { prisma } from "@/lib/db";
+import { getWorkOrders } from "@/lib/actions/workorders";
+import { getHseqRecords } from "@/lib/actions/hseq";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
@@ -22,14 +23,8 @@ export default async function DocumentosPage({
       workOrderId: params.workOrderId,
       hseqRecordId: params.hseqRecordId,
     }),
-    prisma.workOrder.findMany({
-      select: { id: true, code: true, title: true },
-      orderBy: { code: "asc" },
-    }),
-    prisma.hseqRecord.findMany({
-      select: { id: true, type: true, description: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    getWorkOrders(),
+    getHseqRecords(),
   ]);
 
   return (

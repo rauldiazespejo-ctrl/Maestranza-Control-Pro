@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { documentSchema, type DocumentFormData } from "@/lib/validations/document";
-import { auth } from "@/lib/auth";
+import { requireAuth, READ_ROLES, WRITE_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getDocuments(filters?: {
   workOrderId?: string;
@@ -11,7 +11,13 @@ export async function getDocuments(filters?: {
   type?: string;
   search?: string;
 }) {
+  const session = await requireAuth(READ_ROLES);
   const where: Record<string, unknown> = {};
+  
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    where.workOrder = { clientId: session.user.clientId };
+  }
+
   if (filters?.workOrderId) where.workOrderId = filters.workOrderId;
   if (filters?.hseqRecordId) where.hseqRecordId = filters.hseqRecordId;
   if (filters?.type) where.type = filters.type;
@@ -33,13 +39,25 @@ export async function getDocuments(filters?: {
 }
 
 export async function getDocumentsByWorkOrder(workOrderId: string) {
+  const session = await requireAuth(READ_ROLES);
+  const where: Record<string, unknown> = { workOrderId };
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    where.workOrder = { clientId: session.user.clientId };
+  }
+
   return prisma.document.findMany({
-    where: { workOrderId },
+    where,
     orderBy: { createdAt: "desc" },
   });
 }
 
 export async function getDocumentsByHseqRecord(hseqRecordId: string) {
+  const session = await requireAuth(READ_ROLES);
+  // Un cliente normalmente no tiene registros HSEQ, pero por si acaso.
+  if (session.user.role === "CLIENT") {
+    return []; // O lanzar error
+  }
+  
   return prisma.document.findMany({
     where: { hseqRecordId },
     orderBy: { createdAt: "desc" },
@@ -47,9 +65,7 @@ export async function getDocumentsByHseqRecord(hseqRecordId: string) {
 }
 
 export async function createDocument(data: DocumentFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
-
+  const session = await requireAuth(WRITE_ROLES);
   const parsed = documentSchema.parse(data);
 
   const document = await prisma.document.create({
@@ -84,8 +100,7 @@ export async function createDocument(data: DocumentFormData) {
 }
 
 export async function deleteDocument(id: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(MANAGEABLE_ROLES);
 
   const document = await prisma.document.findUnique({ where: { id } });
   if (!document) throw new Error("Documento no encontrado");

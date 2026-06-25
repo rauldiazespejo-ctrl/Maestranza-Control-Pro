@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { getWorkOrders } from "@/lib/actions/workorders";
 import { redirect } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,10 +12,7 @@ export default async function PortalDashboardPage() {
   const session = await auth();
   if (!session?.user?.clientId) redirect("/portal/login");
 
-  const orders = await prisma.workOrder.findMany({
-    where: { clientId: session.user.clientId },
-    orderBy: { createdAt: "desc" },
-  });
+  const orders = await getWorkOrders();
 
   const statusLabels: Record<string, string> = {
     nueva: "Nueva", planificada: "Planificada", en_proceso: "En proceso", detenida: "Detenida",

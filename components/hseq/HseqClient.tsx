@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Pencil, Trash2, AlertTriangle, Shield, ShieldCheck, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -90,8 +92,8 @@ function RecordCard({
       className={`
         group relative rounded-lg border p-4 transition-all duration-200 cursor-pointer
         ${isVencido
-          ? "border-[rgba(149,10,16,0.42)] bg-[rgba(149,10,16,0.08)] shadow-[0_0_16px_rgba(149,10,16,0.35)] animate-critical-pulse"
-          : "border-border-subtle bg-navy-primary/40 hover:border-[rgba(232,179,58,0.25)] hover:bg-navy-primary/60 hover:shadow-[var(--shadow-industrial-sm)]"
+          ? "border-fire/40 bg-fire/10 shadow-[0_0_16px_var(--color-fire-muted)] animate-critical-pulse"
+          : "border-border-subtle bg-navy-primary/40 hover:border-gold/25 hover:bg-navy-primary/60 hover:shadow-industrial-sm"
         }
       `}
       onMouseEnter={() => setHovered(true)}
@@ -335,40 +337,40 @@ export function HseqClient({ records, workers }: Props) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Tipo</label>
+              <Label className="mb-2 block">Tipo</Label>
               <Select {...register("type")}>{Object.entries(typeLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Norma</label>
+              <Label className="mb-2 block">Norma</Label>
               <Select {...register("norm")}>{Object.entries(normLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-steel">Descripción</label>
-            <textarea {...register("description")} rows={3} className="w-full rounded-md border border-border-subtle bg-navy-dark px-3 py-2 text-sm text-white placeholder-steel/50 focus:border-fire focus:outline-none" />
+            <Label className="mb-2 block">Descripción</Label>
+            <Textarea {...register("description")} rows={3} />
             {errors.description && <p className="mt-1 text-xs text-fire-bright">{errors.description.message}</p>}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Responsable</label>
+              <Label className="mb-2 block">Responsable</Label>
               <Select {...register("responsibleId")}><option value="">Sin responsable</option>{workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">Estado</label>
+              <Label className="mb-2 block">Estado</Label>
               <Select {...register("status")}>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-steel">Fecha</label><Input type="date" {...register("date")} /></div>
-            <div><label className="mb-1 block text-xs font-medium text-steel">Vencimiento</label><Input type="date" {...register("dueDate")} /></div>
+            <div><Label className="mb-2 block">Fecha</Label><Input type="date" {...register("date")} /></div>
+            <div><Label className="mb-2 block">Vencimiento</Label><Input type="date" {...register("dueDate")} /></div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-steel">Evidencia documental</label>
+            <Label className="mb-2 block">Evidencia documental</Label>
             <Input {...register("evidenceDocumental")} placeholder="URL o referencia de documento" />
           </div>
           <div className="flex items-center gap-2">
             <input type="checkbox" {...register("signatureRequired")} id="signatureRequired" className="h-4 w-4 rounded border-border-subtle bg-navy-dark text-fire" />
-            <label htmlFor="signatureRequired" className="text-sm text-steel">Firma requerida</label>
+            <Label htmlFor="signatureRequired">Firma requerida</Label>
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="ghost" onClick={() => { setIsOpen(false); setEditing(null); }}>Cancelar</Button>

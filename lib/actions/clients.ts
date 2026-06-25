@@ -3,10 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { clientSchema, type ClientFormData } from "@/lib/validations/client";
-import { auth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getClients(search?: string) {
+  const session = await requireAuth(READ_ROLES);
   const where: Record<string, unknown> = {};
+  
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    where.id = session.user.clientId;
+  }
+
   if (search) {
     where.OR = [
       { name: { contains: search } },
@@ -18,6 +24,11 @@ export async function getClients(search?: string) {
 }
 
 export async function getClientById(id: string) {
+  const session = await requireAuth(READ_ROLES);
+  if (session.user.role === "CLIENT" && session.user.clientId !== id) {
+    throw new Error("No tienes permisos para ver este cliente");
+  }
+
   return prisma.client.findUnique({
     where: { id },
     include: {
@@ -29,11 +40,7 @@ export async function getClientById(id: string) {
 }
 
 export async function createClient(data: ClientFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para crear clientes");
-  }
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = clientSchema.parse(data);
   const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
@@ -54,11 +61,7 @@ export async function createClient(data: ClientFormData) {
 }
 
 export async function updateClient(id: string, data: ClientFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!OPERATIONS_ROLES.includes(session.user.role as typeof OPERATIONS_ROLES[number])) {
-    throw new Error("No tienes permisos para actualizar clientes");
-  }
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = clientSchema.parse(data);
   const client = await prisma.client.update({
@@ -75,11 +78,7 @@ export async function updateClient(id: string, data: ClientFormData) {
 }
 
 export async function deleteClient(id: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autenticado");
-  if (!MANAGEABLE_ROLES.includes(session.user.role as typeof MANAGEABLE_ROLES[number])) {
-    throw new Error("No tienes permisos para eliminar clientes");
-  }
+  await requireAuth(MANAGEABLE_ROLES);
   await prisma.client.delete({ where: { id } });
   revalidatePath("/clientes");
 }

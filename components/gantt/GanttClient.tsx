@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -640,7 +642,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-steel">Nombre</label>
+            <Label className="mb-2 block">Nombre</Label>
             <Input {...register("name")} />
             {errors.name && (
               <p className="mt-1 text-xs text-fire-bright">{errors.name.message}</p>
@@ -648,9 +650,9 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Proyecto
-              </label>
+              </Label>
               <Select {...register("projectId")}>
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -660,9 +662,9 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
               </Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Orden de trabajo
-              </label>
+              </Label>
               <Select {...register("workOrderId")}>
                 <option value="">Ninguna</option>
                 {workOrders.map((o) => (
@@ -675,23 +677,23 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Inicio
-              </label>
+              </Label>
               <Input type="date" {...register("startDate")} />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Término
-              </label>
+              </Label>
               <Input type="date" {...register("endDate")} />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Estado
-              </label>
+              </Label>
               <Select {...register("status")}>
                 {Object.entries(statusLabels).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -701,9 +703,9 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
               </Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Avance (%)
-              </label>
+              </Label>
               <Input
                 type="number"
                 {...register("progress")}
@@ -714,15 +716,15 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Responsable
-              </label>
+              </Label>
               <Input {...register("responsible")} />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-steel">
+              <Label className="mb-2 block">
                 Dependencias
-              </label>
+              </Label>
               <Input
                 {...register("dependencies")}
                 placeholder="IDs separados por coma"

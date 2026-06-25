@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireAuth, ADMIN_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getUsers() {
+  await requireAuth(MANAGEABLE_ROLES); // Only admins can see users list usually
   return prisma.user.findMany({
     select: { id: true, email: true, name: true, role: true, active: true, clientId: true, companyId: true },
     orderBy: { createdAt: "desc" },
@@ -19,8 +20,7 @@ export async function createUser(data: {
   role: string;
   clientId?: string;
 }) {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") throw new Error("No autorizado");
+  await requireAuth(ADMIN_ROLES);
 
   const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
   const user = await prisma.user.create({
@@ -28,7 +28,7 @@ export async function createUser(data: {
       email: data.email,
       name: data.name,
       password: await bcrypt.hash(data.password, 10),
-      role: data.role as Parameters<typeof prisma.user.create>[0]["data"]["role"],
+      role: data.role as import("@prisma/client").UserRole,
       clientId: data.clientId || null,
       companyId: company?.id,
     },
@@ -39,8 +39,7 @@ export async function createUser(data: {
 }
 
 export async function toggleUserActive(id: string, active: boolean) {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") throw new Error("No autorizado");
+  await requireAuth(ADMIN_ROLES);
   await prisma.user.update({ where: { id }, data: { active } });
   revalidatePath("/configuracion");
 }

@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { getDashboardStats } from "@/lib/actions/dashboard";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -21,13 +22,6 @@ import {
 import type { WorkOrderStatus, HseqStatus } from "@prisma/client";
 
 const CLOSED_STATUSES: WorkOrderStatus[] = ["completada", "cerrada"];
-const ACTIVE_STATUSES: WorkOrderStatus[] = [
-  "nueva",
-  "planificada",
-  "en_proceso",
-  "detenida",
-  "revision",
-];
 
 const STATUS_LABELS: Record<WorkOrderStatus, string> = {
   nueva: "Nueva",
@@ -107,92 +101,18 @@ export default async function DashboardPage() {
   const now = new Date();
   const userName = session.user.name?.split(" ")[0] ?? "Usuario";
 
-  const [
+  const {
     activeOrdersCount,
     delayedOrdersCount,
     completedOrdersCount,
     avgProgressResult,
-    // ── LEFT column: órdenes en proceso
-    processOrders,
-    // ── RIGHT column: próximos vencimientos HSEQ
+    ordersInProcess: processOrders,
     hseqVencimientos,
-    // ── HSEQ alerts count
     hseqAlertsCount,
-    // ── Bottom row: Gantt items (ordenes con fechas)
     ganttOrders,
-    // ── Bottom row: Alerts summary
     hseqAlerts,
-    // ── Bottom row: Recent activity
     recentActivity,
-  ] = await Promise.all([
-    // KPI counts
-    prisma.workOrder.count({ where: { status: { in: ACTIVE_STATUSES } } }),
-    prisma.workOrder.count({
-      where: { status: { in: ACTIVE_STATUSES }, dueDate: { lt: now } },
-    }),
-    prisma.workOrder.count({ where: { status: "completada" } }),
-    prisma.workOrder.aggregate({ _avg: { progress: true } }),
-    // Orders in process (active + sorting by due date)
-    prisma.workOrder.findMany({
-      where: { status: { in: ACTIVE_STATUSES } },
-      include: { client: true, project: true, responsible: true },
-      orderBy: [{ status: "asc" }, { dueDate: "asc" }],
-      take: 12,
-    }),
-    // HSEQ vencimientos (abiertos + vencidos)
-    prisma.hseqRecord.findMany({
-      where: {
-        OR: [
-          { status: { in: ["abierto", "vencido"] } },
-          { dueDate: { lt: now } },
-        ],
-      },
-      include: { responsible: true },
-      orderBy: [{ dueDate: "asc" }, { updatedAt: "desc" }],
-      take: 10,
-    }),
-    // Count of HSEQ alerts
-    prisma.hseqRecord.count({
-      where: { OR: [{ status: { in: ["abierto", "vencido"] } }, { dueDate: { lt: now } }] },
-    }),
-    // Gantt: orders with start/due dates
-    prisma.workOrder.findMany({
-      where: {
-        status: { in: ACTIVE_STATUSES },
-        OR: [{ startDate: { not: null } }, { dueDate: { not: null } }],
-      },
-      select: {
-        id: true,
-        code: true,
-        title: true,
-        startDate: true,
-        dueDate: true,
-        progress: true,
-        status: true,
-        priority: true,
-      },
-      orderBy: { dueDate: "asc" },
-      take: 20,
-    }),
-    // Alerts for bottom panel
-    prisma.hseqRecord.findMany({
-      where: {
-        OR: [
-          { status: { in: ["abierto", "vencido"] } },
-          { dueDate: { lt: now } },
-        ],
-      },
-      include: { responsible: true },
-      orderBy: [{ dueDate: "asc" }, { updatedAt: "desc" }],
-      take: 5,
-    }),
-    // Recent activity
-    prisma.workOrder.findMany({
-      include: { client: true },
-      orderBy: { updatedAt: "desc" },
-      take: 8,
-    }),
-  ]);
+  } = await getDashboardStats();
 
   const avgProgress = Math.round(avgProgressResult._avg.progress ?? 0);
 

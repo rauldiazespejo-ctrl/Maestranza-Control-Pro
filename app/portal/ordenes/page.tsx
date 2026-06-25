@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getWorkOrders } from "@/lib/actions/workorders";
 
 export const metadata = {
   title: "Portal Cliente · Mis órdenes",
@@ -12,11 +12,7 @@ export default async function PortalOrdenesPage() {
   const session = await auth();
   if (!session?.user?.clientId) redirect("/portal/login");
 
-  const orders = await prisma.workOrder.findMany({
-    where: { clientId: session.user.clientId },
-    include: { responsible: true, tasks: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const orders = await getWorkOrders();
 
   const statusLabels: Record<string, string> = {
     nueva: "Nueva", planificada: "Planificada", en_proceso: "En proceso", detenida: "Detenida",

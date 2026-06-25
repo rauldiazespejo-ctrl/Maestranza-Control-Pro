@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireAuth, READ_ROLES, OPERATIONS_ROLES } from "@/lib/auth";
 import {
   workerAssignmentSchema,
   workerAssignmentHoursSchema,
@@ -19,6 +19,15 @@ function toNumberOptional(value?: string) {
 }
 
 export async function getWorkerAssignmentsByWorkOrder(workOrderId: string) {
+  const session = await requireAuth(READ_ROLES);
+  
+  if (session.user.role === "CLIENT" && session.user.clientId) {
+    const wo = await prisma.workOrder.findUnique({ where: { id: workOrderId } });
+    if (wo?.clientId !== session.user.clientId) {
+      throw new Error("No tienes permisos para ver las asignaciones de esta orden");
+    }
+  }
+
   return prisma.workerAssignment.findMany({
     where: { workOrderId },
     include: { worker: true },
@@ -27,6 +36,7 @@ export async function getWorkerAssignmentsByWorkOrder(workOrderId: string) {
 }
 
 export async function getActiveWorkersForAssignment() {
+  await requireAuth(READ_ROLES);
   return prisma.worker.findMany({
     where: { status: "activo" },
     select: { id: true, name: true, position: true, specialty: true },
@@ -35,8 +45,7 @@ export async function getActiveWorkersForAssignment() {
 }
 
 export async function assignWorkerToOrder(data: WorkerAssignmentFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workerAssignmentSchema.parse(data);
 
@@ -85,8 +94,7 @@ export async function assignWorkerToOrder(data: WorkerAssignmentFormData) {
 }
 
 export async function removeWorkerAssignment(id: string, workOrderId: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   await prisma.workerAssignment.delete({ where: { id } });
 
@@ -105,8 +113,7 @@ export async function removeWorkerAssignment(id: string, workOrderId: string) {
 }
 
 export async function updateAssignmentHours(id: string, data: WorkerAssignmentHoursFormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workerAssignmentHoursSchema.parse(data);
 

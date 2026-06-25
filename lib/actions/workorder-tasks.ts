@@ -6,7 +6,7 @@ import {
   workOrderTaskSchema,
   type WorkOrderTaskFormData,
 } from "@/lib/validations/workorder-task";
-import { auth } from "@/lib/auth";
+import { requireAuth, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
@@ -35,8 +35,7 @@ export async function createWorkOrderTask(
   workOrderId: string,
   data: WorkOrderTaskFormData
 ) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workOrderTaskSchema.parse(data);
 
@@ -71,8 +70,7 @@ export async function updateWorkOrderTask(
   id: string,
   data: WorkOrderTaskFormData
 ) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workOrderTaskSchema.parse(data);
 
@@ -107,8 +105,7 @@ export async function updateWorkOrderTask(
 }
 
 export async function deleteWorkOrderTask(id: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(MANAGEABLE_ROLES);
 
   const task = await prisma.workOrderTask.findUnique({ where: { id } });
   if (!task) throw new Error("Tarea no encontrada");
@@ -130,8 +127,7 @@ export async function deleteWorkOrderTask(id: string) {
 }
 
 export async function toggleWorkOrderTask(id: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("No autorizado");
+  const session = await requireAuth(OPERATIONS_ROLES);
 
   const task = await prisma.workOrderTask.findUnique({ where: { id } });
   if (!task) throw new Error("Tarea no encontrada");

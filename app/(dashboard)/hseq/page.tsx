@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { HseqClient } from "@/components/hseq/HseqClient";
 import { getHseqRecords } from "@/lib/actions/hseq";
-import { prisma } from "@/lib/db";
+import { getWorkers } from "@/lib/actions/workers";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
@@ -16,7 +16,7 @@ export default async function HseqPage({
   const params = await searchParams;
   const [records, workers] = await Promise.all([
     getHseqRecords({ type: params.type, norm: params.norm, status: params.status }),
-    prisma.worker.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    getWorkers(),
   ]);
 
   return (

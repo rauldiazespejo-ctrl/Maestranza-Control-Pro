@@ -8,6 +8,7 @@ import type { UserRole } from "@prisma/client";
 // ── RBAC roles ──────────────────────────────────────────────────────
 export type Role = UserRole;
 
+export const ADMIN_ROLES:       Role[] = ["ADMIN"];
 export const MANAGEABLE_ROLES:  Role[] = ["ADMIN"];
 export const HSEQ_ROLES:        Role[] = ["ADMIN", "HSEQ_MANAGER"];
 export const OPERATIONS_ROLES:  Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"];
