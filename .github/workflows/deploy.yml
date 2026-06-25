@@ -5,9 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
 jobs:
-  deploy:
-    runs-on: ubuntu-24.04
+  # ── Quality gate: typecheck + lint ──────────────────────────────────
+  quality:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,21 +25,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create .env
-        run: |
-          cat > .env << 'ENVEOF'
-DATABASE_URL="postgresql://neondb_owner:npg_Uw18kNsfFSMV@ep-gentle-river-atrldetf.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"
-NEXTAUTH_URL="https://maestranza-control-pro.vercel.app"
-NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}"
-ENVEOF
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: ESLint
+        run: npm run lint
+
+  # ── Deploy: solo si quality pasa ────────────────────────────────────
+  deploy:
+    runs-on: ubuntu-latest
+    needs: quality
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx vercel --prod --token "$VERCEL_TOKEN" --yes
