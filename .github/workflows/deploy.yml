@@ -7,8 +7,15 @@ on:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
+      - name: Debug info
+        run: |
+          echo "=== Node version ===" && node --version
+          echo "=== npm version ===" && npm --version
+          echo "=== Checkout ===" && ls -la
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -28,14 +35,10 @@ jobs:
         run: npm run lint --max-warnings 0
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: quality
+    timeout-minutes: 20
     environment: production
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,4 +56,8 @@ jobs:
         run: npx prisma generate
 
       - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: npx vercel --prod --token "$VERCEL_TOKEN" --yes
