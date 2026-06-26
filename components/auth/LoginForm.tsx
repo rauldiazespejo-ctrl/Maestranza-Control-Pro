@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
+import { AlertCircle, IdCard, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,6 @@ export function LoginForm() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Formateador simple de RUT (opcional, remueve puntos y guiones para mandar al backend, o lo deja igual)
   const formatRut = (value: string) => {
     let raw = value.replace(/[^0-9kK]/g, "");
     if (raw.length > 1) {
@@ -75,7 +74,7 @@ export function LoginForm() {
           RUT
         </label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
+          <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
           <Input
             id="rut"
             name="rut"
@@ -94,7 +93,7 @@ export function LoginForm() {
           <label htmlFor="password" className="text-sm font-medium text-steel">
             Contraseña
           </label>
-          <span className="text-xs text-steel/60 italic">Solo para Administradores</span>
+          <span className="text-xs text-steel/60 italic">Requerida</span>
         </div>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
@@ -103,6 +102,7 @@ export function LoginForm() {
             name="password"
             type="password"
             autoComplete="current-password"
+            required
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

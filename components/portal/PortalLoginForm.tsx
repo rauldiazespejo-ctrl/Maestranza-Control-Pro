@@ -10,8 +10,8 @@ import { BrandLockup } from "@/components/brand/BrandLockup";
 
 export function PortalLoginForm() {
   const router = useRouter();
-  const [rut, setRut] = React.useState("55.555.555-5");
-  const [password, setPassword] = React.useState("demo1234");
+  const [rut, setRut] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
@@ -71,8 +71,8 @@ export function PortalLoginForm() {
             <Input type="text" value={rut} onChange={handleRutChange} required placeholder="55.555.555-5" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-steel">Contraseña <span className="text-steel/60 italic">(opcional)</span></label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <label className="mb-1 block text-xs font-medium text-steel">Contraseña</label>
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>{loading ? "Ingresando..." : "Ingresar"}</Button>
         </form>

@@ -31,8 +31,12 @@ export async function requireAuth(requiredRoles: Role[] = READ_ROLES) {
 
 const credentialsSchema = z.object({
   rut: z.string().min(1, "RUT es requerido"),
-  password: z.string().optional(),
+  password: z.string().min(1, "Contraseña es requerida"),
 });
+
+function normalizeRut(value: string) {
+  return value.replace(/[^0-9kK]/g, "").toUpperCase();
+}
 
 export const {
   handlers: { GET, POST },
@@ -52,18 +56,16 @@ export const {
         if (!parsed.success) return null;
 
         const { rut, password } = parsed.data;
-        const user = await prisma.user.findUnique({
-          where: { rut },
+        const normalizedRut = normalizeRut(rut);
+        const users = await prisma.user.findMany({
+          where: { rut: { not: null } },
           include: { client: true, company: true },
         });
+        const user = users.find((candidate) => normalizeRut(candidate.rut ?? "") === normalizedRut);
         if (!user || !user.active) return null;
 
-        // Si es ADMIN, exigir contraseña obligatoria
-        if (user.role === "ADMIN") {
-          if (!password) return null;
-          const valid = await bcrypt.compare(password, user.password);
-          if (!valid) return null;
-        }
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) return null;
 
         return {
           id: user.id,
