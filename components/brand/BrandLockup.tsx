@@ -35,7 +35,7 @@ export function BrandLockup({
           )}
         >
           <Image
-            src="/brand/boiler-logo-white.png"
+            src="/brand/boiler-logo-white.svg"
             alt="BOILER COMP S.A."
             fill
             className="object-contain p-1.5"
@@ -51,7 +51,7 @@ export function BrandLockup({
           )}
         >
           <Image
-            src="/brand/soldesp-logo-white.png"
+            src="/brand/soldesp-logo-white.svg"
             alt="SOLDESP S.A."
             fill
             className="object-contain p-1.5"
