@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { clientSchema, type ClientFormData } from "@/lib/validations/client";
+import { normalizeRut } from "@/lib/validations/rut";
 import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getClients(search?: string) {
@@ -47,6 +48,7 @@ export async function createClient(data: ClientFormData) {
   const client = await prisma.client.create({
     data: {
       ...parsed,
+      rut: parsed.rut ? normalizeRut(parsed.rut) : null,
       companyId: company?.id ?? "",
       paymentTerm: parsed.paymentTerm ? Number(parsed.paymentTerm) : null,
     },
@@ -66,7 +68,11 @@ export async function updateClient(id: string, data: ClientFormData) {
   const parsed = clientSchema.parse(data);
   const client = await prisma.client.update({
     where: { id },
-    data: { ...parsed, paymentTerm: parsed.paymentTerm ? Number(parsed.paymentTerm) : null },
+    data: {
+      ...parsed,
+      rut: parsed.rut ? normalizeRut(parsed.rut) : null,
+      paymentTerm: parsed.paymentTerm ? Number(parsed.paymentTerm) : null,
+    },
   });
 
   await prisma.auditLog.create({

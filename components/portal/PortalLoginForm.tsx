@@ -21,8 +21,9 @@ export function PortalLoginForm() {
       raw = raw.slice(0, -1) + "-" + raw.slice(-1);
     }
     const parts = raw.split('-');
-    if (parts[0].length > 3) {
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const body = parts[0] ?? "";
+    if (body.length > 3) {
+      parts[0] = body.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
     return parts.join('-');
   };

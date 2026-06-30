@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,19 +14,22 @@ export interface ButtonProps extends React.ComponentProps<"button"> {
   size?: "default" | "sm" | "lg" | "icon";
   /** Show a gold spinning loader and disable interactions */
   loading?: boolean;
+  /** Render as child element (e.g. Link) instead of a button */
+  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant = "default", size = "default", loading, children, disabled, ...props },
+    { className, variant = "default", size = "default", loading, asChild = false, children, disabled, ...props },
     ref
   ) => {
     const isDisabled = disabled || loading;
+    const Comp = asChild ? Slot : "button";
 
     return (
-      <button
+      <Comp
         ref={ref}
-        disabled={isDisabled}
+        disabled={asChild ? undefined : isDisabled}
         aria-disabled={isDisabled}
         aria-busy={loading}
         className={cn(
@@ -70,7 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           children
         )}
-      </button>
+      </Comp>
     );
   }
 );

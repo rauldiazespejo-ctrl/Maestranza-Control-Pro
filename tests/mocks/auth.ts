@@ -1,5 +1,12 @@
 import { vi } from 'vitest';
 import type { UserRole } from '@prisma/client';
+import { auth } from '@/lib/auth';
+
+/**
+ * Cast tipado: auth es NextMiddleware pero en server components
+ * se invoca como () => Promise<Session | null>.
+ */
+const authGetter = vi.mocked(auth as unknown as () => Promise<unknown>);
 
 // ── Session Mock Factory ──────────────────────────────────────────
 
@@ -61,9 +68,8 @@ export const viewerSession = createMockSession('VIEWER');
  * Uso: antes del test, llama `mockAuthLoggedIn('ADMIN')`
  */
 export function mockAuthLoggedIn(role: UserRole = 'ADMIN') {
-  const { auth } = require('@/lib/auth');
   const session = createMockSession(role);
-  vi.mocked(auth).mockResolvedValue(session);
+  authGetter.mockResolvedValue(session);
   return session;
 }
 
@@ -71,8 +77,7 @@ export function mockAuthLoggedIn(role: UserRole = 'ADMIN') {
  * Configura el mock de auth para simular usuario no logueado.
  */
 export function mockAuthLoggedOut() {
-  const { auth } = require('@/lib/auth');
-  vi.mocked(auth).mockResolvedValue(null);
+  authGetter.mockResolvedValue(null);
 }
 
 /**

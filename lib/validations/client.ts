@@ -1,9 +1,15 @@
 import { z } from "zod";
-import { rutOptionalSchema } from "./rut";
+import { validateRut } from "./rut";
 
 export const clientSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
-  rut: rutOptionalSchema,
+  rut: z.string().refine(
+    (val) => {
+      if (!val || val.trim() === "") return true;
+      return validateRut(val);
+    },
+    { message: "El RUT ingresado no es válido" }
+  ),
   industry: z.string().optional(),
   address: z.string().optional(),
   phone: z.string().optional(),

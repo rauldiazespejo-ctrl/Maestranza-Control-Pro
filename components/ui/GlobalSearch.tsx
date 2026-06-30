@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ClipboardList, HardHat, Users, FileText } from "lucide-react";
+import { Search, X, ClipboardList, HardHat, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { globalSearch } from "@/lib/actions/search";
@@ -21,6 +21,13 @@ export function GlobalSearch() {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
+  /** Cierra el buscador y limpia el estado */
+  const closeSearch = React.useCallback(() => {
+    setOpen(false);
+    setQuery("");
+    setResults(null);
+  }, []);
+
   // Shortcut Ctrl+K para abrir/cerrar busqueda
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -29,42 +36,42 @@ export function GlobalSearch() {
         setOpen((prev) => !prev);
       }
       if (e.key === "Escape") {
-        setOpen(false);
+        closeSearch();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [closeSearch]);
 
   // Focar input al abrir
   React.useEffect(() => {
     if (open) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    } else {
-      setQuery("");
-      setResults(null);
+      const timer = setTimeout(() => inputRef.current?.focus(), 100);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 
   // Cerrar al hacer click fuera
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        closeSearch();
       }
     };
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [open]);
+  }, [open, closeSearch]);
 
-  // Debounced search
+  // Debounced search — solo dispara si el query tiene 2+ caracteres
   React.useEffect(() => {
-    if (query.trim().length < 2) {
-      setResults(null);
-      return;
-    }
+    if (query.trim().length < 2) return;
+
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
@@ -80,11 +87,12 @@ export function GlobalSearch() {
   }, [query]);
 
   const handleNavigate = (path: string) => {
-    setOpen(false);
+    closeSearch();
     router.push(path);
   };
 
   const hasResults =
+    query.trim().length >= 2 &&
     results &&
     (results.workOrders.length > 0 ||
       results.workers.length > 0 ||
@@ -126,7 +134,10 @@ export function GlobalSearch() {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 shrink-0"
-                  onClick={() => { setQuery(""); setResults(null); }}
+                  onClick={() => {
+                    setQuery("");
+                    setResults(null);
+                  }}
                 >
                   <X className="h-3 w-3" />
                 </Button>
@@ -153,7 +164,7 @@ export function GlobalSearch() {
                 </div>
               )}
 
-              {results && results.workOrders.length > 0 && (
+              {results && results.workOrders.length > 0 && hasResults && (
                 <div className="border-b border-border-subtle">
                   <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase text-steel">
                     <ClipboardList className="h-3 w-3" />
@@ -165,15 +176,19 @@ export function GlobalSearch() {
                       onClick={() => handleNavigate(`/ordenes/${o.id}`)}
                       className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-white transition-colors hover:bg-navy-light/50"
                     >
-                      <span className="font-mono text-xs text-gold">{o.code}</span>
+                      <span className="font-mono text-xs text-gold">
+                        {o.code}
+                      </span>
                       <span className="truncate">{o.title}</span>
-                      <span className="ml-auto shrink-0 text-[10px] text-steel">{o.status}</span>
+                      <span className="ml-auto shrink-0 text-[10px] text-steel">
+                        {o.status}
+                      </span>
                     </button>
                   ))}
                 </div>
               )}
 
-              {results && results.workers.length > 0 && (
+              {results && results.workers.length > 0 && hasResults && (
                 <div className="border-b border-border-subtle">
                   <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase text-steel">
                     <HardHat className="h-3 w-3" />
@@ -182,17 +197,23 @@ export function GlobalSearch() {
                   {results.workers.map((w) => (
                     <button
                       key={w.id}
-                      onClick={() => handleNavigate(`/trabajadores?search=${encodeURIComponent(w.name)}`)}
+                      onClick={() =>
+                        handleNavigate(
+                          `/trabajadores?search=${encodeURIComponent(w.name)}`,
+                        )
+                      }
                       className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-white transition-colors hover:bg-navy-light/50"
                     >
                       <span className="truncate">{w.name}</span>
-                      <span className="ml-auto shrink-0 text-[10px] text-steel">{w.position}</span>
+                      <span className="ml-auto shrink-0 text-[10px] text-steel">
+                        {w.position}
+                      </span>
                     </button>
                   ))}
                 </div>
               )}
 
-              {results && results.clients.length > 0 && (
+              {results && results.clients.length > 0 && hasResults && (
                 <div>
                   <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase text-steel">
                     <Users className="h-3 w-3" />
@@ -201,12 +222,18 @@ export function GlobalSearch() {
                   {results.clients.map((c) => (
                     <button
                       key={c.id}
-                      onClick={() => handleNavigate(`/clientes?search=${encodeURIComponent(c.name)}`)}
+                      onClick={() =>
+                        handleNavigate(
+                          `/clientes?search=${encodeURIComponent(c.name)}`,
+                        )
+                      }
                       className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-white transition-colors hover:bg-navy-light/50"
                     >
                       <span className="truncate">{c.name}</span>
                       {c.industry && (
-                        <span className="ml-auto shrink-0 text-[10px] text-steel">{c.industry}</span>
+                        <span className="ml-auto shrink-0 text-[10px] text-steel">
+                          {c.industry}
+                        </span>
                       )}
                     </button>
                   ))}
@@ -216,7 +243,12 @@ export function GlobalSearch() {
 
             {/* Footer */}
             <div className="flex items-center justify-between border-t border-border-subtle px-3 py-1.5 text-[10px] text-steel">
-              <span>{(results?.workOrders.length ?? 0) + (results?.workers.length ?? 0) + (results?.clients.length ?? 0)} resultados</span>
+              <span>
+                {(results?.workOrders.length ?? 0) +
+                  (results?.workers.length ?? 0) +
+                  (results?.clients.length ?? 0)}{" "}
+                resultados
+              </span>
               <span>ESC para cerrar</span>
             </div>
           </div>

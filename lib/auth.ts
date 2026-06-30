@@ -70,7 +70,8 @@ async function getClientIp(): Promise<string> {
   const headersList = await headers();
   const forwarded = headersList.get("x-forwarded-for");
   if (forwarded) {
-    return forwarded.split(",")[0].trim();
+    const firstIp = forwarded.split(",")[0];
+    return firstIp ? firstIp.trim() : "unknown";
   }
   const realIp = headersList.get("x-real-ip");
   if (realIp) return realIp;
@@ -79,7 +80,7 @@ async function getClientIp(): Promise<string> {
 
 const credentialsSchema = z.object({
   rut: z.string().min(1, "RUT es requerido"),
-  password: z.string().optional(),
+  password: z.string().min(1, "Contraseña es requerida"),
 });
 
 export const {
@@ -124,17 +125,15 @@ export const {
           return null;
         }
 
-        // Si es ADMIN, exigir contraseña obligatoria
-        if (user.role === "ADMIN") {
-          if (!password) {
-            recordFailedAttempt(clientIp);
-            return null;
-          }
-          const valid = await bcrypt.compare(password, user.password);
-          if (!valid) {
-            recordFailedAttempt(clientIp);
-            return null;
-          }
+        // ── Contraseña obligatoria para todos los roles ────────────
+        if (!password) {
+          recordFailedAttempt(clientIp);
+          return null;
+        }
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) {
+          recordFailedAttempt(clientIp);
+          return null;
         }
 
         // Login exitoso: resetear rate limiting

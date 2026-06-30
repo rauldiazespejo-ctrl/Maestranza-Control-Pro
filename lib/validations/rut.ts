@@ -28,7 +28,9 @@ export function calculateDv(rutNumber: string): string {
 
   // Recorremos de derecha a izquierda
   for (let i = rutNumber.length - 1; i >= 0; i--) {
-    sum += parseInt(rutNumber[i], 10) * multiplier;
+    const digit = rutNumber[i];
+    if (digit === undefined) continue;
+    sum += parseInt(digit, 10) * multiplier;
     multiplier = multiplier === 7 ? 2 : multiplier + 1;
   }
 
