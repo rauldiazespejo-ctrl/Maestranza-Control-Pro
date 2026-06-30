@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Montserrat } from "next/font/google";
+import { Toaster } from "@/components/ui/Toaster";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -41,7 +42,10 @@ export default function RootLayout({
       lang="es"
       className={`${poppins.variable} ${montserrat.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-navy-dark text-white">{children}</body>
+      <body className="min-h-full bg-navy-dark text-white">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
