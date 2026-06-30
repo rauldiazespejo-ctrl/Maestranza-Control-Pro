@@ -4,6 +4,13 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import * as pg from "pg";
 import bcryptjs from "bcryptjs";
 
+// ── Proteccion: seed solo en desarrollo ─────────────────────────────
+if (process.env.NODE_ENV === "production") {
+  console.error("ERROR: El seed no puede ejecutarse en produccion.");
+  console.error("Solo esta permitido en entornos de desarrollo (NODE_ENV=development).");
+  process.exit(1);
+}
+
 const databaseUrl = process.env.DATABASE_URL ?? "";
 
 function createPrisma() {
