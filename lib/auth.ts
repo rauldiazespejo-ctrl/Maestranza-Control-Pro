@@ -152,17 +152,6 @@ export const {
     }),
   ],
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
-  cookies: {
-    sessionToken: {
-      name: "__Secure-authjs.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: true,
-      },
-    },
-  },
   pages: {
     signIn: "/login",
   },
