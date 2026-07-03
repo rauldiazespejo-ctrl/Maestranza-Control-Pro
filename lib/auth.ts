@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from "@/lib/rate-limit";
 import { validateRut, normalizeRut } from "@/lib/validations/rut";
 import { headers } from "next/headers";
+import authConfig from "@/auth.config";
 
 // ── RBAC roles ──────────────────────────────────────────────────────
 export type Role = UserRole;
@@ -120,6 +121,7 @@ export const {
 } = NextAuth({
   trustHost: process.env.NODE_ENV === "development",
   secret: authSecret,
+  ...authConfig,
   providers: [
     Credentials({
       name: "credentials",
@@ -192,28 +194,4 @@ export const {
       },
     }),
   ],
-  session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
-  pages: {
-    signIn: "/login",
-  },
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.clientId = user.clientId;
-        token.companyId = user.companyId;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = isNonEmptyString(token.id) ? token.id : "";
-        session.user.role = isNonEmptyString(token.role) ? token.role : "";
-        session.user.clientId = isNonEmptyString(token.clientId) ? token.clientId : null;
-        session.user.companyId = isNonEmptyString(token.companyId) ? token.companyId : null;
-      }
-      return session;
-    },
-  },
 });
