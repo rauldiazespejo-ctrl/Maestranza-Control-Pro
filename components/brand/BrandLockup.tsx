@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface BrandLockupProps {
@@ -34,13 +33,11 @@ export function BrandLockup({
             isLogin ? "h-14 w-44" : "h-9 w-28 sm:w-32"
           )}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/brand/boiler-logo-white.svg"
             alt="BOILER COMP S.A."
-            fill
-            className="object-contain p-1.5"
-            priority={isLogin}
-            sizes={isLogin ? "176px" : "128px"}
+            className="h-full w-full object-contain p-1.5"
           />
         </div>
         <div className="h-8 w-px shrink-0 bg-border-subtle" aria-hidden="true" />
@@ -50,13 +47,11 @@ export function BrandLockup({
             isLogin ? "h-14 w-32" : "h-9 w-20 sm:w-24"
           )}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/brand/soldesp-logo-white.svg"
             alt="SOLDESP S.A."
-            fill
-            className="object-contain p-1.5"
-            priority={isLogin}
-            sizes={isLogin ? "128px" : "96px"}
+            className="h-full w-full object-contain p-1.5"
           />
         </div>
       </div>

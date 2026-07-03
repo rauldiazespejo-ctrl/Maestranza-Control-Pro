@@ -89,6 +89,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  trustHost: process.env.NODE_ENV !== "production",
   providers: [
     Credentials({
       name: "credentials",
