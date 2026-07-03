@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { getDashboardStats } from "@/lib/actions/dashboard";
@@ -94,11 +95,8 @@ function getGreeting(): string {
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <p className="text-steel">No se pudo cargar la sesión.</p>
-      </div>
-    );
+    redirect("/login");
+    return; // unreachable
   }
   const now = new Date();
   const userName = session.user.name?.split(" ")[0] ?? "Usuario";
