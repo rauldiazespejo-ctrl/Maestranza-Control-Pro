@@ -17,6 +17,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { hseqRecordSchema, type HseqRecordFormData } from "@/lib/validations/hseq";
 import { createHseqRecord, updateHseqRecord, deleteHseqRecord } from "@/lib/actions/hseq";
 import type { Prisma } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 type HseqRecordWithRelations = Prisma.HseqRecordGetPayload<{
   include: { responsible: true };
@@ -83,22 +84,17 @@ function RecordCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const [hovered, setHovered] = React.useState(false);
   const isVencido = record.status === "vencido";
   const daysOverdue = record.status === "vencido" ? getDaysOverdue(record.dueDate) : null;
 
   return (
     <div
-      className={`
-        group relative rounded-lg border p-4 transition-all duration-200 cursor-pointer
-        ${isVencido
-          ? "border-fire/40 bg-fire/10 shadow-[0_0_16px_var(--color-fire-muted)] animate-critical-pulse"
-          : "border-border-subtle bg-navy-primary/40 hover:border-gold/25 hover:bg-navy-primary/60 hover:shadow-industrial-sm"
-        }
-      `}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ transform: hovered ? "translateY(-2px)" : "translateY(0)" }}
+      className={cn(
+        "group relative rounded-lg border p-4 transition-[background-color,border-color,box-shadow,transform] duration-200",
+        isVencido
+          ? "hseq-alert-vencido border-fire/40 bg-fire/10"
+          : "border-border-subtle bg-navy-primary/40 hover:-translate-y-0.5 hover:border-gold/25 hover:bg-navy-primary/60 hover:shadow-industrial-sm"
+      )}
     >
       {/* Top row: type + norm + status */}
       <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -378,16 +374,6 @@ export function HseqClient({ records, workers }: Props) {
           </div>
         </form>
       </Dialog>
-
-      <style>{`
-        @keyframes critical-pulse {
-          0%, 100% { box-shadow: 0 0 12px rgba(149,10,16,0.35); }
-          50% { box-shadow: 0 0 22px rgba(149,10,16,0.55); }
-        }
-        .animate-critical-pulse {
-          animation: critical-pulse 2s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

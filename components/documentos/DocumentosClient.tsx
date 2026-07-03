@@ -190,7 +190,12 @@ export function DocumentosClient({ documents, workOrders, hseqRecords }: Props) 
                         >
                           <ExternalLink className="h-4 w-4 text-steel" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(doc.id)}
+                          aria-label={`Eliminar documento ${doc.name}`}
+                        >
                           <Trash2 className="h-4 w-4 text-fire-bright" />
                         </Button>
                       </div>

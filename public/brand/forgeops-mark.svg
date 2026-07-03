@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">ForgeOps</title>
+  <desc id="desc">Marca abstracta con escudo, flujo operativo y punto de control.</desc>
+  <defs>
+    <linearGradient id="core" x1="18" y1="12" x2="78" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#38F8A0"/>
+      <stop offset="0.48" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#E8B33A"/>
+    </linearGradient>
+    <linearGradient id="shell" x1="10" y1="6" x2="86" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="glow" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3.2" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.133 0 0 0 0 0.773 0 0 0 0 0.369 0 0 0 .55 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <rect width="96" height="96" rx="24" fill="#020617"/>
+  <path d="M48 8 80 25.5v34.8L48 88 16 60.3V25.5L48 8Z" fill="url(#shell)" stroke="rgba(248,250,252,.20)" stroke-width="2"/>
+  <path d="M48 18 70 30.5v24.8L48 76 26 55.3V30.5L48 18Z" fill="rgba(15,23,42,.88)" stroke="url(#core)" stroke-width="3" filter="url(#glow)"/>
+  <path d="M34 49.8 44.3 60 63 35" fill="none" stroke="url(#core)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 33h16m0 0 9 9m-9-9v18" fill="none" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/>
+  <circle cx="68" cy="28" r="5" fill="#38F8A0"/>
+</svg>

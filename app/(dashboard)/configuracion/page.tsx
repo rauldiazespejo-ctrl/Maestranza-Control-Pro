@@ -7,7 +7,7 @@ import { requireAuth, MANAGEABLE_ROLES } from "@/lib/auth";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Configuración · MAESTRANZA Control Pro",
+  title: "Configuración · ForgeOps",
 };
 
 export default async function ConfiguracionPage() {

@@ -1,43 +1,59 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* BoilerComp palette */
-  --color-navy-primary: #16163F;
-  --color-navy-dark: #0E0E2A;
-  --color-navy-light: #1C244B;
-  --color-fire: #950A10;
-  --color-fire-bright: #D92930;
-  --color-fire-muted: rgba(149, 10, 16, 0.18);
+  /* ── ForgeOps palette: CIAN NEÓN (pulsoai/nexusguard) ── */
+  --color-navy-primary: #0F172A;
+  --color-navy-dark: #020617;
+  --color-navy-light: #1E293B;
+
+  /* Cian neón como acento primario (reemplaza fire/verde) */
+  --color-cyan: #00B8D4;
+  --color-cyan-bright: #00E5FF;
+  --color-cyan-muted: rgba(0, 229, 255, 0.16);
+  --color-cyan-glow: rgba(0, 229, 255, 0.22);
+  --color-cyan-glow-hover: rgba(0, 229, 255, 0.32);
+
+  /* Gold se mantiene como acento secundario / premium */
   --color-gold: #E8B33A;
   --color-gold-muted: rgba(232, 179, 58, 0.18);
-  --color-steel: #C8D5DC;
+
+  /* Alerta roja para estados críticos */
+  --color-alert: #D92930;
+  --color-alert-dark: #950A10;
+
+  /* Backward-compat: fire → cyan (para componentes que aún usen tokens legacy) */
+  --color-fire: #00B8D4;
+  --color-fire-bright: #00E5FF;
+  --color-fire-muted: rgba(0, 229, 255, 0.16);
+
+  --color-steel: #CBD5E1;
   --color-white: #FFFFFF;
 
   /* Semantic tokens */
-  --color-background: #0E0E2A;
+  --color-background: #020617;
   --color-foreground: #FFFFFF;
-  --color-card: #16163F;
+  --color-card: #0F172A;
   --color-card-foreground: #FFFFFF;
   --color-muted: #C8D5DC;
   --color-muted-foreground: #94a3b8;
-  --color-border: #1C244B;
-  --color-border-subtle: rgba(200, 213, 220, 0.12);
-  --color-border-strong: rgba(200, 213, 220, 0.22);
-  --color-border-fire: rgba(149, 10, 16, 0.42);
+  --color-border: #243044;
+  --color-border-subtle: rgba(203, 213, 225, 0.12);
+  --color-border-strong: rgba(203, 213, 225, 0.24);
+  --color-border-cyan: rgba(0, 229, 255, 0.42);
   --color-border-gold: rgba(232, 179, 58, 0.42);
-  --color-surface-glass: rgba(22, 22, 63, 0.72);
-  --color-surface-raised: rgba(28, 36, 75, 0.82);
-  --color-surface-muted: rgba(200, 213, 220, 0.08);
-  --color-surface-hover: rgba(200, 213, 220, 0.11);
-  --color-primary: #950A10;
-  --color-primary-foreground: #FFFFFF;
+  --color-surface-glass: rgba(15, 23, 42, 0.76);
+  --color-surface-raised: rgba(30, 41, 59, 0.84);
+  --color-surface-muted: rgba(203, 213, 225, 0.08);
+  --color-surface-hover: rgba(203, 213, 225, 0.11);
+  --color-primary: #00B8D4;
+  --color-primary-foreground: #020617;
   --color-secondary: #1C244B;
   --color-secondary-foreground: #FFFFFF;
   --color-accent: #E8B33A;
   --color-accent-foreground: #0E0E2A;
   --color-destructive: #D92930;
   --color-destructive-foreground: #FFFFFF;
-  --color-ring: #E8B33A;
+  --color-ring: #00E5FF;
   --color-input: #1C244B;
   --color-popover: #16163F;
   --color-popover-foreground: #FFFFFF;
@@ -74,16 +90,16 @@
   --radius-lg: 8px;
   --radius-xl: 12px;
 
-  /* Shadows */
+  /* Shadows — migrados a cian neón */
   --shadow-card:     0 10px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   --shadow-card-lg:   0 18px 48px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --shadow-industrial:    0 18px 48px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   --shadow-industrial-sm: 0 10px 28px rgba(0, 0, 0, 0.22);
   --shadow-industrial-lg: 0 24px 72px rgba(0, 0, 0, 0.38), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  --shadow-focus:     0 0 0 4px rgba(232, 179, 58, 0.18);
+  --shadow-focus:     0 0 0 4px rgba(0, 229, 255, 0.18);
   --shadow-focus-gold: 0 0 0 4px rgba(232, 179, 58, 0.18);
-  --shadow-btn-fire:  0 4px 12px rgba(149, 10, 16, 0.35);
-  --shadow-btn-fire-hover: 0 4px 16px rgba(149, 10, 16, 0.45);
+  --shadow-btn-primary:  0 8px 18px rgba(0, 229, 255, 0.22);
+  --shadow-btn-primary-hover: 0 10px 28px rgba(0, 229, 255, 0.32);
 
   /* Motion */
   --ease-industrial: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -93,11 +109,11 @@
   --animate-shimmer: shimmer 1.5s infinite;
   --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
   --animate-spin: spin 1s linear infinite;
-  --animate-progress-fire: progress-fire 600ms ease-out forwards;
+  --animate-progress-cyan: progress-cyan 600ms ease-out forwards;
 }
 
 /* ============================================================
-   SKELETON SHIMMER ANIMATION
+   KEYFRAMES
    ============================================================ */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
@@ -109,7 +125,7 @@
   50%       { opacity: 0.4; transform: scale(0.75); }
 }
 
-@keyframes progress-fire {
+@keyframes progress-cyan {
   from { width: 0%; }
 }
 
@@ -118,7 +134,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* HSEQ alert pulse — fire glow border for vencidos */
+/* HSEQ alert pulse — red glow para vencidos */
 @keyframes hseq-alert-pulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(149, 10, 16, 0.0),
@@ -157,13 +173,17 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-navy-light) var(--color-navy-dark);
 }
 
+/* ── BODY: fondo dark con acentos cian neón ── */
 body {
   background:
-    linear-gradient(180deg, rgba(14, 14, 42, 0.94) 0%, rgba(14, 14, 42, 1) 42%),
-    linear-gradient(135deg, rgba(149, 10, 16, 0.13) 0%, transparent 34%),
-    repeating-linear-gradient(0deg, rgba(200, 213, 220, 0.018) 0 1px, transparent 1px 84px),
+    radial-gradient(circle at 50% -20%, rgba(0, 229, 255, 0.14), transparent 36rem),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 1) 42%),
+    linear-gradient(135deg, rgba(232, 179, 58, 0.08) 0%, transparent 34%),
+    repeating-linear-gradient(0deg, rgba(203, 213, 225, 0.018) 0 1px, transparent 1px 84px),
     var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -173,7 +193,7 @@ body {
 }
 
 ::selection {
-  background: rgba(232, 179, 58, 0.32);
+  background: rgba(0, 229, 255, 0.32);
   color: var(--color-white);
 }
 
@@ -190,14 +210,17 @@ button:disabled,
   cursor: not-allowed;
 }
 
+/* ── App shell background ── */
 .app-shell-bg {
   background:
-    linear-gradient(180deg, rgba(28, 36, 75, 0.22), transparent 260px),
-    linear-gradient(90deg, rgba(149, 10, 16, 0.10), transparent 38%),
-    repeating-linear-gradient(90deg, rgba(200, 213, 220, 0.028) 0 1px, transparent 1px 96px),
+    radial-gradient(circle at top left, rgba(0, 229, 255, 0.12), transparent 28rem),
+    linear-gradient(180deg, rgba(30, 41, 59, 0.22), transparent 260px),
+    linear-gradient(90deg, rgba(232, 179, 58, 0.07), transparent 38%),
+    repeating-linear-gradient(90deg, rgba(203, 213, 225, 0.028) 0 1px, transparent 1px 96px),
     var(--color-navy-dark);
 }
 
+/* Glass surfaces */
 .surface-glass {
   border: 1px solid var(--color-border-subtle);
   background: var(--color-surface-glass);
@@ -229,6 +252,7 @@ button:disabled,
   z-index: 1;
 }
 
+/* Dividers */
 .industrial-divider {
   background: linear-gradient(90deg, transparent, rgba(232, 179, 58, 0.52), transparent);
 }
@@ -247,6 +271,7 @@ button:disabled,
   opacity: 0.9;
 }
 
+/* Metric cards */
 .metric-card {
   transform: translateZ(0);
   transition:
@@ -270,6 +295,7 @@ button:disabled,
   transition: transform 220ms var(--ease-spring-subtle), color 220ms var(--ease-industrial);
 }
 
+/* Login animations */
 .login-panel {
   animation: panel-enter 520ms var(--ease-industrial) both;
 }
@@ -337,7 +363,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — WebKit */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

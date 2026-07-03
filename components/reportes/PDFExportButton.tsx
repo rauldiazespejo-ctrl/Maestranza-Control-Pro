@@ -101,7 +101,7 @@ function ReportPDFDocument({
       <Page style={styles.page}>
         <Text style={styles.title}>Reporte Operacional</Text>
         <Text style={styles.subtitle}>
-          {`MAESTRANZA Control Pro | ${new Date().toLocaleDateString("es-CL")}`}
+          {`ForgeOps | ${new Date().toLocaleDateString("es-CL")}`}
         </Text>
         <View style={styles.section}>
           <View style={styles.metricRow}>
@@ -150,7 +150,7 @@ function ReportPDFDocument({
           </View>
         ))}
         <Text style={styles.footer}>
-          {`MAESTRANZA Control Pro | ${new Date().toLocaleDateString("es-CL")}`}
+          {`ForgeOps | ${new Date().toLocaleDateString("es-CL")}`}
         </Text>
       </Page>
     </Document>

@@ -134,7 +134,7 @@ export default async function DashboardPage() {
             <p className="mt-1.5 text-sm text-steel sm:text-base">
               {format(now, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}
               {" · "}
-              BOILER COMP S.A. / SOLDESP S.A.
+              trazabilidad, HSEQ y avance operacional en una sola vista
             </p>
           </div>
           {/* Date + status cards */}

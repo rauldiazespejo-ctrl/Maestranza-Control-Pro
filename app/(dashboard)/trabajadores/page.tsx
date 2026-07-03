@@ -4,7 +4,7 @@ import { getWorkers } from "@/lib/actions/workers";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Trabajadores · MAESTRANZA Control Pro",
+  title: "Trabajadores · ForgeOps",
 };
 
 export default async function TrabajadoresPage({

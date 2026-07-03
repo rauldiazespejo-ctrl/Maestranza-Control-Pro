@@ -6,7 +6,7 @@ import { getWorkOrders } from "@/lib/actions/workorders";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Carta Gantt · MAESTRANZA Control Pro",
+  title: "Carta Gantt · ForgeOps",
 };
 
 export default async function GanttPage({

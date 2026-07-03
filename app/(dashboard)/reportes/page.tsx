@@ -4,7 +4,7 @@ import { getOperationalReport } from "@/lib/actions/reports";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Reportes · MAESTRANZA Control Pro",
+  title: "Reportes · ForgeOps",
 };
 
 export default async function ReportesPage({

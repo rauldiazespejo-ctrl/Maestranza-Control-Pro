@@ -4,7 +4,7 @@ import { getClients } from "@/lib/actions/clients";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Clientes · MAESTRANZA Control Pro",
+  title: "Clientes · ForgeOps",
 };
 
 export default async function ClientesPage({

@@ -47,6 +47,18 @@ const navItems = [
 export function DashboardShell({ user, children }: DashboardShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const mobileNavId = React.useId();
+
+  React.useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
 
   const initials = (user.name ?? user.email ?? "U")
     .split(" ")
@@ -67,13 +79,15 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
               className="lg:hidden"
               onClick={() => setMobileOpen(true)}
               aria-label="Abrir menú"
+              aria-controls={mobileNavId}
+              aria-expanded={mobileOpen}
             >
               <Menu className="h-5 w-5" />
             </Button>
             <Link
               href="/dashboard"
               className="min-w-0"
-              aria-label="Ir al dashboard de MAESTRANZA Control Pro"
+              aria-label="Ir al dashboard de ForgeOps"
             >
               <BrandLockup showProductName />
             </Link>
@@ -119,7 +133,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </p>
           <div className="mt-2 h-px w-full industrial-divider" />
         </div>
-        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Navegación principal">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -127,6 +141,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "group flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-[background-color,border-color,color] duration-200",
                   active
@@ -173,6 +188,9 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
 
       {/* Mobile sidebar */}
       <aside
+        id={mobileNavId}
+        aria-label="Menú principal móvil"
+        aria-hidden={!mobileOpen}
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-[min(20rem,86vw)] transform border-r border-border-subtle bg-navy-primary/94 shadow-industrial backdrop-blur-xl transition-transform duration-200 ease-in-out lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
@@ -185,11 +203,14 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             size="icon"
             onClick={() => setMobileOpen(false)}
             aria-label="Cerrar menú"
+            aria-controls={mobileNavId}
+            aria-expanded={mobileOpen}
+            tabIndex={mobileOpen ? undefined : -1}
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
-        <nav className="space-y-1 p-3">
+        <nav className="space-y-1 p-3" aria-label="Navegación principal móvil">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -198,6 +219,8 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
+                aria-current={active ? "page" : undefined}
+                tabIndex={mobileOpen ? undefined : -1}
                 className={cn(
                   "group flex min-h-11 items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
                   active
@@ -221,6 +244,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             variant="outline"
             className="w-full"
             onClick={() => signOut({ callbackUrl: "/login" })}
+            tabIndex={mobileOpen ? undefined : -1}
           >
             <LogOut className="mr-2 h-4 w-4" />
             Cerrar sesión

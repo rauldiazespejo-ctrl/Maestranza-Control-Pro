@@ -20,7 +20,17 @@ export interface ButtonProps extends React.ComponentProps<"button"> {
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant = "default", size = "default", loading, asChild = false, children, disabled, ...props },
+    {
+      className,
+      variant = "default",
+      size = "default",
+      loading,
+      asChild = false,
+      children,
+      disabled,
+      onClick,
+      ...props
+    },
     ref
   ) => {
     const isDisabled = disabled || loading;
@@ -32,19 +42,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={asChild ? undefined : isDisabled}
         aria-disabled={isDisabled}
         aria-busy={loading}
+        data-disabled={isDisabled ? "" : undefined}
+        onClick={(event) => {
+          if (isDisabled) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          onClick?.(event);
+        }}
         className={cn(
           "inline-flex items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap",
           "transition-all duration-200",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-bright focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
           /* hover: scale(1.02) — disabled just dims, no transform */
           "hover:enabled:scale-[1.02]",
           /* active: scale(0.98) */
           "active:enabled:scale-[0.98]",
           /* disabled: opacity-50, no pointer events */
-          "disabled:opacity-50 disabled:pointer-events-none",
+          "disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50",
           {
             default:
-              "bg-fire text-white shadow-[var(--shadow-btn-fire)] hover:enabled:bg-fire-bright hover:enabled:shadow-[var(--shadow-btn-fire-hover)]",
+              "bg-cyan text-navy-dark shadow-[var(--shadow-btn-primary)] hover:enabled:bg-cyan-bright hover:enabled:shadow-[var(--shadow-btn-primary-hover)]",
             secondary:
               "border border-border-subtle bg-navy-light/85 text-white hover:enabled:border-border-strong hover:enabled:bg-navy-light hover:enabled:shadow-industrial-sm",
             outline:
@@ -52,9 +71,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             ghost:
               "bg-transparent text-steel hover:enabled:bg-navy-light/80 hover:enabled:text-white",
             destructive:
-              "bg-fire-bright text-white shadow-[var(--shadow-btn-fire)] hover:enabled:bg-fire hover:enabled:shadow-[var(--shadow-btn-fire-hover)]",
+              "bg-alert text-white shadow-[0_8px_18px_rgba(217,41,48,0.22)] hover:enabled:bg-alert-dark hover:enabled:shadow-[0_10px_28px_rgba(217,41,48,0.32)]",
             accent:
-              "bg-gold text-navy-dark shadow-[var(--shadow-btn-fire)] hover:enabled:bg-gold/90 hover:enabled:shadow-[var(--shadow-btn-fire-hover)]",
+              "bg-gold text-navy-dark shadow-[var(--shadow-btn-primary)] hover:enabled:bg-gold/90 hover:enabled:shadow-[var(--shadow-btn-primary-hover)]",
           }[variant],
           {
             default: "min-h-10 px-6 py-3 text-sm",

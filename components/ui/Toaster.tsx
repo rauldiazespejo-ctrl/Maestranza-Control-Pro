@@ -4,7 +4,7 @@ import { Toaster as SonnerToaster } from "sonner";
 
 /**
  * Wrapper de Sonner Toaster para notificaciones toast en toda la aplicacion.
- * Se integra en el layout principal.
+ * Usa tokens CSS del sistema de diseño para coherencia visual.
  */
 export function Toaster() {
   return (
@@ -12,9 +12,10 @@ export function Toaster() {
       position="top-right"
       toastOptions={{
         style: {
-          background: "#1a1a3e",
-          color: "#ffffff",
-          border: "1px solid rgba(255,255,255,0.1)",
+          background: "var(--color-popover)",
+          color: "var(--color-popover-foreground)",
+          border: "1px solid var(--color-border-subtle)",
+          fontFamily: "var(--font-sans)",
         },
       }}
     />

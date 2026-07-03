@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
+import { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import type { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from "@/lib/rate-limit";
 import { validateRut, normalizeRut } from "@/lib/validations/rut";
 import { headers } from "next/headers";
@@ -18,8 +19,8 @@ export const OPERATIONS_ROLES:  Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"]
 export const WRITE_ROLES:       Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"];
 export const READ_ROLES:        Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS", "CLIENT", "VIEWER"];
 
-/** Todos los valores validos del enum UserRole */
-const ALL_ROLES: readonly string[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS", "CLIENT", "VIEWER"] as const;
+/** Array derivado del enum de Prisma — siempre sincronizado */
+const ALL_ROLES: readonly string[] = Object.values(UserRole);
 
 /**
  * Verifica que un valor sea un Role valido.
@@ -83,13 +84,42 @@ const credentialsSchema = z.object({
   password: z.string().min(1, "Contraseña es requerida"),
 });
 
+class InvalidCredentialsError extends CredentialsSignin {
+  override code = "credenciales_invalidas";
+  override message = "RUT o contraseña incorrectos. Verifica tus credenciales e intenta nuevamente.";
+}
+
+class TemporaryAttemptsError extends CredentialsSignin {
+  override code = "intentos_temporales";
+  override message = "Demasiados intentos fallidos. Espera unos minutos e intenta nuevamente.";
+}
+
+class AuthenticationUnavailableError extends CredentialsSignin {
+  override code = "servicio_no_disponible";
+  override message = "No se pudo validar el acceso con la base de datos. Revisa la configuración e intenta nuevamente.";
+}
+
+const authSecret =
+  process.env.AUTH_SECRET ??
+  process.env.NEXTAUTH_SECRET ??
+  (process.env.NODE_ENV === "development"
+    ? "maestranza-control-pro-dev-secret"
+    : undefined);
+
+if (!authSecret && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "[AUTH] AUTH_SECRET o NEXTAUTH_SECRET deben estar configurados en producción."
+  );
+}
+
 export const {
   handlers: { GET, POST },
   auth,
   signIn,
   signOut,
 } = NextAuth({
-  trustHost: true,
+  trustHost: process.env.NODE_ENV === "development",
+  secret: authSecret,
   providers: [
     Credentials({
       name: "credentials",
@@ -105,7 +135,7 @@ export const {
 
         // ── Validar formato RUT ─────────────────────────────────────
         if (!validateRut(rut)) {
-          throw new Error("RUT_INVALIDO");
+          throw new InvalidCredentialsError();
         }
         const normalizedRut = normalizeRut(rut);
 
@@ -113,13 +143,24 @@ export const {
         const clientIp = await getClientIp();
         const rateLimit = checkRateLimit(clientIp);
         if (!rateLimit.allowed) {
-          throw new Error("RATE_LIMITED");
+          throw new TemporaryAttemptsError();
         }
 
-        const user = await prisma.user.findUnique({
-          where: { rut: normalizedRut },
-          include: { client: true, company: true },
-        });
+        if (!process.env.DATABASE_URL) {
+          console.error("DATABASE_URL no está configurado para validar credenciales");
+          throw new AuthenticationUnavailableError();
+        }
+
+        let user;
+        try {
+          user = await prisma.user.findUnique({
+            where: { rut: normalizedRut },
+            include: { client: true, company: true },
+          });
+        } catch (error) {
+          console.error("No se pudo validar credenciales contra la base de datos", error);
+          throw new AuthenticationUnavailableError();
+        }
         if (!user || !user.active) {
           // Registrar intento fallido para rate limiting
           recordFailedAttempt(clientIp);

@@ -303,15 +303,25 @@ function OrderCard({
   onDelete: () => void;
 }) {
   const [hovered, setHovered] = React.useState(false);
+  const openOrderFromKeyboard = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    onView();
+  };
 
   return (
     <Card
       className={cn(
-        "group cursor-pointer transition-all duration-200",
+        "group cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
         hovered && "border-gold/30 shadow-[var(--shadow-industrial-lg)]"
       )}
+      role="button"
+      tabIndex={0}
+      aria-label={`Ver orden ${order.code}: ${order.title}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onKeyDown={openOrderFromKeyboard}
       onClick={onView}
       style={{ transform: hovered ? "translateY(-2px)" : "translateY(0)" }}
     >

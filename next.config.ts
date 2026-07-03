@@ -37,6 +37,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+  poweredByHeader: false,
+  compress: true,
+  productionBrowserSourceMaps: false,
+  generateBuildId: async () => {
+    return process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local";
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

@@ -18,20 +18,20 @@ export default function DashboardError({ error, reset }: DashboardErrorProps) {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4">
       <div className="mx-auto flex max-w-md flex-col items-center text-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/20">
-          <AlertTriangle className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-alert-dark/30">
+          <AlertTriangle className="h-8 w-8 text-alert" />
         </div>
 
-        <h2 className="mb-2 text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+        <h2 className="mb-2 text-xl font-semibold tracking-tight text-white">
           Error al cargar el panel
         </h2>
 
-        <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-          No se pudo cargar esta seccion del dashboard. Intenta nuevamente.
+        <p className="mb-4 text-sm text-steel">
+          No se pudo cargar esta sección del dashboard. Intenta nuevamente.
         </p>
 
         {error.digest && (
-          <p className="mb-4 rounded-md bg-gray-100 px-3 py-1.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <p className="mb-4 rounded-md bg-navy-light px-3 py-1.5 font-mono text-xs text-steel">
             Ref: {error.digest}
           </p>
         )}

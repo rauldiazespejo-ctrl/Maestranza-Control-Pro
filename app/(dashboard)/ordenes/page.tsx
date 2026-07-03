@@ -7,7 +7,7 @@ import { getProjects } from "@/lib/actions/projects";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Órdenes de trabajo · MAESTRANZA Control Pro",
+  title: "Órdenes de trabajo · ForgeOps",
 };
 
 export default async function OrdenesPage({

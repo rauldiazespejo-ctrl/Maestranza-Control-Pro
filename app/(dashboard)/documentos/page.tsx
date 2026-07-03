@@ -6,7 +6,7 @@ import { getHseqRecords } from "@/lib/actions/hseq";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Documentos y evidencias · MAESTRANZA Control Pro",
+  title: "Documentos y evidencias · ForgeOps",
 };
 
 export default async function DocumentosPage({

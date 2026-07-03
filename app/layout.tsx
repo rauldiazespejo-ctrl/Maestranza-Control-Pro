@@ -19,16 +19,16 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "MAESTRANZA Control Pro | BoilerComp",
+  title: "ForgeOps",
   description:
-    "Sistema de gestión y control de maestranza para operaciones industriales. BOILER COMP.",
+    "Plataforma de control operacional, HSEQ, documental y trazabilidad industrial.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/brand/forgeops-mark.svg",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0E0E2A",
+  themeColor: "#020617",
   width: "device-width",
   initialScale: 1,
 };

@@ -12,6 +12,7 @@ export function BrandLockup({
   showProductName = true,
 }: BrandLockupProps) {
   const isLogin = variant === "login";
+  const isSidebar = variant === "sidebar";
 
   return (
     <div
@@ -23,56 +24,37 @@ export function BrandLockup({
     >
       <div
         className={cn(
-          "flex items-center gap-2 rounded-lg border border-border-subtle bg-navy-primary/70 p-2 shadow-industrial backdrop-blur-md",
-          isLogin && "gap-3 p-3"
+          "relative flex shrink-0 items-center justify-center overflow-hidden border border-cyan-bright/30 bg-slate-950/80 shadow-[0_0_28px_rgba(0,229,255,0.18)] backdrop-blur-md",
+          isLogin ? "h-20 w-20 rounded-2xl p-3" : "h-11 w-11 rounded-xl p-2",
+          isSidebar && "h-10 w-10 rounded-lg"
         )}
       >
-        <div
-          className={cn(
-            "relative flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-navy-dark/60 px-2",
-            isLogin ? "h-14 w-44" : "h-9 w-28 sm:w-32"
-          )}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/boiler-logo-white.svg"
-            alt="BOILER COMP S.A."
-            className="h-full w-full object-contain p-1.5"
-          />
-        </div>
-        <div className="h-8 w-px shrink-0 bg-border-subtle" aria-hidden="true" />
-        <div
-          className={cn(
-            "relative flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-navy-dark/60 px-2",
-            isLogin ? "h-14 w-32" : "h-9 w-20 sm:w-24"
-          )}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/soldesp-logo-white.svg"
-            alt="SOLDESP S.A."
-            className="h-full w-full object-contain p-1.5"
-          />
-        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,229,255,0.24),transparent_45%)]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/forgeops-mark.svg"
+          alt="ForgeOps"
+          className="relative h-full w-full object-contain"
+        />
       </div>
 
       {showProductName && (
-        <div className={cn("min-w-0", isLogin ? "space-y-1" : "hidden xl:block")}>
+        <div className={cn("min-w-0", isLogin ? "space-y-1.5" : "hidden xl:block")}>
           <p
             className={cn(
-              "truncate font-heading font-bold text-white",
-              isLogin ? "text-2xl" : "text-sm"
+              "truncate font-heading font-bold tracking-normal text-white",
+              isLogin ? "text-3xl" : "text-base"
             )}
           >
-            MAESTRANZA Control Pro
+            ForgeOps
           </p>
           <p
             className={cn(
-              "truncate text-steel",
+              "truncate font-medium text-cyan-bright/85",
               isLogin ? "text-sm" : "text-[11px]"
             )}
           >
-            BOILER COMP S.A. / SOLDESP S.A.
+            Operaciones, trazabilidad y control
           </p>
         </div>
       )}
