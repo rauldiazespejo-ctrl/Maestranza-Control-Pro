@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
@@ -10,7 +9,11 @@ export default async function DashboardLayout({
   const session = await auth();
 
   if (!session?.user) {
-    redirect("/login");
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <p className="text-steel">No se pudo cargar la sesión (layout).</p>
+      </div>
+    );
   }
 
   return (
