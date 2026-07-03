@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { AlertCircle, IdCard, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export function LoginForm() {
-  const router = useRouter();
   const [rut, setRut] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -38,27 +36,17 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    try {
-      const result = await signIn("credentials", {
-        rut,
-        password,
-        redirect: false,
-        callbackUrl: "/dashboard",
-      });
+    // redirect: true (default) — signIn redirige el navegador automáticamente.
+    // Si las credenciales fallan, redirige a /login?error=...
+    // Si funcionan, redirige a /dashboard.
+    await signIn("credentials", {
+      rut,
+      password,
+      callbackUrl: "/dashboard",
+    });
 
-      if (result?.error) {
-        setError("Credenciales incorrectas o usuario inactivo.");
-      } else if (result?.ok) {
-        // Navegar client-side con router.push para evitar perder la cookie seteada por signIn.
-        router.push(result.url ?? "/dashboard");
-      } else {
-        setError("No se pudo iniciar sesión. Intenta nuevamente.");
-      }
-    } catch {
-      setError("Ocurrió un error inesperado. Intenta nuevamente.");
-    } finally {
-      setLoading(false);
-    }
+    // Si llegamos aquí, signIn ya redirigió. No necesitamos hacer nada más.
+    setLoading(false);
   }
 
   return (
