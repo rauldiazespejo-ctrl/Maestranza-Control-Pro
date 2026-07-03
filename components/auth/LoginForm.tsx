@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { AlertCircle, IdCard, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export function LoginForm() {
-  const router = useRouter();
   const [rut, setRut] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -49,8 +47,8 @@ export function LoginForm() {
       if (result?.error) {
         setError("Credenciales incorrectas o usuario inactivo.");
       } else if (result?.ok) {
-        router.push(result.url ?? "/dashboard");
-        router.refresh();
+        // Forzar recarga completa para que NextAuth/Auth.js escriba y envíe la cookie de sesión al servidor.
+        window.location.href = result.url ?? "/dashboard";
       } else {
         setError("No se pudo iniciar sesión. Intenta nuevamente.");
       }
