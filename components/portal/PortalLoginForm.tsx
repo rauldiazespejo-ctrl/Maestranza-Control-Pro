@@ -1,18 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { BrandLockup } from "@/components/brand/BrandLockup";
 
-export function PortalLoginForm() {
-  const router = useRouter();
+export function PortalLoginForm({ authError }: { authError?: string }) {
   const [rut, setRut] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [error, setError] = React.useState(authError || "");
   const [loading, setLoading] = React.useState(false);
 
   const formatRut = (value: string) => {
@@ -36,19 +34,16 @@ export function PortalLoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const result = await signIn("credentials", {
+    
+    // signIn con redirect: true
+    await signIn("credentials", {
       rut,
       password,
-      redirect: false,
+      redirect: true,
       callbackUrl: "/portal/dashboard",
     });
+    // Si falla, el middleware/auth.js hara redirect a /portal/login con ?error=...
     setLoading(false);
-    if (result?.ok) {
-      router.push("/portal/dashboard");
-      router.refresh();
-    } else {
-      setError("Credenciales incorrectas o usuario no es cliente.");
-    }
   };
 
   return (

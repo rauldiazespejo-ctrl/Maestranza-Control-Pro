@@ -89,7 +89,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 
             /* ── Priority ── */
             critica: (
-              "border-fire bg-fire text-white shadow-[0_0_12px_rgba(149,10,16,0.55)]" +
+              "border-fire bg-fire text-white shadow-[0_0_12px_var(--color-fire)]" +
               " [&_.badge-dot]:bg-white"
             ),
             alta: (
@@ -113,7 +113,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             "hseq-cerrado":
               "border-steel/30 bg-steel/10 text-steel/60",
             "hseq-vencido":
-              "border-fire-bright/60 bg-fire-bright/25 text-white shadow-[0_0_10px_rgba(217,41,48,0.35)]",
+              "border-fire-bright/60 bg-fire-bright/25 text-white shadow-[0_0_10px_var(--color-fire-bright)]",
           }[variant],
           className
         )}

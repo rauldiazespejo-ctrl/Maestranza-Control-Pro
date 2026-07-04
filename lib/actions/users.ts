@@ -13,24 +13,30 @@ export async function getUsers() {
   });
 }
 
-export async function createUser(data: {
-  email: string;
-  name: string;
-  password: string;
-  role: string;
-  clientId?: string;
-}) {
-  await requireAuth(ADMIN_ROLES);
+import { z } from "zod";
+import { UserRole } from "@prisma/client";
 
-  const company = await prisma.company.findFirst({ orderBy: { createdAt: "asc" } });
+const createUserSchema = z.object({
+  email: z.string().email("Email inválido"),
+  name: z.string().min(2, "Nombre debe tener al menos 2 caracteres"),
+  password: z.string().min(6, "Contraseña muy corta"),
+  role: z.nativeEnum(UserRole),
+  clientId: z.string().optional(),
+});
+
+export async function createUser(data: z.infer<typeof createUserSchema>) {
+  const session = await requireAuth(ADMIN_ROLES);
+
+  const parsed = createUserSchema.parse(data);
+
   const user = await prisma.user.create({
     data: {
-      email: data.email,
-      name: data.name,
-      password: await bcrypt.hash(data.password, 10),
-      role: data.role as import("@prisma/client").UserRole,
-      clientId: data.clientId || null,
-      companyId: company?.id,
+      email: parsed.email,
+      name: parsed.name,
+      password: await bcrypt.hash(parsed.password, 10),
+      role: parsed.role,
+      clientId: parsed.clientId || null,
+      companyId: session.user.companyId || undefined,
     },
   });
 

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { ConfiguracionClient } from "@/components/configuracion/ConfiguracionClient";
 import { getUsers } from "@/lib/actions/users";
 import { getClients } from "@/lib/actions/clients";
-import { prisma } from "@/lib/db";
+import { getCompany } from "@/lib/actions/company";
 import { requireAuth, MANAGEABLE_ROLES } from "@/lib/auth";
 import { LoadingState } from "@/components/ui/LoadingState";
 
@@ -15,7 +15,7 @@ export default async function ConfiguracionPage() {
 
   const [users, company, clients] = await Promise.all([
     getUsers(),
-    prisma.company.findFirst({ orderBy: { createdAt: "asc" } }),
+    getCompany(),
     getClients(),
   ]);
 

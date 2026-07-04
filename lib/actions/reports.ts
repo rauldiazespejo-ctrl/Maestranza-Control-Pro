@@ -6,15 +6,15 @@ import { requireAuth, READ_ROLES } from "@/lib/auth";
 export async function getOperationalReport(from?: string, to?: string) {
   const session = await requireAuth(READ_ROLES);
   
-  const dateFilter: Record<string, unknown> = {};
+  const dateFilter: { gte?: Date; lte?: Date } = {};
   if (from) dateFilter.gte = new Date(from);
   if (to) dateFilter.lte = new Date(to);
 
   const whereDate = Object.keys(dateFilter).length ? { createdAt: dateFilter } : {};
   
-  const ordersWhere: Record<string, unknown> = { ...whereDate };
-  const hseqWhere: Record<string, unknown> = { ...whereDate };
-  const clientsWhere: Record<string, unknown> = {};
+  const ordersWhere: import('@prisma/client').Prisma.WorkOrderWhereInput = { ...whereDate };
+  const hseqWhere: import('@prisma/client').Prisma.HseqRecordWhereInput = { ...whereDate };
+  const clientsWhere: import('@prisma/client').Prisma.ClientWhereInput = {};
 
   if (session.user.role === "CLIENT" && session.user.clientId) {
     ordersWhere.clientId = session.user.clientId;

@@ -107,9 +107,21 @@ const authSecret =
     ? "maestranza-control-pro-dev-secret"
     : undefined);
 
-if (!authSecret && process.env.NODE_ENV === "production") {
+// Durante `next build`, algunos entornos hacen que NODE_ENV quede en "production"
+// y entonces NextAuth exige el secret. Para que el build no falle, permitimos
+// un fallback SOLO durante la fase de build. En runtime real, si falta el secret,
+// mantenemos el error para no operar sin seguridad.
+const isProductionBuild =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  process.env.NEXT_PHASE === "phase-production-compile" ||
+  process.env.NEXT_PHASE === "phase-production";
+
+const resolvedSecret =
+  authSecret ?? (isProductionBuild ? "maestranza-control-pro-dev-secret" : undefined);
+
+if (!resolvedSecret && process.env.NODE_ENV === "production" && !isProductionBuild) {
   throw new Error(
-    "[AUTH] AUTH_SECRET o NEXTAUTH_SECRET deben estar configurados en producción."
+    "[AUTH] AUTH_SECRET o NEXTAUTH_SECRET deben estar configurados en producción (runtime)."
   );
 }
 

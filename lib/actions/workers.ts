@@ -11,13 +11,13 @@ function toDateOptional(value?: string) {
 
 export async function getWorkers(filters?: { status?: string; search?: string }) {
   await requireAuth(READ_ROLES);
-  const where: Record<string, unknown> = {};
+  const where: import('@prisma/client').Prisma.WorkerWhereInput = {};
   if (filters?.status) where.status = filters.status;
   if (filters?.search) {
     where.OR = [
-      { name: { contains: filters.search } },
-      { rut: { contains: filters.search } },
-      { specialty: { contains: filters.search } },
+      { name: { contains: filters.search, mode: "insensitive" } },
+      { rut: { contains: filters.search, mode: "insensitive" } },
+      { specialty: { contains: filters.search, mode: "insensitive" } },
     ];
   }
   return prisma.worker.findMany({

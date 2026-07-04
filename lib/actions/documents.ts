@@ -12,7 +12,7 @@ export async function getDocuments(filters?: {
   search?: string;
 }) {
   const session = await requireAuth(READ_ROLES);
-  const where: Record<string, unknown> = {};
+  const where: import('@prisma/client').Prisma.DocumentWhereInput = {};
   
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.workOrder = { clientId: session.user.clientId };
@@ -23,8 +23,8 @@ export async function getDocuments(filters?: {
   if (filters?.type) where.type = filters.type;
   if (filters?.search) {
     where.OR = [
-      { name: { contains: filters.search } },
-      { url: { contains: filters.search } },
+      { name: { contains: filters.search, mode: "insensitive" } },
+      { url: { contains: filters.search, mode: "insensitive" } },
     ];
   }
 
@@ -40,7 +40,7 @@ export async function getDocuments(filters?: {
 
 export async function getDocumentsByWorkOrder(workOrderId: string) {
   const session = await requireAuth(READ_ROLES);
-  const where: Record<string, unknown> = { workOrderId };
+  const where: import('@prisma/client').Prisma.DocumentWhereInput = { workOrderId };
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.workOrder = { clientId: session.user.clientId };
   }

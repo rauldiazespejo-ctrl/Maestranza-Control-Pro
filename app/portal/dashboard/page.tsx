@@ -3,6 +3,7 @@ import { getWorkOrders } from "@/lib/actions/workorders";
 import { redirect } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 export const metadata = {
   title: "Portal Cliente · Dashboard",
@@ -32,19 +33,21 @@ export default async function PortalDashboardPage() {
         <CardHeader><CardTitle>Últimas órdenes</CardTitle></CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-navy-light text-left text-xs uppercase text-steel"><tr><th className="px-4 py-3">Código</th><th className="px-4 py-3">Título</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Avance</th></tr></thead>
-              <tbody className="divide-y divide-border-subtle">
+            <Table>
+              <TableHeader>
+                <TableRow><TableHead>Código</TableHead><TableHead>Título</TableHead><TableHead>Estado</TableHead><TableHead>Avance</TableHead></TableRow>
+              </TableHeader>
+              <TableBody>
                 {orders.slice(0, 5).map((o) => (
-                  <tr key={o.id} className="hover:bg-navy-light/30">
-                    <td className="px-4 py-3 text-white">{o.code}</td>
-                    <td className="px-4 py-3 text-steel">{o.title}</td>
-                    <td className="px-4 py-3"><Badge>{statusLabels[o.status]}</Badge></td>
-                    <td className="px-4 py-3 text-steel">{o.progress}%</td>
-                  </tr>
+                  <TableRow key={o.id}>
+                    <TableCell className="text-white">{o.code}</TableCell>
+                    <TableCell className="text-steel">{o.title}</TableCell>
+                    <TableCell><Badge>{statusLabels[o.status]}</Badge></TableCell>
+                    <TableCell className="text-steel">{o.progress}%</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

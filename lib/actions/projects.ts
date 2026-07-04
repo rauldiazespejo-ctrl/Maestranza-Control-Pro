@@ -6,7 +6,7 @@ import { requireAuth, READ_ROLES } from "@/lib/auth";
 export async function getProjects() {
   const session = await requireAuth(READ_ROLES);
   
-  const where: Record<string, unknown> = {};
+  const where: import('@prisma/client').Prisma.ProjectWhereInput = {};
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.clientId = session.user.clientId;
   }

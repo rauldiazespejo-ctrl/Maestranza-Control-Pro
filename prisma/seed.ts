@@ -39,35 +39,36 @@ function offsetDate(days: number) {
 async function main() {
   console.log("Iniciando seed MAESTRANZA Control Pro...\n");
 
+  await prisma.$transaction(async (tx) => {
   console.log("Limpiando...");
   try {
-    await prisma.notification.deleteMany();
-    await prisma.auditLog.deleteMany();
-    await prisma.session.deleteMany();
-    await prisma.document.deleteMany();
-    await prisma.hseqAction.deleteMany();
-    await prisma.hseqRecord.deleteMany();
-    await prisma.workerAssignment.deleteMany();
-    await prisma.workOrderTask.deleteMany();
-    await prisma.ganttTask.deleteMany();
-    await prisma.workOrder.deleteMany();
-    await prisma.project.deleteMany();
-    await prisma.contact.deleteMany();
-    await prisma.equipment.deleteMany();
-    await prisma.material.deleteMany();
-    await prisma.client.deleteMany();
-    await prisma.worker.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.company.deleteMany();
+    await tx.notification.deleteMany();
+    await tx.auditLog.deleteMany();
+    await tx.session.deleteMany();
+    await tx.document.deleteMany();
+    await tx.hseqAction.deleteMany();
+    await tx.hseqRecord.deleteMany();
+    await tx.workerAssignment.deleteMany();
+    await tx.workOrderTask.deleteMany();
+    await tx.ganttTask.deleteMany();
+    await tx.workOrder.deleteMany();
+    await tx.project.deleteMany();
+    await tx.contact.deleteMany();
+    await tx.equipment.deleteMany();
+    await tx.material.deleteMany();
+    await tx.client.deleteMany();
+    await tx.worker.deleteMany();
+    await tx.user.deleteMany();
+    await tx.company.deleteMany();
   } catch (e: unknown) { console.log("Cleanup:", (e as Error).message.split('\n')[0]); }
   console.log("Tablas limpias\n");
 
   // Empresas
   console.log("Creando empresas...");
-  const boilerComp = await prisma.company.create({
+  const boilerComp = await tx.company.create({
     data: { name: "BOILER COMP S.A.", rut: "76.238.153-2", address: "Av. Presidente Eduardo Frei Montalva 1234, Quilicura, Santiago", phone: "+56 2 2345 6789", email: "contacto@boilercomp.com", logoUrl: "/logos/boilercomp.svg" }
   });
-  const soldesp = await prisma.company.create({
+  const soldesp = await tx.company.create({
     data: { name: "SOLDESP S.A.", rut: "76.841.820-9", address: "Camino Lo Boza 4567, Pudahuel, Santiago", phone: "+56 2 2456 7890", email: "contacto@soldesp.cl", logoUrl: "/logos/soldesp.svg" }
   });
   console.log(` ${boilerComp.name}`);
@@ -85,7 +86,7 @@ async function main() {
   ];
   const clients = [];
   for (const d of clientsData) {
-    const c = await prisma.client.create({ data: { companyId: boilerComp.id, ...d } });
+    const c = await tx.client.create({ data: { companyId: boilerComp.id, ...d } });
     clients.push(c);
     console.log(` ${c.name}`);
   }
@@ -122,8 +123,8 @@ async function main() {
     { rut: "22.199.718-2", name: "Jaime Andres Vargas Ibanez", position: "Ayudante", specialty: "Apoyo Operativo", certifications: "Trabajo en altura", phone: "+56 9 0000 0023", email: "jvargas@soldesp.cl" },
     { rut: "22.153.767-k", name: "Miguel Fernando Vergara Cisterna", position: "Maestro Primera", specialty: "Soldadura y Fabricacion", certifications: "ISO 9606-1, Soldadura estructural", phone: "+56 9 0000 0024", email: "mvergarac@soldesp.cl" },
   ];
-  for (const d of workersBC) { const w = await prisma.worker.create({ data: { companyId: boilerComp.id, ...d, status: "activo" } }); workersAll.push(w); }
-  for (const d of workersSD) { const w = await prisma.worker.create({ data: { companyId: soldesp.id, ...d, status: "activo" } }); workersAll.push(w); }
+  for (const d of workersBC) { const w = await tx.worker.create({ data: { companyId: boilerComp.id, ...d, status: "activo" } }); workersAll.push(w); }
+  for (const d of workersSD) { const w = await tx.worker.create({ data: { companyId: soldesp.id, ...d, status: "activo" } }); workersAll.push(w); }
   console.log(` ${workersAll.length} trabajadores (14 BC + 10 SD)\n`);
 
   // Proyectos
@@ -137,7 +138,7 @@ async function main() {
   ];
   const projects = [];
   for (const d of projectsData) {
-    const p = await prisma.project.create({
+    const p = await tx.project.create({
       data: { companyId: boilerComp.id, clientId: clients[d.clientIdx].id, name: d.name, code: d.code, description: `Proyecto para ${clients[d.clientIdx].name}`, startDate: offsetDate(d.startOff), endDate: offsetDate(d.endOff), status: "activo" }
     });
     projects.push(p);
@@ -167,7 +168,7 @@ async function main() {
 
   const workOrders = [];
   for (const d of woData) {
-    const wo = await prisma.workOrder.create({
+    const wo = await tx.workOrder.create({
       data: {
         code: d.code, title: d.title, description: d.description,
         status: d.status, priority: d.priority,
@@ -191,7 +192,7 @@ async function main() {
     const n = 3 + (wo.id.charCodeAt(0) % 3);
     for (let i = 0; i < n; i++) {
       const p = Math.min(100, Math.max(0, wo.progress + (Math.random() * 30 - 15)));
-      await prisma.workOrderTask.create({
+      await tx.workOrderTask.create({
         data: { workOrderId: wo.id, title: `${taskTitles[i % taskTitles.length]} - ${wo.code}`, description: `Tarea ${i+1}`, progress: Math.round(p), completed: p >= 100, dueDate: offsetDate(i * 3) }
       });
       taskCount++;
@@ -207,7 +208,7 @@ async function main() {
     const n = 2 + (wo.id.charCodeAt(1) % 3);
     while (used.size < n) used.add(Math.floor(Math.random() * workersAll.length));
     for (const idx of used) {
-      await prisma.workerAssignment.create({ data: { workerId: workersAll[idx].id, workOrderId: wo.id, startDate: wo.startDate, endDate: wo.dueDate, hours: 40 + Math.floor(Math.random() * 80) } });
+      await tx.workerAssignment.create({ data: { workerId: workersAll[idx].id, workOrderId: wo.id, startDate: wo.startDate, endDate: wo.dueDate, hours: 40 + Math.floor(Math.random() * 80) } });
       asnCount++;
     }
   }
@@ -233,7 +234,7 @@ async function main() {
       const start = offsetDate(tpl.off - 30);
       const end = new Date(start); end.setDate(end.getDate() + tpl.dur);
       const prog = Math.round(Math.random() * 100);
-      await prisma.ganttTask.create({
+      await tx.ganttTask.create({
         data: { projectId: p.id, name: `${tpl.name} - ${p.code}`, startDate: start, endDate: end, progress: prog, status: ganttStatuses[Math.floor(Math.random() * 4)], responsible: workersAll[Math.floor(Math.random() * workersAll.length)].name }
       });
       ganttCount++;
@@ -250,7 +251,7 @@ async function main() {
     { name: "Torno CNC Takisawa", code: "EQ-TORNO-001", type: "Mecanizado", status: "mantencion" },
     { name: "Grua puente 10 ton", code: "EQ-GRUA-001", type: "Izaje", status: "disponible" },
   ];
-  for (const e of equip) { await prisma.equipment.create({ data: { companyId: boilerComp.id, ...e, lastService: offsetDate(-30), nextService: offsetDate(90) } }); }
+  for (const e of equip) { await tx.equipment.create({ data: { companyId: boilerComp.id, ...e, lastService: offsetDate(-30), nextService: offsetDate(90) } }); }
   const mats = [
     { name: "Plancha de acero ASTM A516 Gr.70", code: "MAT-001", unit: "m2", stock: 120, minStock: 20, cost: 85000 },
     { name: "Electrodo E7018 3/32", code: "MAT-002", unit: "kg", stock: 350, minStock: 50, cost: 4200 },
@@ -259,7 +260,7 @@ async function main() {
     { name: "Pintura epoxica industrial", code: "MAT-005", unit: "litro", stock: 200, minStock: 40, cost: 9500 },
     { name: "Valvula de seguridad 2in x 150 psi", code: "MAT-006", unit: "unidad", stock: 12, minStock: 3, cost: 145000 },
   ];
-  for (const m of mats) { await prisma.material.create({ data: { companyId: boilerComp.id, ...m } }); }
+  for (const m of mats) { await tx.material.create({ data: { companyId: boilerComp.id, ...m } }); }
   console.log(` ${equip.length} equipos, ${mats.length} materiales\n`);
 
   // HSEQ
@@ -279,11 +280,11 @@ async function main() {
     { type: HseqType.matriz_riesgo, norm: Norm.ISO_45001, description: "Matriz de riesgos para mantencion mayor LP-301.", respIdx: 17, dueOff: -10, status: HseqStatus.vencido, sig: true },
   ];
   for (const d of hseqData) {
-    const rec = await prisma.hseqRecord.create({
+    const rec = await tx.hseqRecord.create({
       data: { companyId: boilerComp.id, type: d.type, norm: d.norm, description: d.description, responsibleId: workersAll[d.respIdx].id, date: new Date(), dueDate: offsetDate(d.dueOff), status: d.status, evidenceDocumental: "Evidencia registrada", signatureRequired: d.sig, signed: d.status === HseqStatus.cerrado && d.sig, signedAt: d.status === HseqStatus.cerrado && d.sig ? offsetDate(d.dueOff) : null }
     });
     if (d.status === HseqStatus.abierto || d.status === HseqStatus.en_revision) {
-      await prisma.hseqAction.create({ data: { hseqRecordId: rec.id, description: `Accion derivada`, responsible: workersAll[d.respIdx].name, dueDate: offsetDate(d.dueOff + 5), completed: false } });
+      await tx.hseqAction.create({ data: { hseqRecordId: rec.id, description: `Accion derivada`, responsible: workersAll[d.respIdx].name, dueDate: offsetDate(d.dueOff + 5), completed: false } });
     }
   }
   console.log(` ${hseqData.length} registros HSEQ\n`);
@@ -300,10 +301,12 @@ async function main() {
     { email: "viewer@boilercomp.com", rut: "66.666.666-6", name: "Visualizador", role: UserRole.VIEWER, companyId: boilerComp.id },
   ];
   for (const u of users) {
-    await prisma.user.create({ data: { email: u.email, rut: u.rut, name: u.name, password: hashedPassword, role: u.role, active: true, companyId: u.companyId || undefined, clientId: u.clientId || undefined } });
+    await tx.user.create({ data: { email: u.email, rut: u.rut, name: u.name, password: hashedPassword, role: u.role, active: true, companyId: u.companyId || undefined, clientId: u.clientId || undefined } });
     console.log(` ${u.role.padEnd(18)} | RUT: ${u.rut} | ${u.email}`);
   }
   console.log("");
+
+  });
 
   // Resumen
   const woCount = await prisma.workOrder.count();

@@ -8,7 +8,7 @@ import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/l
 
 export async function getClients(search?: string) {
   const session = await requireAuth(READ_ROLES);
-  const where: Record<string, unknown> = {};
+  const where: import('@prisma/client').Prisma.ClientWhereInput = {};
   
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.id = session.user.clientId;
@@ -16,9 +16,9 @@ export async function getClients(search?: string) {
 
   if (search) {
     where.OR = [
-      { name: { contains: search } },
-      { rut: { contains: search } },
-      { industry: { contains: search } },
+      { name: { contains: search, mode: "insensitive" } },
+      { rut: { contains: search, mode: "insensitive" } },
+      { industry: { contains: search, mode: "insensitive" } },
     ];
   }
   return prisma.client.findMany({ where, include: { _count: { select: { workOrders: true } } }, orderBy: { name: "asc" } });

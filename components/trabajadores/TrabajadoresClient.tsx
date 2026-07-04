@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { Dialog } from "@/components/ui/dialog";
 import { SlideOver } from "@/components/ui/slide-over";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -381,9 +382,7 @@ function WorkerDetailPanel({
   );
 }
 
-function cn(...classes: (string | boolean | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
+
 
 export function TrabajadoresClient({ workers }: Props) {
   const router = useRouter();

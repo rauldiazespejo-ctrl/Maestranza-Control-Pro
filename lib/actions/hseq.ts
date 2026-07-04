@@ -10,10 +10,10 @@ function toDateOptional(value?: string) {
 }
 
 export async function getHseqRecords(filters?: { type?: string; norm?: string; status?: string }) {
-  const where: Record<string, unknown> = {};
-  if (filters?.type) where.type = filters.type;
-  if (filters?.norm) where.norm = filters.norm;
-  if (filters?.status) where.status = filters.status;
+  const where: import('@prisma/client').Prisma.HseqRecordWhereInput = {};
+  if (filters?.type) where.type = filters.type as HseqRecordFormData["type"];
+  if (filters?.norm) where.norm = filters.norm as HseqRecordFormData["norm"];
+  if (filters?.status) where.status = filters.status as HseqRecordFormData["status"];
   return prisma.hseqRecord.findMany({
     where,
     include: { responsible: true },

@@ -12,7 +12,7 @@ function toDate(value: string) {
 export async function getGanttTasks(filters?: { projectId?: string; status?: string }) {
   const session = await requireAuth(READ_ROLES);
 
-  const where: Record<string, unknown> = {};
+  const where: import('@prisma/client').Prisma.GanttTaskWhereInput = {};
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.project = { clientId: session.user.clientId };
   }

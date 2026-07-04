@@ -1,4 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
+import { UserRole } from "@prisma/client";
+
+function isUserRole(value: unknown): value is UserRole {
+  return typeof value === "string" && (Object.values(UserRole) as string[]).includes(value);
+}
 
 const authConfig = {
   providers: [],
@@ -19,7 +24,7 @@ const authConfig = {
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = typeof token.id === "string" ? token.id : "";
-        session.user.role = typeof token.role === "string" ? token.role : "";
+        if (isUserRole(token.role)) session.user.role = token.role;
         session.user.clientId = typeof token.clientId === "string" ? token.clientId : null;
         session.user.companyId = typeof token.companyId === "string" ? token.companyId : null;
       }

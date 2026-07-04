@@ -16,7 +16,7 @@ export async function getWorkOrders(filters?: {
   search?: string;
 }) {
   const session = await requireAuth(READ_ROLES);
-  const where: Record<string, unknown> = {};
+  const where: import('@prisma/client').Prisma.WorkOrderWhereInput = {};
 
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.clientId = session.user.clientId;
@@ -24,12 +24,12 @@ export async function getWorkOrders(filters?: {
     where.clientId = filters.clientId;
   }
 
-  if (filters?.status) where.status = filters.status;
-  if (filters?.priority) where.priority = filters.priority;
+  if (filters?.status) where.status = filters.status as WorkOrderFormData["status"];
+  if (filters?.priority) where.priority = filters.priority as WorkOrderFormData["priority"];
   if (filters?.search) {
     where.OR = [
-      { code: { contains: filters.search } },
-      { title: { contains: filters.search } },
+      { code: { contains: filters.search, mode: "insensitive" } },
+      { title: { contains: filters.search, mode: "insensitive" } },
     ];
   }
 
@@ -42,7 +42,7 @@ export async function getWorkOrders(filters?: {
 
 export async function getWorkOrderById(id: string) {
   const session = await requireAuth(READ_ROLES);
-  const where: Record<string, unknown> = { id };
+  const where: import('@prisma/client').Prisma.WorkOrderWhereInput = { id };
   
   if (session.user.role === "CLIENT" && session.user.clientId) {
     where.clientId = session.user.clientId;
