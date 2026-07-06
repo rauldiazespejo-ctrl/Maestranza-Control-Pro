@@ -23,13 +23,19 @@ import {
 } from "@/lib/actions/worker-assignments";
 import { assignSupervisorToWorkOrder } from "@/lib/actions/workorders";
 import { createFabricationGanttFromWorkOrder } from "@/lib/actions/gantt";
+import { WorkOrderTasksSection } from "@/components/ordenes/WorkOrderTasksSection";
 
 type WorkOrderDetail = Prisma.WorkOrderGetPayload<{
   include: {
     client: true;
     responsible: true;
     project: true;
-    tasks: true;
+    tasks: {
+      include: {
+        asts: { select: { id: true; status: true; riskLevel: true; approvedAt: true } };
+        permits: { select: { id: true; type: true; status: true; startAt: true; endAt: true } };
+      };
+    };
     assignments: { include: { worker: true } };
     documents: true;
   };
@@ -283,19 +289,19 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
             </div>
           )}
           {globalSuccess && (
-            <div className="rounded-lg border border-emerald-400/25 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+            <div className="rounded-lg border border-blue-400/25 bg-blue-500/10 p-3 text-sm text-blue-100">
               {globalSuccess}
             </div>
           )}
 
           <form
             onSubmit={handleSupervisorSave}
-            className="rounded-lg border border-cyan-bright/20 bg-cyan-muted/40 p-4"
+            className="rounded-lg border border-blue-400/20 bg-blue-500/10 p-4"
           >
             <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
               <div>
                 <label className="mb-1 flex items-center gap-2 text-xs font-medium text-steel">
-                  <ShieldCheck className="h-4 w-4 text-cyan-bright" />
+                  <ShieldCheck className="h-4 w-4 text-blue-300" />
                   Supervisor responsable de la OT
                 </label>
                 <Select value={supervisorId} onChange={(event) => setSupervisorId(event.target.value)}>
@@ -387,6 +393,8 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
           )}
         </CardContent>
       </Card>
+
+      <WorkOrderTasksSection workOrderId={order.id} tasks={order.tasks} />
     </div>
   );
 }

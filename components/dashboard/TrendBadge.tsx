@@ -17,12 +17,12 @@ export function TrendBadge({ value, label, className }: TrendBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors duration-200",
         isNeutral
-          ? "bg-stone-500/20 text-stone-400"
+          ? "border-border-subtle bg-white/5 text-steel"
           : isPositive
-          ? "bg-emerald-500/20 text-emerald-300"
-          : "bg-fire/20 text-fire-bright",
+          ? "border-blue-400/30 bg-blue-500/12 text-blue-200"
+          : "border-red-400/35 bg-red-500/12 text-red-200",
         className
       )}
     >

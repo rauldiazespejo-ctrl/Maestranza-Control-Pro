@@ -1,0 +1,159 @@
+{"kind":"deck","id":"pr/45jlq9","name":"Deck"}
+{"kind":"layout","layoutId":"8265fc8b-70de-413e-9ce1-d6da213d0b00","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"71ffcfe7-2c12-4855-ba5c-5eb9f24c96f8","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/xc5ua7","slide":1,"title":"Maestranza Control Pro","textShapes":9}
+{"kind":"shape","id":"sh/zqtcj6to","slide":1,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/obm58z25","slide":1,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":1,"text":"Maestranza Control Pro","textPreview":"Maestranza Control Pro","textChars":22,"textLines":1,"bbox":[72,86,820,74]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":1,"text":"Plataforma productiva para OT, planificación, HSEQ, AST/PTW y trazabilidad documental.","textPreview":"Plataforma productiva para OT, planificación, HSEQ, AST/PTW y trazabilidad documental.","textChars":86,"textLines":1,"bbox":[74,174,760,78]}
+{"kind":"shape","id":"sh/oza1gvy9","slide":1,"bbox":[74,300,190,34]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":1,"text":"Producción desplegada","textPreview":"Producción desplegada","textChars":21,"textLines":1,"bbox":[74,306,190,24]}
+{"kind":"shape","id":"sh/al87ed8b","slide":1,"bbox":[282,300,140,34]}
+{"kind":"textbox","id":"sh/z61032ls","slide":1,"text":"AST/PTW MVP","textPreview":"AST/PTW MVP","textChars":11,"textLines":1,"bbox":[282,306,140,24]}
+{"kind":"shape","id":"sh/za1gvy90","slide":1,"bbox":[438,300,160,34]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":1,"text":"HSEQ auditable","textPreview":"HSEQ auditable","textChars":14,"textLines":1,"bbox":[438,306,160,24]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":1,"text":"Objetivo","textPreview":"Objetivo","textChars":8,"textLines":1,"bbox":[74,404,250,34]}
+{"kind":"textbox","id":"sh/svu9knih","slide":1,"text":"Unificar operación, seguridad y evidencia en una sola fuente confiable para equipos industriales.","textPreview":"Unificar operación, seguridad y evidencia en una sola fuente confiable para equipos industriales.","textChars":97,"textLines":1,"bbox":[74,448,520,86]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":1,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"image","id":"im/2hwfyxob","slide":1,"name":"","geometry":"roundRect","alt":"Vista general de ForgeOps","bbox":[688,86,470,530]}
+{"kind":"notes","id":"nt/xc5ua7","slide":1,"text":""}
+{"kind":"slide","id":"sl/uu9akm","slide":2,"title":"El control operacional queda concentrado en una vista ejecutiva","textShapes":9}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":2,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":2,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":2,"text":"El control operacional queda concentrado en una vista ejecutiva","textPreview":"El control operacional queda concentrado en una vista ejecutiva","textChars":63,"textLines":1,"bbox":[72,54,1020,88]}
+{"kind":"shape","id":"sh/m1cfa9w3","slide":2,"bbox":[778,176,380,92]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":2,"text":"KPIs vivos","textPreview":"KPIs vivos","textChars":10,"textLines":1,"bbox":[804,195,300,30]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":2,"text":"Órdenes activas, atrasos, avance promedio y alertas HSEQ.","textPreview":"Órdenes activas, atrasos, avance promedio y alertas HSEQ.","textChars":57,"textLines":1,"bbox":[804,230,310,42]}
+{"kind":"shape","id":"sh/bq1oryts","slide":2,"bbox":[778,294,380,92]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":2,"text":"Foco diario","textPreview":"Foco diario","textChars":11,"textLines":1,"bbox":[804,313,300,30]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":2,"text":"La operación ve prioridades y compromisos sin buscar en planillas.","textPreview":"La operación ve prioridades y compromisos sin buscar en planillas.","textChars":66,"textLines":1,"bbox":[804,348,310,42]}
+{"kind":"shape","id":"sh/dsji5sne","slide":2,"bbox":[778,412,380,92]}
+{"kind":"textbox","id":"sh/61032lsz","slide":2,"text":"Estado claro","textPreview":"Estado claro","textChars":12,"textLines":1,"bbox":[804,431,300,30]}
+{"kind":"textbox","id":"sh/vmtwra5g","slide":2,"text":"Rojo para crítico, naranja para advertencia y azul para cumplimiento.","textPreview":"Rojo para crítico, naranja para advertencia y azul para cumplimiento.","textChars":69,"textLines":1,"bbox":[804,466,320,42]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":2,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/d4vmtwra","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"image","id":"im/u54zidon","slide":2,"name":"","geometry":"roundRect","alt":"Dashboard operacional","bbox":[72,170,660,390]}
+{"kind":"notes","id":"nt/uu9akm","slide":2,"text":""}
+{"kind":"slide","id":"sl/ygxbjd","slide":3,"title":"Cada OT conecta planificación, dotación y avance real","textShapes":13}
+{"kind":"shape","id":"sh/yd0z6103","slide":3,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/90je9cvi","slide":3,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":3,"text":"Cada OT conecta planificación, dotación y avance real","textPreview":"Cada OT conecta planificación, dotación y avance real","textChars":53,"textLines":1,"bbox":[72,54,1030,80]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":3,"text":"Flujo operativo","textPreview":"Flujo operativo","textChars":15,"textLines":1,"bbox":[812,166,330,36]}
+{"kind":"shape","id":"sh/9s36hcrm","slide":3,"bbox":[812,224,42,42]}
+{"kind":"textbox","id":"sh/g7adsji5","slide":3,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[812,232,42,24]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":3,"text":"Crear OT y responsable","textPreview":"Crear OT y responsable","textChars":22,"textLines":1,"bbox":[876,228,290,34]}
+{"kind":"shape","id":"sh/yxobm58z","slide":3,"bbox":[812,296,42,42]}
+{"kind":"textbox","id":"sh/obm58z25","slide":3,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[812,304,42,24]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":3,"text":"Asignar tareas y procesos","textPreview":"Asignar tareas y procesos","textChars":25,"textLines":1,"bbox":[876,300,290,34]}
+{"kind":"shape","id":"sh/65wjudg7","slide":3,"bbox":[812,368,42,42]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[812,376,42,24]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":3,"text":"Generar carta Gantt","textPreview":"Generar carta Gantt","textChars":19,"textLines":1,"bbox":[876,372,290,34]}
+{"kind":"shape","id":"sh/hk3q5o7q","slide":3,"bbox":[812,440,42,42]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":3,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[812,448,42,24]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":3,"text":"Controlar avance y atrasos","textPreview":"Controlar avance y atrasos","textChars":26,"textLines":1,"bbox":[876,444,290,34]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":3,"text":"Resultado: planificación trazable por proyecto, proceso y responsable.","textPreview":"Resultado: planificación trazable por proyecto, proceso y responsable.","textChars":70,"textLines":1,"bbox":[812,548,310,54]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":3,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"image","id":"im/qd4vmtwr","slide":3,"name":"","geometry":"roundRect","alt":"Órdenes y carta Gantt","bbox":[72,162,690,420]}
+{"kind":"notes","id":"nt/ygxbjd","slide":3,"text":""}
+{"kind":"slide","id":"sl/3go47f","slide":4,"title":"HSEQ deja de ser registro aislado y pasa a controlar la ejecución","textShapes":9}
+{"kind":"shape","id":"sh/upwb2hwf","slide":4,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/5gbq1ory","slide":4,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/cvixczed","slide":4,"text":"HSEQ deja de ser registro aislado y pasa a controlar la ejecución","textPreview":"HSEQ deja de ser registro aislado y pasa a controlar la ejecución","textChars":65,"textLines":1,"bbox":[72,54,1080,80]}
+{"kind":"shape","id":"sh/udg7adsj","slide":4,"bbox":[736,166,420,118]}
+{"kind":"textbox","id":"sh/54zidony","slide":4,"text":"AST digital","textPreview":"AST digital","textChars":11,"textLines":1,"bbox":[764,190,260,32]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":4,"text":"Pasos, peligros, controles, riesgo residual y aprobación.","textPreview":"Pasos, peligros, controles, riesgo residual y aprobación.","textChars":57,"textLines":1,"bbox":[764,232,340,40]}
+{"kind":"shape","id":"sh/judg7ads","slide":4,"bbox":[736,314,420,118]}
+{"kind":"textbox","id":"sh/u9knih4b","slide":4,"text":"PTW vigente","textPreview":"PTW vigente","textChars":11,"textLines":1,"bbox":[764,338,260,32]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":4,"text":"Permisos tipificados por riesgo y validados contra AST aprobado.","textPreview":"Permisos tipificados por riesgo y validados contra AST aprobado.","textChars":64,"textLines":1,"bbox":[764,380,350,40]}
+{"kind":"shape","id":"sh/tsvu9kni","slide":4,"bbox":[736,462,420,118]}
+{"kind":"textbox","id":"sh/m1cfa9w3","slide":4,"text":"Bloqueo automático","textPreview":"Bloqueo automático","textChars":18,"textLines":1,"bbox":[764,486,300,32]}
+{"kind":"textbox","id":"sh/bm58z25k","slide":4,"text":"Una tarea crítica no avanza sin cumplimiento HSEQ.","textPreview":"Una tarea crítica no avanza sin cumplimiento HSEQ.","textChars":50,"textLines":1,"bbox":[764,528,350,40]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":4,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"image","id":"im/m58z25kb","slide":4,"name":"","geometry":"roundRect","alt":"Módulo HSEQ","bbox":[72,166,620,380]}
+{"kind":"notes","id":"nt/3go47f","slide":4,"text":""}
+{"kind":"slide","id":"sl/lw3mbb","slide":5,"title":"El dossier documental queda vinculado a OT y registros HSEQ","textShapes":7}
+{"kind":"shape","id":"sh/9w3m94fu","slide":5,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/25kb6xkf","slide":5,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":5,"text":"El dossier documental queda vinculado a OT y registros HSEQ","textPreview":"El dossier documental queda vinculado a OT y registros HSEQ","textChars":59,"textLines":1,"bbox":[72,54,1040,80]}
+{"kind":"textbox","id":"sh/9knih4by","slide":5,"text":"Evidencias que soportan la liberación","textPreview":"Evidencias que soportan la liberación","textChars":37,"textLines":1,"bbox":[72,176,520,44]}
+{"kind":"shape","id":"sh/2t83itgf","slide":5,"bbox":[92,263,13,13]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":5,"text":"Procedimientos, certificados y registros de inspección.","textPreview":"Procedimientos, certificados y registros de inspección.","textChars":55,"textLines":1,"bbox":[126,256,520,52]}
+{"kind":"shape","id":"sh/gvy90je9","slide":5,"bbox":[92,341,13,13]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":5,"text":"Visibilidad pública/privada para portal cliente.","textPreview":"Visibilidad pública/privada para portal cliente.","textChars":48,"textLines":1,"bbox":[126,334,520,52]}
+{"kind":"shape","id":"sh/dg7adsji","slide":5,"bbox":[92,419,13,13]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":5,"text":"Trazabilidad para cierre de OT y auditorías ISO.","textPreview":"Trazabilidad para cierre de OT y auditorías ISO.","textChars":48,"textLines":1,"bbox":[126,412,520,52]}
+{"kind":"textbox","id":"sh/vahoza1g","slide":5,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"image","id":"im/5sneloj2","slide":5,"name":"","geometry":"roundRect","alt":"Documentos y evidencias","bbox":[688,162,470,390]}
+{"kind":"notes","id":"nt/lw3mbb","slide":5,"text":""}
+{"kind":"slide","id":"sl/v5j6ss","slide":6,"title":"El despliegue productivo ya quedó validado extremo a extremo","textShapes":16}
+{"kind":"shape","id":"sh/za1gvy90","slide":6,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/svu9knih","slide":6,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":6,"text":"El despliegue productivo ya quedó validado extremo a extremo","textPreview":"El despliegue productivo ya quedó validado extremo a extremo","textChars":60,"textLines":1,"bbox":[72,54,1060,80]}
+{"kind":"shape","id":"sh/a1gvy90j","slide":6,"bbox":[92,174,1050,58]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":6,"text":"Producción","textPreview":"Producción","textChars":10,"textLines":1,"bbox":[116,192,190,26]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":6,"text":"https://maestranza-control-pro.vercel.app","textPreview":"https://maestranza-control-pro.vercel.app","textChars":41,"textLines":1,"bbox":[332,192,620,26]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":6,"bbox":[1038,186,64,34]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":6,"text":"OK","textPreview":"OK","textChars":2,"textLines":1,"bbox":[1038,192,64,24]}
+{"kind":"shape","id":"sh/3m94fu18","slide":6,"bbox":[92,250,1050,58]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":6,"text":"Base de datos","textPreview":"Base de datos","textChars":13,"textLines":1,"bbox":[116,268,190,26]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":6,"text":"Migración AST/PTW aplicada en Neon PostgreSQL","textPreview":"Migración AST/PTW aplicada en Neon PostgreSQL","textChars":45,"textLines":1,"bbox":[332,268,620,26]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":6,"bbox":[1038,262,64,34]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":6,"text":"OK","textPreview":"OK","textChars":2,"textLines":1,"bbox":[1038,268,64,24]}
+{"kind":"shape","id":"sh/za1gvy90","slide":6,"bbox":[92,326,1050,58]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":6,"text":"Health check","textPreview":"Health check","textChars":12,"textLines":1,"bbox":[116,344,190,26]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":6,"text":"/api/health con database ok y schema ok","textPreview":"/api/health con database ok y schema ok","textChars":39,"textLines":1,"bbox":[332,344,620,26]}
+{"kind":"shape","id":"sh/svu9knih","slide":6,"bbox":[1038,338,64,34]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":6,"text":"OK","textPreview":"OK","textChars":2,"textLines":1,"bbox":[1038,344,64,24]}
+{"kind":"shape","id":"sh/adsji5sn","slide":6,"bbox":[92,402,1050,58]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":6,"text":"Build remoto","textPreview":"Build remoto","textChars":12,"textLines":1,"bbox":[116,420,190,26]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":6,"text":"Next.js 16.2.9 compilado en Vercel","textPreview":"Next.js 16.2.9 compilado en Vercel","textChars":34,"textLines":1,"bbox":[332,420,620,26]}
+{"kind":"shape","id":"sh/0je9cvix","slide":6,"bbox":[1038,414,64,34]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":6,"text":"OK","textPreview":"OK","textChars":2,"textLines":1,"bbox":[1038,420,64,24]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":6,"text":"La plataforma quedó publicada con autenticación, rutas protegidas y esquema actualizado.","textPreview":"La plataforma quedó publicada con autenticación, rutas protegidas y esquema actualizado.","textChars":88,"textLines":1,"bbox":[92,560,850,38]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":6,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"notes","id":"nt/v5j6ss","slide":6,"text":""}
+{"kind":"slide","id":"sl/2to28p","slide":7,"title":"Beneficios para operación, HSEQ y gerencia","textShapes":11}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":7,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/kb6xkf6d","slide":7,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":7,"text":"Beneficios para operación, HSEQ y gerencia","textPreview":"Beneficios para operación, HSEQ y gerencia","textChars":42,"textLines":1,"bbox":[72,54,900,74]}
+{"kind":"shape","id":"sh/2t83itgf","slide":7,"bbox":[92,172,480,128]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":7,"text":"Menos dispersión","textPreview":"Menos dispersión","textChars":16,"textLines":1,"bbox":[120,198,400,34]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":7,"text":"OT, Gantt, HSEQ y documentos conviven en el mismo flujo.","textPreview":"OT, Gantt, HSEQ y documentos conviven en el mismo flujo.","textChars":56,"textLines":1,"bbox":[120,240,410,44]}
+{"kind":"shape","id":"sh/9knih4by","slide":7,"bbox":[632,172,480,128]}
+{"kind":"textbox","id":"sh/2p8nqxs7","slide":7,"text":"Más control preventivo","textPreview":"Más control preventivo","textChars":22,"textLines":1,"bbox":[660,198,400,34]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":7,"text":"AST/PTW bloquean avances inseguros antes de ejecutar.","textPreview":"AST/PTW bloquean avances inseguros antes de ejecutar.","textChars":53,"textLines":1,"bbox":[660,240,410,44]}
+{"kind":"shape","id":"sh/3m94fu18","slide":7,"bbox":[92,350,480,128]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":7,"text":"Auditoría preparada","textPreview":"Auditoría preparada","textChars":19,"textLines":1,"bbox":[120,376,400,34]}
+{"kind":"textbox","id":"sh/lszqtcj6","slide":7,"text":"Acciones sensibles quedan registradas para seguimiento.","textPreview":"Acciones sensibles quedan registradas para seguimiento.","textChars":55,"textLines":1,"bbox":[120,418,410,44]}
+{"kind":"shape","id":"sh/s72x4nap","slide":7,"bbox":[632,350,480,128]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":7,"text":"Mejor lectura visual","textPreview":"Mejor lectura visual","textChars":20,"textLines":1,"bbox":[660,376,400,34]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":7,"text":"Paleta rojo, azul, naranja y blanco sin dependencias verdes.","textPreview":"Paleta rojo, azul, naranja y blanco sin dependencias verdes.","textChars":60,"textLines":1,"bbox":[660,418,410,44]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":7,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/sji5snel","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"notes","id":"nt/2to28p","slide":7,"text":""}
+{"kind":"slide","id":"sl/rvfqjb","slide":8,"title":"Siguiente paso recomendado","textShapes":14}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":8,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/al87ed8b","slide":8,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/z61032ls","slide":8,"text":"Siguiente paso recomendado","textPreview":"Siguiente paso recomendado","textChars":26,"textLines":1,"bbox":[72,76,880,62]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":8,"text":"Ejecutar una revisión operativa con usuarios clave y cargar AST/PTW reales de una OT crítica.","textPreview":"Ejecutar una revisión operativa con usuarios clave y cargar AST/PTW reales de una OT crítica.","textChars":93,"textLines":1,"bbox":[72,162,840,72]}
+{"kind":"shape","id":"sh/h0fepkzu","slide":8,"bbox":[72,292,320,150]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[96,316,40,42]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":8,"text":"Validar flujo de OT crítica","textPreview":"Validar flujo de OT crítica","textChars":27,"textLines":1,"bbox":[150,322,190,48]}
+{"kind":"textbox","id":"sh/obm58z25","slide":8,"text":"Crear tarea, AST, PTW y cierre controlado.","textPreview":"Crear tarea, AST, PTW y cierre controlado.","textChars":42,"textLines":1,"bbox":[150,378,190,36]}
+{"kind":"shape","id":"sh/hwfyxobm","slide":8,"bbox":[430,292,320,150]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[454,316,40,42]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":8,"text":"Cargar evidencias","textPreview":"Cargar evidencias","textChars":17,"textLines":1,"bbox":[508,322,190,48]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":8,"text":"Documentos, certificados y registros HSEQ.","textPreview":"Documentos, certificados y registros HSEQ.","textChars":42,"textLines":1,"bbox":[508,378,190,36]}
+{"kind":"shape","id":"sh/mhk3q5o7","slide":8,"bbox":[788,292,320,150]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[812,316,40,42]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":8,"text":"Cerrar dossier","textPreview":"Cerrar dossier","textChars":14,"textLines":1,"bbox":[866,322,190,48]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":8,"text":"Verificar trazabilidad para auditoría.","textPreview":"Verificar trazabilidad para auditoría.","textChars":38,"textLines":1,"bbox":[866,378,190,36]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":8,"text":"URL productiva: maestranza-control-pro.vercel.app","textPreview":"URL productiva: maestranza-control-pro.vercel.app","textChars":49,"textLines":1,"bbox":[72,574,720,34]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":8,"text":"Maestranza Control Pro · Producción","textPreview":"Maestranza Control Pro · Producción","textChars":35,"textLines":1,"bbox":[72,670,420,26]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1150,670,60,26]}
+{"kind":"notes","id":"nt/rvfqjb","slide":8,"text":""}

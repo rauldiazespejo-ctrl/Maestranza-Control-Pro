@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* ── ForgeOps palette: CIAN NEÓN (pulsoai/nexusguard) ── */
+  /* ── ForgeOps palette: Industrial premium sobria ── */
   --color-navy-primary: #0F172A;
   --color-navy-dark: #020617;
   --color-navy-light: #1E293B;
 
-  /* Cian neón como acento primario (reemplaza fire/verde) */
-  --color-cyan: #00B8D4;
-  --color-cyan-bright: #00E5FF;
-  --color-cyan-muted: rgba(0, 229, 255, 0.16);
-  --color-cyan-glow: rgba(0, 229, 255, 0.22);
-  --color-cyan-glow-hover: rgba(0, 229, 255, 0.32);
+  /* Azul acero como primario sobrio */
+  --color-cyan: #3B82A0;
+  --color-cyan-bright: #63A3BF;
+  --color-cyan-muted: rgba(99, 163, 191, 0.14);
+  --color-cyan-glow: rgba(99, 163, 191, 0.16);
+  --color-cyan-glow-hover: rgba(99, 163, 191, 0.22);
 
   /* Gold se mantiene como acento secundario / premium */
   --color-gold: #E8B33A;
@@ -45,7 +45,7 @@
   --color-surface-raised: rgba(30, 41, 59, 0.84);
   --color-surface-muted: rgba(203, 213, 225, 0.08);
   --color-surface-hover: rgba(203, 213, 225, 0.11);
-  --color-primary: #00B8D4;
+  --color-primary: #3B82A0;
   --color-primary-foreground: #020617;
   --color-secondary: #1C244B;
   --color-secondary-foreground: #FFFFFF;
@@ -53,7 +53,7 @@
   --color-accent-foreground: #0E0E2A;
   --color-destructive: #D92930;
   --color-destructive-foreground: #FFFFFF;
-  --color-ring: #00E5FF;
+  --color-ring: #E8B33A;
   --color-input: #1C244B;
   --color-popover: #16163F;
   --color-popover-foreground: #FFFFFF;
@@ -96,10 +96,10 @@
   --shadow-industrial:    0 18px 48px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   --shadow-industrial-sm: 0 10px 28px rgba(0, 0, 0, 0.22);
   --shadow-industrial-lg: 0 24px 72px rgba(0, 0, 0, 0.38), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  --shadow-focus:     0 0 0 4px rgba(0, 229, 255, 0.18);
+  --shadow-focus:     0 0 0 4px rgba(99, 163, 191, 0.16);
   --shadow-focus-gold: 0 0 0 4px rgba(232, 179, 58, 0.18);
-  --shadow-btn-primary:  0 8px 18px rgba(0, 229, 255, 0.22);
-  --shadow-btn-primary-hover: 0 10px 28px rgba(0, 229, 255, 0.32);
+  --shadow-btn-primary:  0 8px 18px rgba(15, 23, 42, 0.24);
+  --shadow-btn-primary-hover: 0 10px 28px rgba(15, 23, 42, 0.34);
 
   /* Motion */
   --ease-industrial: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -177,10 +177,10 @@ html {
   scrollbar-color: var(--color-navy-light) var(--color-navy-dark);
 }
 
-/* ── BODY: fondo dark con acentos cian neón ── */
+  /* ── BODY: fondo dark con acentos sobrios acero/ámbar ── */
 body {
   background:
-    radial-gradient(circle at 50% -20%, rgba(0, 229, 255, 0.14), transparent 36rem),
+    radial-gradient(circle at 50% -20%, rgba(99, 163, 191, 0.10), transparent 36rem),
     linear-gradient(180deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 1) 42%),
     linear-gradient(135deg, rgba(232, 179, 58, 0.08) 0%, transparent 34%),
     repeating-linear-gradient(0deg, rgba(203, 213, 225, 0.018) 0 1px, transparent 1px 84px),
@@ -193,7 +193,7 @@ body {
 }
 
 ::selection {
-  background: rgba(0, 229, 255, 0.32);
+  background: rgba(99, 163, 191, 0.24);
   color: var(--color-white);
 }
 
@@ -213,7 +213,7 @@ button:disabled,
 /* ── App shell background ── */
 .app-shell-bg {
   background:
-    radial-gradient(circle at top left, rgba(0, 229, 255, 0.10), transparent 24rem),
+    radial-gradient(circle at top left, rgba(99, 163, 191, 0.08), transparent 24rem),
     linear-gradient(180deg, rgba(30, 41, 59, 0.18), transparent 220px),
     repeating-linear-gradient(90deg, rgba(203, 213, 225, 0.022) 0 1px, transparent 1px 96px),
     var(--color-navy-dark);
@@ -242,7 +242,7 @@ button:disabled,
   pointer-events: none;
   background:
     linear-gradient(115deg, rgba(255, 255, 255, 0.055), transparent 34%),
-    linear-gradient(180deg, rgba(0, 229, 255, 0.035), transparent 42%);
+    linear-gradient(180deg, rgba(99, 163, 191, 0.03), transparent 42%);
   opacity: 0.82;
 }
 
@@ -281,7 +281,7 @@ button:disabled,
 }
 
 .metric-card:hover {
-  border-color: rgba(0, 229, 255, 0.34);
+  border-color: rgba(99, 163, 191, 0.26);
   box-shadow: var(--shadow-industrial-lg);
   transform: translateY(-2px);
 }
@@ -403,9 +403,9 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
   z-index: -2;
   background:
-    radial-gradient(circle at 8% 10%, rgba(0, 229, 255, 0.11), transparent 26rem),
+    radial-gradient(circle at 8% 10%, rgba(99, 163, 191, 0.08), transparent 26rem),
     radial-gradient(circle at 92% 14%, rgba(232, 179, 58, 0.11), transparent 28rem),
-    radial-gradient(circle at 52% 115%, rgba(0, 184, 212, 0.13), transparent 34rem);
+    radial-gradient(circle at 52% 115%, rgba(59, 130, 160, 0.10), transparent 34rem);
 }
 
 .control-center-shell::after {
@@ -427,7 +427,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
   background:
-    linear-gradient(120deg, rgba(0, 229, 255, 0.10), transparent 42%),
+    linear-gradient(120deg, rgba(99, 163, 191, 0.08), transparent 42%),
     linear-gradient(300deg, rgba(232, 179, 58, 0.10), transparent 45%),
     var(--color-surface-glass);
   box-shadow: var(--shadow-industrial-lg);
@@ -439,27 +439,27 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   inset: -45% -10% auto;
   height: 240px;
-  background: radial-gradient(circle, rgba(0, 229, 255, 0.26), transparent 60%);
+  background: radial-gradient(circle, rgba(99, 163, 191, 0.18), transparent 60%);
   filter: blur(22px);
   pointer-events: none;
   opacity: 0.9;
 }
 
 .neon-surface {
-  border: 1px solid rgba(0, 229, 255, 0.2);
+  border: 1px solid rgba(99, 163, 191, 0.18);
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.84), rgba(2, 6, 23, 0.92));
   box-shadow:
-    0 0 0 1px rgba(0, 229, 255, 0.06) inset,
+    0 0 0 1px rgba(99, 163, 191, 0.06) inset,
     0 18px 44px rgba(0, 0, 0, 0.36),
-    0 0 28px rgba(0, 229, 255, 0.11);
+    0 0 22px rgba(99, 163, 191, 0.08);
 }
 
 .neon-pill {
-  border: 1px solid rgba(0, 229, 255, 0.35);
-  background: rgba(0, 229, 255, 0.1);
-  color: #a6f7ff;
-  box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.12) inset;
+  border: 1px solid rgba(99, 163, 191, 0.28);
+  background: rgba(99, 163, 191, 0.10);
+  color: #c5d8e0;
+  box-shadow: 0 0 0 1px rgba(99, 163, 191, 0.10) inset;
 }
 
 .gold-pill {
@@ -482,7 +482,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 230px;
   height: 230px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(0, 229, 255, 0.24), transparent 68%);
+  background: radial-gradient(circle, rgba(99, 163, 191, 0.16), transparent 68%);
   pointer-events: none;
 }
 
@@ -496,8 +496,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .impact-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(0, 229, 255, 0.35);
+  border-color: rgba(99, 163, 191, 0.26);
   box-shadow:
     0 16px 38px rgba(0, 0, 0, 0.35),
-    0 0 24px rgba(0, 229, 255, 0.18);
+    0 0 18px rgba(99, 163, 191, 0.10);
 }

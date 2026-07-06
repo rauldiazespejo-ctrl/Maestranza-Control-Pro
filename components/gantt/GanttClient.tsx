@@ -75,7 +75,7 @@ function getBarGradient(status: string): string {
     case "en_progreso":
       return "linear-gradient(90deg, #E8B33A, #F0C860)";
     case "completada":
-      return "linear-gradient(90deg, #16a34a, #4ade80)";
+      return "linear-gradient(90deg, #2563eb, #60a5fa)";
     default:
       return "linear-gradient(90deg, #C8D5DC, #e2e8ed)";
   }
@@ -162,7 +162,7 @@ function GanttTooltip({ data, containerW }: { data: TooltipData; containerW: num
           style={{
             width: `${task.progress}%`,
             background: task.status === "completada"
-              ? "linear-gradient(90deg, #16a34a, #4ade80)"
+              ? "linear-gradient(90deg, #2563eb, #60a5fa)"
               : task.status === "retrasada"
               ? "linear-gradient(90deg, #950A10, #D92930)"
               : "linear-gradient(90deg, #E8B33A, #F0C860)",
@@ -496,7 +496,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
               </p>
             </div>
             {generationMessage && (
-              <div className="mt-3 rounded-md border border-emerald-400/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+              <div className="mt-3 rounded-md border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-sm text-blue-100">
                 {generationMessage}
               </div>
             )}

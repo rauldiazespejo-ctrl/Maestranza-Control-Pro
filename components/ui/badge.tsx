@@ -49,18 +49,18 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             outline:
               "border border-border-subtle bg-transparent text-steel",
             fire:
-              "border-fire-bright/30 bg-fire text-white",
+              "border-alert/40 bg-alert/85 text-white",
             gold:
               "border-gold/45 bg-gold text-navy-dark",
             success:
-              "border-emerald-400/30 bg-emerald-600 text-white",
+              "border-blue-400/35 bg-blue-500/20 text-blue-100",
             destructive:
-              "border-fire-bright/40 bg-fire-bright text-white",
+              "border-alert/45 bg-alert text-white",
 
             /* ── Order states ── */
             nueva: (
-              "border-border-fire bg-fire-muted text-fire-bright" +
-              " [&_.badge-dot]:bg-fire-bright"
+              "border-alert/35 bg-alert/12 text-red-200" +
+              " [&_.badge-dot]:bg-red-300"
             ),
             planificada: (
               "border-border-gold bg-gold-muted text-gold" +
@@ -71,16 +71,16 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
               " [&_.badge-dot]:bg-steel [&_.badge-dot]:animate-[pulse-dot_2s_ease-in-out_infinite]"
             ),
             detenida: (
-              "border-border-fire/50 bg-fire-muted text-fire" +
-              " [&_.badge-dot]:bg-fire"
+              "border-alert/45 bg-alert/15 text-red-200" +
+              " [&_.badge-dot]:bg-red-300"
             ),
             revision: (
               "border-border-gold/50 bg-gold-muted text-gold" +
               " [&_.badge-dot]:bg-gold"
             ),
             completada: (
-              "border-steel/40 bg-navy-light text-steel" +
-              " [&_.badge-dot]:bg-steel/60"
+              "border-blue-400/35 bg-blue-500/15 text-blue-200" +
+              " [&_.badge-dot]:bg-blue-300"
             ),
             cerrada: (
               "border-border-subtle bg-navy-light/40 text-steel/60" +
@@ -89,12 +89,12 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 
             /* ── Priority ── */
             critica: (
-              "border-fire bg-fire text-white shadow-[0_0_12px_var(--color-fire)]" +
+              "border-alert/60 bg-alert text-white" +
               " [&_.badge-dot]:bg-white"
             ),
             alta: (
-              "border-fire bg-fire-muted text-fire-bright" +
-              " [&_.badge-dot]:bg-fire"
+              "border-alert/45 bg-alert/15 text-red-200" +
+              " [&_.badge-dot]:bg-red-300"
             ),
             media: (
               "border-border-gold bg-gold-muted text-gold" +
@@ -107,13 +107,13 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 
             /* ── HSEQ states ── */
             "hseq-abierto":
-              "border-border-fire/40 bg-fire/20 text-fire-bright",
+              "border-alert/35 bg-alert/12 text-red-200",
             "hseq-en-revision":
               "border-border-gold/45 bg-gold/15 text-gold",
             "hseq-cerrado":
-              "border-steel/30 bg-steel/10 text-steel/60",
+              "border-blue-300/30 bg-blue-500/10 text-blue-100/80",
             "hseq-vencido":
-              "border-fire-bright/60 bg-fire-bright/25 text-white shadow-[0_0_10px_var(--color-fire-bright)]",
+              "border-alert/60 bg-alert/20 text-red-100",
           }[variant],
           className
         )}

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-/** Base card: glass surface, subtle lift, cyan operational focus on hover. */
+/** Base card: glass surface with sober industrial hover feedback. */
 const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => (
     <div
@@ -9,7 +9,7 @@ const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
       className={cn(
         "surface-glass rounded-lg border border-border-subtle text-card-foreground",
         "transition-all duration-200 will-change-transform",
-        "hover:-translate-y-1 hover:border-border-cyan hover:shadow-[0_20px_44px_rgba(0,0,0,0.35),0_0_26px_rgba(0,229,255,0.15)]",
+        "hover:-translate-y-0.5 hover:border-border-strong hover:shadow-industrial",
         className
       )}
       {...props}

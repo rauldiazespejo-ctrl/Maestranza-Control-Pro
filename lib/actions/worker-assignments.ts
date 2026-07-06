@@ -56,43 +56,53 @@ export async function assignWorkerToOrder(data: WorkerAssignmentFormData) {
 
   const parsed = workerAssignmentSchema.parse(data);
 
-  const worker = await prisma.worker.findUnique({
-    where: { id: parsed.workerId },
+  const workOrder = await prisma.workOrder.findUnique({
+    where: { id: parsed.workOrderId },
+    select: { id: true },
   });
+  if (!workOrder) throw new Error("Orden de trabajo no encontrada");
 
-  if (!worker) throw new Error("Trabajador no encontrado");
-  if (worker.status !== "activo") throw new Error("El trabajador no está activo");
+  const assignment = await prisma.$transaction(async (tx) => {
+    const worker = await tx.worker.findUnique({
+      where: { id: parsed.workerId },
+    });
 
-  const existing = await prisma.workerAssignment.findUnique({
-    where: {
-      workerId_workOrderId: {
+    if (!worker) throw new Error("Trabajador no encontrado");
+    if (worker.status !== "activo") throw new Error("El trabajador no está activo");
+
+    const existing = await tx.workerAssignment.findUnique({
+      where: {
+        workerId_workOrderId: {
+          workerId: parsed.workerId,
+          workOrderId: parsed.workOrderId,
+        },
+      },
+    });
+
+    if (existing) throw new Error("El trabajador ya está asignado a esta orden");
+
+    const created = await tx.workerAssignment.create({
+      data: {
         workerId: parsed.workerId,
         workOrderId: parsed.workOrderId,
+        startDate: toDateOptional(parsed.startDate),
+        endDate: toDateOptional(parsed.endDate),
+        hours: toNumberOptional(parsed.hours),
       },
-    },
-  });
+      include: { worker: true },
+    });
 
-  if (existing) throw new Error("El trabajador ya está asignado a esta orden");
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "ASSIGN",
+        entity: "WorkerAssignment",
+        entityId: created.id,
+        metadata: JSON.stringify({ workerId: parsed.workerId, workOrderId: parsed.workOrderId }),
+      },
+    });
 
-  const assignment = await prisma.workerAssignment.create({
-    data: {
-      workerId: parsed.workerId,
-      workOrderId: parsed.workOrderId,
-      startDate: toDateOptional(parsed.startDate),
-      endDate: toDateOptional(parsed.endDate),
-      hours: toNumberOptional(parsed.hours),
-    },
-    include: { worker: true },
-  });
-
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "ASSIGN",
-      entity: "WorkerAssignment",
-      entityId: assignment.id,
-      metadata: JSON.stringify({ workerId: parsed.workerId, workOrderId: parsed.workOrderId }),
-    },
+    return created;
   });
 
   revalidatePath(`/ordenes/${parsed.workOrderId}`);
@@ -103,16 +113,24 @@ export async function assignWorkerToOrder(data: WorkerAssignmentFormData) {
 export async function removeWorkerAssignment(id: string, workOrderId: string) {
   const session = await requireAuth(OPERATIONS_ROLES);
 
-  await prisma.workerAssignment.delete({ where: { id } });
+  const existing = await prisma.workerAssignment.findUnique({
+    where: { id },
+    select: { id: true, workOrderId: true },
+  });
+  if (!existing) throw new Error("Asignación no encontrada");
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "UNASSIGN",
-      entity: "WorkerAssignment",
-      entityId: id,
-      metadata: JSON.stringify({ workOrderId }),
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.workerAssignment.delete({ where: { id } });
+
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "UNASSIGN",
+        entity: "WorkerAssignment",
+        entityId: id,
+        metadata: JSON.stringify({ workOrderId }),
+      },
+    });
   });
 
   revalidatePath(`/ordenes/${workOrderId}`);
@@ -124,24 +142,31 @@ export async function updateAssignmentHours(id: string, data: WorkerAssignmentHo
 
   const parsed = workerAssignmentHoursSchema.parse(data);
 
-  const assignment = await prisma.workerAssignment.update({
-    where: { id },
-    data: {
-      hours: toNumberOptional(parsed.hours),
-      startDate: toDateOptional(parsed.startDate),
-      endDate: toDateOptional(parsed.endDate),
-    },
-    include: { worker: true },
-  });
+  const assignment = await prisma.$transaction(async (tx) => {
+    const existing = await tx.workerAssignment.findUnique({ where: { id } });
+    if (!existing) throw new Error("Asignación no encontrada");
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "UPDATE",
-      entity: "WorkerAssignment",
-      entityId: assignment.id,
-      metadata: JSON.stringify({ hours: parsed.hours }),
-    },
+    const updated = await tx.workerAssignment.update({
+      where: { id },
+      data: {
+        hours: toNumberOptional(parsed.hours),
+        startDate: toDateOptional(parsed.startDate),
+        endDate: toDateOptional(parsed.endDate),
+      },
+      include: { worker: true },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "UPDATE",
+        entity: "WorkerAssignment",
+        entityId: updated.id,
+        metadata: JSON.stringify({ hours: parsed.hours }),
+      },
+    });
+
+    return updated;
   });
 
   revalidatePath(`/ordenes/${assignment.workOrderId}`);

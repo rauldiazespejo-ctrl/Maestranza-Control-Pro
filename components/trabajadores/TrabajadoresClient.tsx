@@ -81,7 +81,7 @@ function CertificationStatus({
       ) : isSoon ? (
         <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-gold" />
       ) : (
-        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-blue-300" />
       )}
       <div className="min-w-0 flex-1">
         <span className="truncate font-medium text-white">{name}</span>
@@ -96,7 +96,7 @@ function CertificationStatus({
             ? "text-fire-bright"
             : isSoon
             ? "text-gold"
-            : "text-emerald-400"
+            : "text-blue-300"
         )}
       >
         {isExpired ? `Vencido` : isSoon ? `${daysLeft}d` : `OK`}

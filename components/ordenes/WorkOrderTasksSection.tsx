@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/badge";
 import {
   workOrderTaskSchema,
   type WorkOrderTaskFormData,
@@ -28,12 +29,19 @@ import {
   deleteWorkOrderTask,
   toggleWorkOrderTask,
 } from "@/lib/actions/workorder-tasks";
-import type { WorkOrderTask } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 interface Props {
   workOrderId: string;
-  tasks: WorkOrderTask[];
+  tasks: Prisma.WorkOrderTaskGetPayload<{
+    include: {
+      asts: { select: { id: true; status: true; riskLevel: true; approvedAt: true } };
+      permits: { select: { id: true; type: true; status: true; startAt: true; endAt: true } };
+    };
+  }>[];
 }
+
+type TaskWithSafety = Props["tasks"][number];
 
 function formatDate(date?: Date | null) {
   if (!date) return "—";
@@ -43,7 +51,7 @@ function formatDate(date?: Date | null) {
 export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [editing, setEditing] = React.useState<WorkOrderTask | null>(null);
+  const [editing, setEditing] = React.useState<TaskWithSafety | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const {
@@ -58,6 +66,9 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
     defaultValues: {
       title: "",
       description: "",
+      processArea: "",
+      critical: false,
+      requiresPermit: false,
       progress: "0",
       completed: false,
       dueDate: "",
@@ -65,12 +76,16 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
   });
 
   const completed = useWatch({ control, name: "completed" });
+  const critical = useWatch({ control, name: "critical" });
 
   React.useEffect(() => {
     if (editing) {
       reset({
         title: editing.title,
         description: editing.description ?? "",
+        processArea: editing.processArea ?? "",
+        critical: editing.critical,
+        requiresPermit: editing.requiresPermit,
         progress: String(editing.progress),
         completed: editing.completed,
         dueDate: editing.dueDate
@@ -81,6 +96,9 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
       reset({
         title: "",
         description: "",
+        processArea: "",
+        critical: false,
+        requiresPermit: false,
         progress: "0",
         completed: false,
         dueDate: "",
@@ -91,6 +109,10 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
   React.useEffect(() => {
     if (completed) setValue("progress", "100");
   }, [completed, setValue]);
+
+  React.useEffect(() => {
+    if (!critical) setValue("requiresPermit", false);
+  }, [critical, setValue]);
 
   const onSubmit = async (data: WorkOrderTaskFormData) => {
     setError(null);
@@ -139,7 +161,7 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
     setIsOpen(true);
   };
 
-  const openEdit = (task: WorkOrderTask) => {
+  const openEdit = (task: TaskWithSafety) => {
     setEditing(task);
     setError(null);
     setIsOpen(true);
@@ -198,7 +220,7 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
                       }
                     >
                       {task.completed ? (
-                        <CheckSquare className="h-5 w-5 text-emerald-400" />
+                        <CheckSquare className="h-5 w-5 text-blue-300" />
                       ) : (
                         <Square className="h-5 w-5" />
                       )}
@@ -211,6 +233,35 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
                     {task.description && (
                       <p className="text-xs text-steel">{task.description}</p>
                     )}
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {task.processArea && <Badge variant="outline">{task.processArea}</Badge>}
+                      {task.critical && <Badge variant="destructive">Crítica</Badge>}
+                      {task.critical && (
+                        <Badge
+                          variant={task.asts.some((ast) => ast.status === "aprobado") ? "success" : "gold"}
+                        >
+                          AST {task.asts.some((ast) => ast.status === "aprobado") ? "aprobado" : "pendiente"}
+                        </Badge>
+                      )}
+                      {task.requiresPermit && (
+                        <Badge
+                          variant={
+                            task.permits.some((permit) => {
+                              const now = Date.now();
+                              return (
+                                (permit.status === "activo" || permit.status === "aprobado") &&
+                                new Date(permit.startAt).getTime() <= now &&
+                                new Date(permit.endAt).getTime() >= now
+                              );
+                            })
+                              ? "success"
+                              : "gold"
+                          }
+                        >
+                          PTW {task.permits.length > 0 ? "registrado" : "pendiente"}
+                        </Badge>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -291,6 +342,31 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
               rows={3}
               className="w-full rounded-md border border-border-subtle bg-navy-dark px-3 py-2 text-sm text-white placeholder-steel/50 focus:border-fire focus:outline-none"
             />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-steel">
+              Proceso / área
+            </label>
+            <Input {...register("processArea")} placeholder="Ej.: Puente grúa / Soldadura / CNC" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex items-center gap-2 rounded-lg border border-border-subtle bg-navy-primary/30 p-3 text-sm text-steel">
+              <input
+                type="checkbox"
+                {...register("critical")}
+                className="h-4 w-4 accent-gold"
+              />
+              Tarea crítica HSEQ
+            </label>
+            <label className="flex items-center gap-2 rounded-lg border border-border-subtle bg-navy-primary/30 p-3 text-sm text-steel">
+              <input
+                type="checkbox"
+                {...register("requiresPermit")}
+                disabled={!critical}
+                className="h-4 w-4 accent-gold disabled:opacity-40"
+              />
+              Requiere PTW vigente
+            </label>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>

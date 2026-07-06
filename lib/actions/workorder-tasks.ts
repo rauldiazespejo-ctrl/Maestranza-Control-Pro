@@ -12,23 +12,81 @@ function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
 }
 
-async function recalcWorkOrderProgress(workOrderId: string) {
-  const tasks = await prisma.workOrderTask.findMany({
+async function recalcWorkOrderProgress(tx: typeof prisma, workOrderId: string) {
+  const tasks = await tx.workOrderTask.findMany({
     where: { workOrderId },
   });
 
   const progress =
     tasks.length > 0
-      ? tasks.reduce(
-          (sum, task) => sum + (task.completed ? 100 : Number(task.progress)),
-          0
-        ) / tasks.length
+      ? tasks.reduce((sum, task) => sum + (task.completed ? 100 : Number(task.progress)), 0) /
+        tasks.length
       : 0;
 
-  await prisma.workOrder.update({
+  await tx.workOrder.update({
     where: { id: workOrderId },
     data: { progress },
   });
+}
+
+async function assertCriticalTaskClearance(tx: typeof prisma, taskId: string) {
+  const task = await tx.workOrderTask.findUnique({
+    where: { id: taskId },
+    include: {
+      workOrder: {
+        include: {
+          assignments: { include: { worker: true } },
+        },
+      },
+      asts: true,
+      permits: { include: { equipment: { include: { certifications: true } } } },
+    },
+  });
+
+  if (!task) throw new Error("Tarea no encontrada");
+  if (!task.critical) return;
+
+  const approvedAst = task.asts.find((ast) => ast.status === "aprobado");
+  if (!approvedAst) {
+    throw new Error("Bloqueo HSEQ: tarea crítica sin AST aprobado");
+  }
+
+  if (task.requiresPermit) {
+    const now = new Date();
+    const validPermit = task.permits.find(
+      (permit) =>
+        (permit.status === "activo" || permit.status === "aprobado") &&
+        permit.startAt <= now &&
+        permit.endAt >= now
+    );
+
+    if (!validPermit) {
+      throw new Error("Bloqueo HSEQ: tarea crítica sin PTW vigente");
+    }
+
+    if (validPermit.equipment) {
+      if (validPermit.equipment.status !== "disponible") {
+        throw new Error("Bloqueo HSEQ: equipo asociado no disponible");
+      }
+
+      const certifications = validPermit.equipment.certifications;
+      const hasExpiredCertification = certifications.some(
+        (cert) => cert.status !== "vigente" || cert.validTo < now
+      );
+      if (hasExpiredCertification) {
+        throw new Error("Bloqueo HSEQ: certificación de equipo vencida");
+      }
+    }
+  }
+
+  const expiredCompetency = task.workOrder.assignments.find((assignment) => {
+    const expires = assignment.worker.criticalExpires;
+    return expires !== null && expires < new Date();
+  });
+
+  if (expiredCompetency) {
+    throw new Error(`Bloqueo HSEQ: habilitación vencida de ${expiredCompetency.worker.name}`);
+  }
 }
 
 export async function createWorkOrderTask(
@@ -39,27 +97,38 @@ export async function createWorkOrderTask(
 
   const parsed = workOrderTaskSchema.parse(data);
 
-  const task = await prisma.workOrderTask.create({
-    data: {
-      workOrderId,
-      title: parsed.title,
-      description: parsed.description,
-      progress: parsed.completed ? 100 : Number(parsed.progress),
-      completed: parsed.completed,
-      dueDate: toDateOptional(parsed.dueDate),
-    },
-  });
+  const task = await prisma.$transaction(async (tx) => {
+    const created = await tx.workOrderTask.create({
+      data: {
+        workOrderId,
+        title: parsed.title,
+        description: parsed.description,
+        processArea: parsed.processArea,
+        critical: parsed.critical,
+        requiresPermit: parsed.requiresPermit,
+        progress: parsed.completed ? 100 : Number(parsed.progress),
+        completed: parsed.completed,
+        dueDate: toDateOptional(parsed.dueDate),
+      },
+    });
 
-  await recalcWorkOrderProgress(workOrderId);
+    if (created.completed || created.progress > 0) {
+      await assertCriticalTaskClearance(tx as typeof prisma, created.id);
+    }
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "CREATE",
-      entity: "WorkOrderTask",
-      entityId: task.id,
-      metadata: JSON.stringify({ workOrderId }),
-    },
+    await recalcWorkOrderProgress(tx as typeof prisma, workOrderId);
+
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "CREATE",
+        entity: "WorkOrderTask",
+        entityId: created.id,
+        metadata: JSON.stringify({ workOrderId }),
+      },
+    });
+
+    return created;
   });
 
   revalidatePath(`/ordenes/${workOrderId}`);
@@ -77,27 +146,38 @@ export async function updateWorkOrderTask(
   const existing = await prisma.workOrderTask.findUnique({ where: { id } });
   if (!existing) throw new Error("Tarea no encontrada");
 
-  const task = await prisma.workOrderTask.update({
-    where: { id },
-    data: {
-      title: parsed.title,
-      description: parsed.description,
-      progress: parsed.completed ? 100 : Number(parsed.progress),
-      completed: parsed.completed,
-      dueDate: toDateOptional(parsed.dueDate),
-    },
-  });
+  const task = await prisma.$transaction(async (tx) => {
+    const updated = await tx.workOrderTask.update({
+      where: { id },
+      data: {
+        title: parsed.title,
+        description: parsed.description,
+        processArea: parsed.processArea,
+        critical: parsed.critical,
+        requiresPermit: parsed.requiresPermit,
+        progress: parsed.completed ? 100 : Number(parsed.progress),
+        completed: parsed.completed,
+        dueDate: toDateOptional(parsed.dueDate),
+      },
+    });
 
-  await recalcWorkOrderProgress(existing.workOrderId);
+    if (updated.completed || updated.progress > 0) {
+      await assertCriticalTaskClearance(tx as typeof prisma, updated.id);
+    }
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "UPDATE",
-      entity: "WorkOrderTask",
-      entityId: task.id,
-      metadata: JSON.stringify({ workOrderId: existing.workOrderId }),
-    },
+    await recalcWorkOrderProgress(tx as typeof prisma, existing.workOrderId);
+
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "UPDATE",
+        entity: "WorkOrderTask",
+        entityId: updated.id,
+        metadata: JSON.stringify({ workOrderId: existing.workOrderId }),
+      },
+    });
+
+    return updated;
   });
 
   revalidatePath(`/ordenes/${existing.workOrderId}`);
@@ -110,17 +190,19 @@ export async function deleteWorkOrderTask(id: string) {
   const task = await prisma.workOrderTask.findUnique({ where: { id } });
   if (!task) throw new Error("Tarea no encontrada");
 
-  await prisma.workOrderTask.delete({ where: { id } });
-  await recalcWorkOrderProgress(task.workOrderId);
+  await prisma.$transaction(async (tx) => {
+    await tx.workOrderTask.delete({ where: { id } });
+    await recalcWorkOrderProgress(tx as typeof prisma, task.workOrderId);
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "DELETE",
-      entity: "WorkOrderTask",
-      entityId: id,
-      metadata: JSON.stringify({ workOrderId: task.workOrderId }),
-    },
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "DELETE",
+        entity: "WorkOrderTask",
+        entityId: id,
+        metadata: JSON.stringify({ workOrderId: task.workOrderId }),
+      },
+    });
   });
 
   revalidatePath(`/ordenes/${task.workOrderId}`);
@@ -133,24 +215,32 @@ export async function toggleWorkOrderTask(id: string) {
   if (!task) throw new Error("Tarea no encontrada");
 
   const completed = !task.completed;
-  const updated = await prisma.workOrderTask.update({
-    where: { id },
-    data: { completed, progress: completed ? 100 : 0 },
-  });
+  const updated = await prisma.$transaction(async (tx) => {
+    if (completed) {
+      await assertCriticalTaskClearance(tx as typeof prisma, id);
+    }
 
-  await recalcWorkOrderProgress(task.workOrderId);
+    const toggled = await tx.workOrderTask.update({
+      where: { id },
+      data: { completed, progress: completed ? 100 : 0 },
+    });
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "TOGGLE",
-      entity: "WorkOrderTask",
-      entityId: id,
-      metadata: JSON.stringify({
-        workOrderId: task.workOrderId,
-        completed,
-      }),
-    },
+    await recalcWorkOrderProgress(tx as typeof prisma, task.workOrderId);
+
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "TOGGLE",
+        entity: "WorkOrderTask",
+        entityId: id,
+        metadata: JSON.stringify({
+          workOrderId: task.workOrderId,
+          completed,
+        }),
+      },
+    });
+
+    return toggled;
   });
 
   revalidatePath(`/ordenes/${task.workOrderId}`);

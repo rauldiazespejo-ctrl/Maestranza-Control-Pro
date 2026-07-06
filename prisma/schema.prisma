@@ -64,6 +64,40 @@ enum WorkerEngagement {
   spot
 }
 
+enum RiskLevel {
+  bajo
+  medio
+  alto
+  critico
+}
+
+enum AstStatus {
+  borrador
+  en_revision
+  aprobado
+  requiere_revalidacion
+  cerrado
+}
+
+enum PermitType {
+  caliente
+  izaje_critico
+  altura
+  loto
+  electrico
+  maquinaria
+  espacio_confinado
+}
+
+enum PermitStatus {
+  borrador
+  aprobado
+  activo
+  suspendido
+  cerrado
+  vencido
+}
+
 model Company {
   id        String   @id @default(uuid())
   name      String
@@ -75,12 +109,13 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  clients   Client[]
-  projects  Project[]
-  users     User[]
-  workers   Worker[]
-  equipment Equipment[]
-  materials Material[]
+  clients      Client[]
+  projects     Project[]
+  users        User[]
+  workers      Worker[]
+  equipment    Equipment[]
+  materials    Material[]
+  competencies Competency[]
 }
 
 model User {
@@ -210,6 +245,8 @@ model WorkOrder {
   documents   Document[]
   auditLogs   AuditLog[]
   ganttTasks  GanttTask[]
+  asts        Ast[]
+  permits     WorkPermit[]
 
   // ── Performance indexes for dashboard queries ──
   @@index([status])
@@ -222,20 +259,27 @@ model WorkOrder {
 }
 
 model WorkOrderTask {
-  id          String    @id @default(uuid())
-  workOrderId String
-  title       String
-  description String?
-  progress    Float     @default(0)
-  completed   Boolean   @default(false)
-  dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(uuid())
+  workOrderId    String
+  title          String
+  description    String?
+  processArea    String?
+  critical       Boolean   @default(false)
+  requiresPermit Boolean   @default(false)
+  progress       Float     @default(0)
+  completed      Boolean   @default(false)
+  dueDate        DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workOrder WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  asts      Ast[]
+  permits   WorkPermit[]
 
   @@index([workOrderId])
   @@index([completed])
+  @@index([critical])
+  @@index([requiresPermit])
 }
 
 model Worker {
@@ -258,10 +302,11 @@ model Worker {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  company     Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  ledOrders   WorkOrder[]
-  assignments WorkerAssignment[]
-  hseqRecords HseqRecord[]
+  company      Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ledOrders    WorkOrder[]
+  assignments  WorkerAssignment[]
+  hseqRecords  HseqRecord[]
+  competencies Competency[]
 
   @@index([companyId])
   @@index([status])
@@ -323,10 +368,163 @@ model Equipment {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company        Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  asts           Ast[]
+  permits        WorkPermit[]
+  certifications EquipmentCertification[]
 
   @@index([companyId])
   @@index([status])
+}
+
+model Ast {
+  id              String    @id @default(uuid())
+  workOrderId     String
+  workOrderTaskId String?
+  area            String
+  equipmentId     String?
+  riskLevel       RiskLevel
+  status          AstStatus @default(borrador)
+  version         Int       @default(1)
+  supervisor      String?
+  preStartChecks  String?
+  evidence        String?
+  changeReason    String?
+  createdBy       String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  workOrder     WorkOrder      @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workOrderTask WorkOrderTask? @relation(fields: [workOrderTaskId], references: [id], onDelete: SetNull)
+  equipment     Equipment?     @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
+  steps         AstStep[]
+  permits       WorkPermit[]
+
+  @@index([workOrderId])
+  @@index([workOrderTaskId])
+  @@index([equipmentId])
+  @@index([riskLevel])
+  @@index([status])
+}
+
+model AstStep {
+  id          String   @id @default(uuid())
+  astId       String
+  stepOrder   Int
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ast     Ast         @relation(fields: [astId], references: [id], onDelete: Cascade)
+  hazards AstHazard[]
+
+  @@index([astId])
+}
+
+model AstHazard {
+  id           String    @id @default(uuid())
+  astStepId    String
+  hazardType   String
+  initialRisk  RiskLevel
+  controls     String
+  residualRisk RiskLevel
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  astStep AstStep @relation(fields: [astStepId], references: [id], onDelete: Cascade)
+
+  @@index([astStepId])
+  @@index([initialRisk])
+  @@index([residualRisk])
+}
+
+model WorkPermit {
+  id              String       @id @default(uuid())
+  type            PermitType
+  workOrderId     String
+  workOrderTaskId String?
+  astId           String
+  area            String
+  equipmentId     String?
+  startAt         DateTime
+  endAt           DateTime
+  status          PermitStatus @default(borrador)
+  preconditions   String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  suspendedReason String?
+  createdBy       String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  workOrder     WorkOrder             @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workOrderTask WorkOrderTask?        @relation(fields: [workOrderTaskId], references: [id], onDelete: SetNull)
+  ast           Ast                   @relation(fields: [astId], references: [id], onDelete: Restrict)
+  equipment     Equipment?            @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
+  checklist     PermitChecklistItem[]
+
+  @@index([workOrderId])
+  @@index([workOrderTaskId])
+  @@index([astId])
+  @@index([equipmentId])
+  @@index([type])
+  @@index([status])
+  @@index([endAt])
+}
+
+model PermitChecklistItem {
+  id        String    @id @default(uuid())
+  permitId  String
+  label     String
+  required  Boolean   @default(true)
+  checked   Boolean   @default(false)
+  checkedBy String?
+  checkedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  permit WorkPermit @relation(fields: [permitId], references: [id], onDelete: Cascade)
+
+  @@index([permitId])
+  @@index([checked])
+}
+
+model EquipmentCertification {
+  id          String    @id @default(uuid())
+  equipmentId String
+  certType    String
+  validFrom   DateTime?
+  validTo     DateTime
+  status      String    @default("vigente")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@index([equipmentId])
+  @@index([validTo])
+  @@index([status])
+}
+
+model Competency {
+  id             String   @id @default(uuid())
+  companyId      String
+  workerId       String
+  competencyType String
+  issuer         String?
+  validTo        DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  worker  Worker  @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([workerId])
+  @@index([competencyType])
+  @@index([validTo])
 }
 
 model Material {

@@ -25,9 +25,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
   const cards = [
     {
       icon: Wrench,
-      iconColor: "text-gold",
-      iconGlow: true,
-      accentColor: "bg-gold",
+      iconColor: "text-steel",
+      iconGlow: false,
+      accentColor: "bg-border-strong",
       label: "Órdenes activas",
       value: activeOrders,
       trend: trends?.activeOrders,
@@ -35,9 +35,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: AlertTriangle,
-      iconColor: "text-fire-bright",
-      iconGlow: true,
-      accentColor: "bg-fire-bright",
+      iconColor: "text-red-300",
+      iconGlow: false,
+      accentColor: "bg-alert/70",
       label: "Órdenes atrasadas",
       value: delayedOrders,
       trend: trends?.delayedOrders,
@@ -45,9 +45,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: CheckCircle2,
-      iconColor: "text-emerald-400",
+      iconColor: "text-blue-200",
       iconGlow: false,
-      accentColor: "bg-emerald-500",
+      accentColor: "bg-blue-400/60",
       label: "Completadas",
       value: completedOrders,
       trend: trends?.completedOrders,
@@ -56,8 +56,8 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     {
       icon: TrendingUp,
       iconColor: "text-gold",
-      iconGlow: true,
-      accentColor: "bg-gold",
+      iconGlow: false,
+      accentColor: "bg-gold/70",
       label: "Avance promedio",
       value: Math.round(avgProgress),
       suffix: "%",
@@ -67,9 +67,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: ShieldAlert,
-      iconColor: hseqAlerts > 0 ? "text-fire-bright" : "text-gold",
-      iconGlow: hseqAlerts > 0,
-      accentColor: hseqAlerts > 0 ? "bg-fire-bright" : "bg-gold",
+      iconColor: hseqAlerts > 0 ? "text-red-300" : "text-steel",
+      iconGlow: false,
+      accentColor: hseqAlerts > 0 ? "bg-alert/70" : "bg-border-strong",
       label: "Alertas HSEQ",
       value: hseqAlerts,
       trend: trends?.hseqAlerts,
@@ -91,8 +91,7 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
           >
             {/* Top accent line */}
             <div
-              className="absolute inset-x-0 top-0 h-1"
-              style={{ backgroundColor: card.accentColor }}
+              className={`absolute inset-x-0 top-0 h-1 ${card.accentColor}`}
               aria-hidden="true"
             />
             <CardHeader className="flex flex-row items-center justify-between pb-2">

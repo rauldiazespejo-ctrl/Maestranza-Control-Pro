@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           "inline-flex items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap",
           "transition-all duration-200",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-bright focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
           /* hover: scale(1.02) — disabled just dims, no transform */
           "hover:enabled:scale-[1.02]",
           /* active: scale(0.98) */
@@ -63,7 +63,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50",
           {
             default:
-              "bg-cyan text-navy-dark shadow-[var(--shadow-btn-primary)] hover:enabled:bg-cyan-bright hover:enabled:shadow-[var(--shadow-btn-primary-hover)]",
+              "bg-navy-light text-white shadow-industrial-sm hover:enabled:bg-navy-light/95 hover:enabled:border hover:enabled:border-border-strong",
             secondary:
               "border border-border-subtle bg-navy-light/85 text-white hover:enabled:border-border-strong hover:enabled:bg-navy-light hover:enabled:shadow-industrial-sm",
             outline:
@@ -71,9 +71,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             ghost:
               "bg-transparent text-steel hover:enabled:bg-navy-light/80 hover:enabled:text-white",
             destructive:
-              "bg-alert text-white shadow-[0_8px_18px_rgba(217,41,48,0.22)] hover:enabled:bg-alert-dark hover:enabled:shadow-[0_10px_28px_rgba(217,41,48,0.32)]",
+              "bg-alert text-white shadow-industrial-sm hover:enabled:bg-alert-dark",
             accent:
-              "bg-gold text-navy-dark shadow-[var(--shadow-btn-primary)] hover:enabled:bg-gold/90 hover:enabled:shadow-[var(--shadow-btn-primary-hover)]",
+              "bg-gold text-navy-dark shadow-industrial-sm hover:enabled:bg-gold/90",
           }[variant],
           {
             default: "min-h-10 px-6 py-3 text-sm",

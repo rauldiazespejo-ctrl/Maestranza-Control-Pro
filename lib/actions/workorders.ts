@@ -54,7 +54,13 @@ export async function getWorkOrderById(id: string) {
       client: true,
       responsible: true,
       project: true,
-      tasks: true,
+      tasks: {
+        include: {
+          asts: { select: { id: true, status: true, riskLevel: true, approvedAt: true } },
+          permits: { select: { id: true, type: true, status: true, startAt: true, endAt: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      },
       assignments: { include: { worker: true } },
       documents: true,
     },
@@ -68,27 +74,31 @@ export async function createWorkOrder(data: WorkOrderFormData) {
   const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workOrderSchema.parse(data);
-  const order = await prisma.workOrder.create({
-    data: {
-      ...parsed,
-      startDate: toDateOptional(parsed.startDate),
-      dueDate: toDateOptional(parsed.dueDate),
-      responsibleId: parsed.responsibleId || null,
-      clientId: parsed.clientId || null,
-      projectId: parsed.projectId || null,
-      progress: Number(parsed.progress),
-      estimatedCost: parsed.estimatedCost ? Number(parsed.estimatedCost) : null,
-      actualCost: parsed.actualCost ? Number(parsed.actualCost) : null,
-    },
-  });
+  const order = await prisma.$transaction(async (tx) => {
+    const created = await tx.workOrder.create({
+      data: {
+        ...parsed,
+        startDate: toDateOptional(parsed.startDate),
+        dueDate: toDateOptional(parsed.dueDate),
+        responsibleId: parsed.responsibleId || null,
+        clientId: parsed.clientId || null,
+        projectId: parsed.projectId || null,
+        progress: Number(parsed.progress),
+        estimatedCost: parsed.estimatedCost ? Number(parsed.estimatedCost) : null,
+        actualCost: parsed.actualCost ? Number(parsed.actualCost) : null,
+      },
+    });
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "CREATE",
-      entity: "WorkOrder",
-      entityId: order.id,
-    },
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "CREATE",
+        entity: "WorkOrder",
+        entityId: created.id,
+      },
+    });
+
+    return created;
   });
 
   revalidatePath("/ordenes");
@@ -99,28 +109,32 @@ export async function updateWorkOrder(id: string, data: WorkOrderFormData) {
   const session = await requireAuth(OPERATIONS_ROLES);
 
   const parsed = workOrderSchema.parse(data);
-  const order = await prisma.workOrder.update({
-    where: { id },
-    data: {
-      ...parsed,
-      startDate: toDateOptional(parsed.startDate),
-      dueDate: toDateOptional(parsed.dueDate),
-      responsibleId: parsed.responsibleId || null,
-      clientId: parsed.clientId || null,
-      projectId: parsed.projectId || null,
-      progress: Number(parsed.progress),
-      estimatedCost: parsed.estimatedCost ? Number(parsed.estimatedCost) : null,
-      actualCost: parsed.actualCost ? Number(parsed.actualCost) : null,
-    },
-  });
+  const order = await prisma.$transaction(async (tx) => {
+    const updated = await tx.workOrder.update({
+      where: { id },
+      data: {
+        ...parsed,
+        startDate: toDateOptional(parsed.startDate),
+        dueDate: toDateOptional(parsed.dueDate),
+        responsibleId: parsed.responsibleId || null,
+        clientId: parsed.clientId || null,
+        projectId: parsed.projectId || null,
+        progress: Number(parsed.progress),
+        estimatedCost: parsed.estimatedCost ? Number(parsed.estimatedCost) : null,
+        actualCost: parsed.actualCost ? Number(parsed.actualCost) : null,
+      },
+    });
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "UPDATE",
-      entity: "WorkOrder",
-      entityId: order.id,
-    },
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "UPDATE",
+        entity: "WorkOrder",
+        entityId: updated.id,
+      },
+    });
+
+    return updated;
   });
 
   revalidatePath("/ordenes");
@@ -128,8 +142,21 @@ export async function updateWorkOrder(id: string, data: WorkOrderFormData) {
 }
 
 export async function deleteWorkOrder(id: string) {
-  await requireAuth(MANAGEABLE_ROLES);
-  await prisma.workOrder.delete({ where: { id } });
+  const session = await requireAuth(MANAGEABLE_ROLES);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.workOrder.delete({ where: { id } });
+
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "DELETE",
+        entity: "WorkOrder",
+        entityId: id,
+      },
+    });
+  });
+
   revalidatePath("/ordenes");
 }
 
@@ -156,19 +183,23 @@ export async function assignSupervisorToWorkOrder(id: string, supervisorId: stri
     }
   }
 
-  const order = await prisma.workOrder.update({
-    where: { id },
-    data: { responsibleId },
-  });
+  const order = await prisma.$transaction(async (tx) => {
+    const updated = await tx.workOrder.update({
+      where: { id },
+      data: { responsibleId },
+    });
 
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      action: "ASSIGN_SUPERVISOR",
-      entity: "WorkOrder",
-      entityId: order.id,
-      metadata: JSON.stringify({ supervisorId: responsibleId }),
-    },
+    await tx.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "ASSIGN_SUPERVISOR",
+        entity: "WorkOrder",
+        entityId: updated.id,
+        metadata: JSON.stringify({ supervisorId: responsibleId }),
+      },
+    });
+
+    return updated;
   });
 
   revalidatePath(`/ordenes/${id}`);

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { ganttTaskSchema, type GanttTaskFormData } from "@/lib/validations/gantt";
 import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
 import {
   fabricationProcessDefinitions,
   totalFabricationProcessDays,
@@ -106,109 +107,143 @@ export async function deleteGanttTask(id: string) {
 export async function createFabricationGanttFromWorkOrder(workOrderId: string) {
   const session = await requireAuth(OPERATIONS_ROLES);
 
-  const workOrder = await prisma.workOrder.findUnique({
-    where: { id: workOrderId },
-    include: {
-      client: true,
-      project: true,
-      responsible: true,
-    },
-  });
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const workOrder = await tx.workOrder.findUnique({
+        where: { id: workOrderId },
+        include: {
+          client: true,
+          project: true,
+          responsible: true,
+        },
+      });
 
-  if (!workOrder) throw new Error("Orden de trabajo no encontrada");
+      if (!workOrder) throw new Error("Orden de trabajo no encontrada");
 
-  let projectId = workOrder.projectId;
+      let projectId = workOrder.projectId;
 
-  if (!projectId) {
-    const companyId =
-      workOrder.client?.companyId ??
-      session.user.companyId ??
-      (await prisma.company.findFirst({ select: { id: true } }))?.id;
+      if (!projectId) {
+        // Reutilizar proyecto existente por codigo para evitar violacion de @unique(Project.code)
+        const existingProjectByCode = workOrder.code
+          ? await tx.project.findFirst({ where: { code: workOrder.code }, select: { id: true } })
+          : null;
 
-    if (!companyId) {
-      throw new Error("No existe empresa base para crear el proyecto asociado a la OT");
+        if (existingProjectByCode?.id) {
+          projectId = existingProjectByCode.id;
+        } else {
+          const companyId =
+            workOrder.client?.companyId ??
+            session.user.companyId ??
+            (await tx.company.findFirst({ select: { id: true } }))?.id;
+
+          if (!companyId) {
+            throw new Error("No existe empresa base para crear el proyecto asociado a la OT");
+          }
+
+          const project = await tx.project.create({
+            data: {
+              companyId,
+              clientId: workOrder.clientId,
+              code: workOrder.code,
+              name: `OT ${workOrder.code} · ${workOrder.title}`,
+              description: "Proyecto creado automaticamente desde carta Gantt de fabricacion.",
+              startDate: workOrder.startDate,
+              endDate: workOrder.dueDate,
+              status: "activo",
+            },
+          });
+
+          projectId = project.id;
+        }
+
+        await tx.workOrder.update({
+          where: { id: workOrder.id },
+          data: { projectId },
+        });
+      }
+
+      const existingTasks = await tx.ganttTask.findMany({
+        where: { workOrderId: workOrder.id },
+        orderBy: { startDate: "asc" },
+      });
+
+      const existingNames = new Set(existingTasks.map((task) => task.name));
+      const plannedStart = workOrder.startDate ?? new Date();
+      const plannedEnd = workOrder.dueDate ?? addCalendarDays(plannedStart, totalFabricationProcessDays - 1);
+      const plannedDays = daysBetween(plannedStart, plannedEnd);
+      let cursor = new Date(plannedStart);
+      let previousTaskId = existingTasks.at(-1)?.id ?? null;
+      let created = 0;
+      let skipped = 0;
+
+      for (const process of fabricationProcessDefinitions) {
+        const taskName = `${process.code} · ${process.group} · ${process.name}`;
+        const duration = scaleProcessDuration(process.defaultDays, plannedDays);
+        const startDate = new Date(cursor);
+        const endDate = addCalendarDays(startDate, duration - 1);
+
+        if (existingNames.has(taskName)) {
+          skipped += 1;
+          cursor = addCalendarDays(endDate, 1);
+          continue;
+        }
+
+        const task = await tx.ganttTask.create({
+          data: {
+            projectId,
+            workOrderId: workOrder.id,
+            name: taskName,
+            startDate,
+            endDate,
+            progress: 0,
+            status: "pendiente",
+            responsible: workOrder.responsible?.name ?? process.responsibleRole,
+            dependencies: previousTaskId ? previousTaskId : undefined,
+          },
+        });
+
+        previousTaskId = task.id;
+        created += 1;
+        cursor = addCalendarDays(endDate, 1);
+      }
+
+      await tx.auditLog.create({
+        data: {
+          userId: session.user.id,
+          workOrderId: workOrder.id,
+          action: "GENERATE_FABRICATION_GANTT",
+          entity: "WorkOrder",
+          entityId: workOrder.id,
+          metadata: JSON.stringify({ created, skipped, projectId }),
+        },
+      });
+
+      return { created, skipped, projectId, workOrderCode: workOrder.code, workOrderId: workOrder.id };
+    });
+
+    revalidatePath("/gantt");
+    revalidatePath("/ordenes");
+    revalidatePath(`/ordenes/${result.workOrderId}`);
+
+    return {
+      created: result.created,
+      skipped: result.skipped,
+      projectId: result.projectId,
+      workOrderCode: result.workOrderCode,
+    };
+  } catch (error) {
+    const errorCode =
+      typeof error === "object" && error !== null && "code" in error
+        ? (error as { code?: string }).code
+        : undefined;
+
+    if (
+      errorCode === "P2002" ||
+      (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+    ) {
+      throw new Error("Conflicto de datos al crear proyecto/tareas para la OT. Intenta nuevamente.");
     }
 
-    const project = await prisma.project.create({
-      data: {
-        companyId,
-        clientId: workOrder.clientId,
-        code: workOrder.code,
-        name: `OT ${workOrder.code} · ${workOrder.title}`,
-        description: "Proyecto creado automaticamente desde carta Gantt de fabricacion.",
-        startDate: workOrder.startDate,
-        endDate: workOrder.dueDate,
-        status: "activo",
-      },
-    });
-
-    await prisma.workOrder.update({
-      where: { id: workOrder.id },
-      data: { projectId: project.id },
-    });
-
-    projectId = project.id;
+    throw error;
   }
-
-  const existingTasks = await prisma.ganttTask.findMany({
-    where: { workOrderId: workOrder.id },
-    orderBy: { startDate: "asc" },
-  });
-
-  const existingNames = new Set(existingTasks.map((task) => task.name));
-  const plannedStart = workOrder.startDate ?? new Date();
-  const plannedEnd = workOrder.dueDate ?? addCalendarDays(plannedStart, totalFabricationProcessDays - 1);
-  const plannedDays = daysBetween(plannedStart, plannedEnd);
-  let cursor = new Date(plannedStart);
-  let previousTaskId = existingTasks.at(-1)?.id ?? null;
-  let created = 0;
-  let skipped = 0;
-
-  for (const process of fabricationProcessDefinitions) {
-    const taskName = `${process.code} · ${process.group} · ${process.name}`;
-    const duration = scaleProcessDuration(process.defaultDays, plannedDays);
-    const startDate = new Date(cursor);
-    const endDate = addCalendarDays(startDate, duration - 1);
-
-    if (existingNames.has(taskName)) {
-      skipped += 1;
-      cursor = addCalendarDays(endDate, 1);
-      continue;
-    }
-
-    const task = await prisma.ganttTask.create({
-      data: {
-        projectId,
-        workOrderId: workOrder.id,
-        name: taskName,
-        startDate,
-        endDate,
-        progress: 0,
-        status: "pendiente",
-        responsible: workOrder.responsible?.name ?? process.responsibleRole,
-        dependencies: previousTaskId ? previousTaskId : undefined,
-      },
-    });
-
-    previousTaskId = task.id;
-    created += 1;
-    cursor = addCalendarDays(endDate, 1);
-  }
-
-  await prisma.auditLog.create({
-    data: {
-      userId: session.user.id,
-      workOrderId: workOrder.id,
-      action: "GENERATE_FABRICATION_GANTT",
-      entity: "WorkOrder",
-      entityId: workOrder.id,
-      metadata: JSON.stringify({ created, skipped, projectId }),
-    },
-  });
-
-  revalidatePath("/gantt");
-  revalidatePath("/ordenes");
-  revalidatePath(`/ordenes/${workOrder.id}`);
-
-  return { created, skipped, projectId, workOrderCode: workOrder.code };
 }

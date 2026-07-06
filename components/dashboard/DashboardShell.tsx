@@ -71,7 +71,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
     <div className="app-shell-bg control-center-shell min-h-screen">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-md focus:bg-cyan focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-navy-dark"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-navy-dark"
       >
         Saltar al contenido
       </a>
@@ -101,7 +101,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <span className="hidden min-h-9 items-center gap-2 rounded-full border border-cyan-bright/30 bg-cyan-muted px-3 text-xs font-semibold text-cyan-bright shadow-[0_0_24px_rgba(0,229,255,0.12)] sm:inline-flex">
+            <span className="hidden min-h-9 items-center gap-2 rounded-full border border-border-strong bg-navy-light/80 px-3 text-xs font-semibold text-steel shadow-industrial-sm sm:inline-flex">
               <Circle className="h-2 w-2 fill-current animate-pulse" aria-hidden="true" />
               Sistema operacional
             </span>
@@ -152,14 +152,14 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 className={cn(
                   "group flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-[background-color,border-color,box-shadow,color] duration-200",
                   active
-                    ? "border border-cyan-bright/35 bg-cyan-muted text-white shadow-[inset_3px_0_0_rgba(0,229,255,0.88),0_10px_28px_rgba(0,0,0,0.18)]"
+                    ? "border border-border-gold bg-navy-light/85 text-white shadow-industrial-sm"
                     : "border border-transparent text-steel hover:border-border-subtle hover:bg-navy-light/70 hover:text-white"
                 )}
               >
                 <Icon
                   className={cn(
                     "h-5 w-5 transition-colors",
-                    active ? "text-cyan-bright" : "text-steel group-hover:text-white"
+                    active ? "text-gold" : "text-steel group-hover:text-white"
                   )}
                 />
                 {item.label}
@@ -231,14 +231,14 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 className={cn(
                   "group flex min-h-11 items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "border-cyan-bright/35 bg-cyan-muted text-white"
+                    ? "border-border-gold bg-navy-light/85 text-white"
                     : "border-transparent text-steel hover:border-border-subtle hover:bg-navy-light hover:text-white"
                 )}
               >
                 <Icon
                   className={cn(
                     "h-5 w-5",
-                    active ? "text-cyan-bright" : "text-steel group-hover:text-white"
+                    active ? "text-gold" : "text-steel group-hover:text-white"
                   )}
                 />
                 {item.label}

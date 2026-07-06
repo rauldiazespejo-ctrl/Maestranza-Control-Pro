@@ -59,8 +59,8 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
             <BrandLockup />
           </Link>
           <div className="hidden items-center gap-3 md:flex">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-100">
+              <span className="h-2 w-2 rounded-full bg-blue-300" />
               Demo operativo
             </span>
             <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-border-subtle bg-white/[0.03] px-3 py-2 text-xs font-semibold text-steel">
@@ -81,11 +81,11 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
                   className={[
                     "flex min-h-11 items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium",
                     index === 0
-                      ? "border-emerald-400/25 bg-emerald-400/10 text-white"
+                      ? "border-blue-400/25 bg-blue-400/10 text-white"
                       : "border-transparent text-steel",
                   ].join(" ")}
                 >
-                  <Icon className={index === 0 ? "h-5 w-5 text-emerald-300" : "h-5 w-5"} />
+                  <Icon className={index === 0 ? "h-5 w-5 text-blue-300" : "h-5 w-5"} />
                   {item.label}
                 </div>
               );
@@ -127,10 +127,10 @@ export default function PrintsPreviewPage() {
   return (
     <ShellFrame>
       <div className="mx-auto max-w-7xl space-y-6">
-        <section id="dashboard" className="surface-glass rounded-lg border-emerald-400/20 p-5 shadow-industrial-lg sm:p-6">
+        <section id="dashboard" className="surface-glass rounded-lg border-blue-400/20 p-5 shadow-industrial-lg sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase text-emerald-200">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-400/10 px-3 py-1 text-xs font-semibold uppercase text-blue-100">
                 <Activity className="h-3.5 w-3.5" />
                 Centro de control
               </div>
@@ -144,16 +144,16 @@ export default function PrintsPreviewPage() {
                 <p className="text-xs uppercase text-steel">Fecha de control</p>
                 <p className="mt-1 font-semibold text-white">03 Jul 2026</p>
               </div>
-              <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 p-3">
-                <p className="text-xs uppercase text-emerald-200">Estado</p>
-                <p className="mt-1 font-semibold text-emerald-200">Operativo</p>
+              <div className="rounded-lg border border-blue-500/25 bg-blue-500/10 p-3">
+                <p className="text-xs uppercase text-blue-100">Estado</p>
+                <p className="mt-1 font-semibold text-blue-100">Operativo</p>
               </div>
             </div>
           </div>
         </section>
 
         <section id="kpis" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <KpiCard label="Ordenes activas" value="18" tone="text-emerald-300" icon={ClipboardList} />
+          <KpiCard label="Ordenes activas" value="18" tone="text-blue-300" icon={ClipboardList} />
           <KpiCard label="Avance promedio" value="72%" tone="text-gold" icon={BarChart3} />
           <KpiCard label="Alertas abiertas" value="5" tone="text-red-300" icon={AlertTriangle} />
           <KpiCard label="Trabajadores asignados" value="42" tone="text-steel" icon={HardHat} />
@@ -179,13 +179,13 @@ export default function PrintsPreviewPage() {
                 <div key={order.code} className="rounded-lg border border-border-subtle bg-navy-primary/50 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-mono text-xs font-semibold text-emerald-200">{order.code}</p>
+                      <p className="font-mono text-xs font-semibold text-blue-100">{order.code}</p>
                       <p className="mt-1 font-heading text-base font-semibold text-white">{order.title}</p>
                     </div>
                     <Badge variant={order.status === "Atrasada" ? "destructive" : "gold"}>{order.status}</Badge>
                   </div>
                   <div className="mt-3 h-2 rounded-full bg-navy-light">
-                    <div className="h-full rounded-full bg-emerald-400" style={{ width: `${order.progress}%` }} />
+                    <div className="h-full rounded-full bg-blue-400" style={{ width: `${order.progress}%` }} />
                   </div>
                   <div className="mt-2 flex justify-between text-xs text-steel">
                     <span>Prioridad {order.priority}</span>
@@ -210,7 +210,7 @@ export default function PrintsPreviewPage() {
                   </div>
                   <div className="h-8 rounded-lg bg-navy-light/70 p-1">
                     <div
-                      className="h-full rounded-md bg-gradient-to-r from-emerald-500 to-gold"
+                      className="h-full rounded-md bg-gradient-to-r from-blue-500 to-gold"
                       style={{ width: `${48 + index * 12}%`, marginLeft: `${index * 7}%` }}
                     />
                   </div>
@@ -230,7 +230,7 @@ export default function PrintsPreviewPage() {
               {hseqRecords.map((record) => (
                 <div key={`${record.type}-${record.status}`} className="rounded-lg border border-border-subtle bg-navy-primary/45 p-4">
                   <div className="flex items-center justify-between gap-2">
-                    <ShieldAlert className={record.status === "Vencido" ? "h-5 w-5 text-red-300" : "h-5 w-5 text-emerald-300"} />
+                    <ShieldAlert className={record.status === "Vencido" ? "h-5 w-5 text-red-300" : "h-5 w-5 text-blue-300"} />
                     <Badge variant={record.status === "Vencido" ? "destructive" : "outline"}>{record.status}</Badge>
                   </div>
                   <p className="mt-4 font-heading text-sm font-semibold text-white">{record.type}</p>
@@ -253,7 +253,7 @@ export default function PrintsPreviewPage() {
               {["Ordenes por estado", "Avance por cliente", "Alertas abiertas"].map((label, index) => (
                 <div key={label} className="flex items-center justify-between rounded-lg border border-border-subtle bg-navy-dark/35 p-3">
                   <span className="text-sm text-white">{label}</span>
-                  <span className="font-mono text-sm text-emerald-200">{[18, 72, 5][index]}</span>
+                  <span className="font-mono text-sm text-blue-100">{[18, 72, 5][index]}</span>
                 </div>
               ))}
               <span className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-border-subtle bg-navy-light/85 px-4 py-2 text-sm font-semibold text-white">
@@ -269,12 +269,12 @@ export default function PrintsPreviewPage() {
               <h2 className="font-heading text-lg font-semibold text-white">Documentos y evidencias</h2>
               <p className="text-sm text-steel">Trazabilidad de respaldos por orden, cliente y registro.</p>
             </div>
-            <FileText className="h-6 w-6 text-emerald-300" />
+            <FileText className="h-6 w-6 text-blue-300" />
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {["Procedimiento soldadura.pdf", "Certificado inspeccion.pdf", "Evidencia fotografica.zip"].map((doc) => (
               <div key={doc} className="flex items-center gap-3 rounded-lg border border-border-subtle bg-navy-dark/40 p-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-300" />
+                <CheckCircle2 className="h-5 w-5 text-blue-300" />
                 <span className="truncate text-sm text-white">{doc}</span>
               </div>
             ))}
