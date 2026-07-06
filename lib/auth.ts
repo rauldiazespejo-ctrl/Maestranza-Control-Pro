@@ -131,8 +131,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  trustHost: process.env.NODE_ENV === "development",
-  secret: authSecret,
+  secret: resolvedSecret,
   ...authConfig,
   providers: [
     Credentials({

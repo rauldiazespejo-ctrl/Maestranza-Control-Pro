@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Plus, Trash2, User, Save, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, User, Save, Calendar, Clock, ShieldCheck, Factory } from "lucide-react";
 import type { Prisma } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,8 @@ import {
   removeWorkerAssignment,
   updateAssignmentHours,
 } from "@/lib/actions/worker-assignments";
+import { assignSupervisorToWorkOrder } from "@/lib/actions/workorders";
+import { createFabricationGanttFromWorkOrder } from "@/lib/actions/gantt";
 
 type WorkOrderDetail = Prisma.WorkOrderGetPayload<{
   include: {
@@ -38,6 +40,8 @@ type ActiveWorker = {
   name: string;
   position: string;
   specialty: string | null;
+  profile: string;
+  engagement: string;
 };
 
 interface Props {
@@ -77,15 +81,39 @@ function formatDate(date: Date | null | undefined) {
   return new Date(date).toLocaleDateString("es-CL");
 }
 
-function formatCurrency(value: number | null | undefined) {
+function formatCurrency(value: Prisma.Decimal | number | null | undefined) {
   if (value === null || value === undefined) return "—";
-  return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(value);
+  const numericValue =
+    typeof value === "number"
+      ? value
+      : typeof value === "object" && "toNumber" in value
+        ? value.toNumber()
+        : Number(value);
+  if (!Number.isFinite(numericValue)) return "—";
+  return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(numericValue);
 }
 
 export function OrdenDetailClient({ order, activeWorkers }: Props) {
   const router = useRouter();
   const [globalError, setGlobalError] = React.useState<string | null>(null);
+  const [globalSuccess, setGlobalSuccess] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [supervisorId, setSupervisorId] = React.useState(order.responsibleId ?? "");
+  const [savingSupervisor, setSavingSupervisor] = React.useState(false);
+  const [generatingGantt, setGeneratingGantt] = React.useState(false);
+
+  const supervisors = React.useMemo(
+    () => activeWorkers.filter((worker) => worker.profile === "supervisor"),
+    [activeWorkers]
+  );
+  const assignedWorkerIds = React.useMemo(
+    () => new Set(order.assignments.map((assignment) => assignment.workerId)),
+    [order.assignments]
+  );
+  const assignableWorkers = React.useMemo(
+    () => activeWorkers.filter((worker) => !assignedWorkerIds.has(worker.id)),
+    [activeWorkers, assignedWorkerIds]
+  );
 
   const {
     register,
@@ -106,6 +134,7 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
   const onAssign = async (data: WorkerAssignmentFormData) => {
     setSubmitting(true);
     setGlobalError(null);
+    setGlobalSuccess(null);
     try {
       await assignWorkerToOrder({
         ...data,
@@ -130,6 +159,41 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
     }
   };
 
+  const handleSupervisorSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSavingSupervisor(true);
+    setGlobalError(null);
+    setGlobalSuccess(null);
+    try {
+      await assignSupervisorToWorkOrder(order.id, supervisorId);
+      router.refresh();
+    } catch (err) {
+      setGlobalError(err instanceof Error ? err.message : "Error al asignar supervisor");
+    } finally {
+      setSavingSupervisor(false);
+    }
+  };
+
+  const handleGenerateGantt = async () => {
+    setGeneratingGantt(true);
+    setGlobalError(null);
+    setGlobalSuccess(null);
+    try {
+      const result = await createFabricationGanttFromWorkOrder(order.id);
+      const message =
+        result.created > 0
+          ? `Carta Gantt generada: ${result.created} procesos creados para la OT ${result.workOrderCode}.`
+          : `La OT ${result.workOrderCode} ya tenia carta Gantt de fabricacion.`;
+      setGlobalSuccess(result.skipped > 0 ? `${message} ${result.skipped} procesos existentes no se duplicaron.` : message);
+      router.refresh();
+      router.push(`/gantt?projectId=${result.projectId}`);
+    } catch (err) {
+      setGlobalError(err instanceof Error ? err.message : "Error al generar carta Gantt");
+    } finally {
+      setGeneratingGantt(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -149,6 +213,10 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
               <p className="text-sm text-muted">{order.description || "Sin descripción"}</p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="secondary" onClick={handleGenerateGantt} disabled={generatingGantt} className="gap-2">
+                <Factory className="h-4 w-4" />
+                {generatingGantt ? "Generando..." : "Generar carta Gantt"}
+              </Button>
               <Badge variant={statusBadgeMap[order.status] ?? "secondary"}>{statusLabels[order.status]}</Badge>
               <Badge variant={order.priority === "critica" ? "destructive" : order.priority === "alta" ? "gold" : order.priority === "media" ? "gold" : "secondary"}>
                 {priorityLabels[order.priority]}
@@ -214,6 +282,40 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
               {globalError}
             </div>
           )}
+          {globalSuccess && (
+            <div className="rounded-lg border border-emerald-400/25 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+              {globalSuccess}
+            </div>
+          )}
+
+          <form
+            onSubmit={handleSupervisorSave}
+            className="rounded-lg border border-cyan-bright/20 bg-cyan-muted/40 p-4"
+          >
+            <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div>
+                <label className="mb-1 flex items-center gap-2 text-xs font-medium text-steel">
+                  <ShieldCheck className="h-4 w-4 text-cyan-bright" />
+                  Supervisor responsable de la OT
+                </label>
+                <Select value={supervisorId} onChange={(event) => setSupervisorId(event.target.value)}>
+                  <option value="">Sin supervisor asignado</option>
+                  {supervisors.map((worker) => (
+                    <option key={worker.id} value={worker.id}>
+                      {worker.name} · {worker.position}
+                    </option>
+                  ))}
+                </Select>
+                <p className="mt-1 text-xs text-steel/75">
+                  Solo aparecen trabajadores activos marcados como supervisores.
+                </p>
+              </div>
+              <Button type="submit" disabled={savingSupervisor} className="gap-2">
+                <Save className="h-4 w-4" />
+                {savingSupervisor ? "Guardando..." : "Guardar supervisor"}
+              </Button>
+            </div>
+          </form>
 
           <form onSubmit={handleSubmit(onAssign)} className="rounded-lg border border-border-subtle bg-navy-primary/30 p-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -221,9 +323,11 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
                 <label className="mb-1 block text-xs font-medium text-steel">Trabajador activo</label>
                 <Select {...register("workerId")}>
                   <option value="">Seleccionar trabajador</option>
-                  {activeWorkers.map((w) => (
+                  {assignableWorkers.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name} · {w.position}
+                      {w.profile === "supervisor" ? " · Supervisor" : ""}
+                      {w.engagement === "spot" ? " · Spot" : ""}
                     </option>
                   ))}
                 </Select>
@@ -262,6 +366,7 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
                   <tr>
                     <th className="px-4 py-3 font-semibold">Trabajador</th>
                     <th className="px-4 py-3 font-semibold">Cargo</th>
+                    <th className="px-4 py-3 font-semibold">Perfil</th>
                     <th className="px-4 py-3 font-semibold">Inicio</th>
                     <th className="px-4 py-3 font-semibold">Término</th>
                     <th className="px-4 py-3 font-semibold">Horas</th>
@@ -327,6 +432,10 @@ function AssignmentRow({
       <tr>
         <td className="px-4 py-3 text-white">{assignment.worker.name}</td>
         <td className="px-4 py-3 text-steel">{assignment.worker.position}</td>
+        <td className="px-4 py-3 text-steel">
+          {assignment.worker.profile === "supervisor" ? "Supervisor" : "Empleado"}
+          {assignment.worker.engagement === "spot" ? " / Spot" : ""}
+        </td>
         <td className="px-4 py-3" colSpan={3}>
           <form id={`edit-form-${assignment.id}`} onSubmit={handleSave} className="flex flex-wrap items-end gap-3">
             <div>
@@ -362,6 +471,10 @@ function AssignmentRow({
     <tr className="hover:bg-navy-light/30">
       <td className="px-4 py-3 font-medium text-white">{assignment.worker.name}</td>
       <td className="px-4 py-3 text-steel">{assignment.worker.position}</td>
+      <td className="px-4 py-3 text-steel">
+        {assignment.worker.profile === "supervisor" ? "Supervisor" : "Empleado"}
+        {assignment.worker.engagement === "spot" ? " / Spot" : ""}
+      </td>
       <td className="px-4 py-3 text-steel">
         <span className="flex items-center gap-1">
           <Calendar className="h-3.5 w-3.5 text-steel/70" /> {formatDate(assignment.startDate)}

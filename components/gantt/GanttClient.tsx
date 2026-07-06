@@ -16,6 +16,7 @@ import {
   User,
   TrendingUp,
   ArrowRight,
+  Factory,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ganttTaskSchema, type GanttTaskFormData } from "@/lib/validations/gantt";
-import { createGanttTask, updateGanttTask, deleteGanttTask } from "@/lib/actions/gantt";
+import {
+  createGanttTask,
+  updateGanttTask,
+  deleteGanttTask,
+  createFabricationGanttFromWorkOrder,
+} from "@/lib/actions/gantt";
+import { fabricationProcessGroups } from "@/lib/fabrication-processes";
 import {
   format,
   differenceInDays,
@@ -178,6 +185,10 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
     return startOfWeek(today, { weekStartsOn: 1 });
   });
   const [tooltip, setTooltip] = React.useState<TooltipData | null>(null);
+  const [selectedWorkOrderId, setSelectedWorkOrderId] = React.useState(workOrders[0]?.id ?? "");
+  const [generating, setGenerating] = React.useState(false);
+  const [generationMessage, setGenerationMessage] = React.useState<string | null>(null);
+  const [generationError, setGenerationError] = React.useState<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = React.useState(800);
@@ -253,6 +264,28 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
     if (!confirm("¿Eliminar esta tarea?")) return;
     await deleteGanttTask(id);
     router.refresh();
+  };
+
+  const handleGenerateFabricationGantt = async () => {
+    if (!selectedWorkOrderId) return;
+    setGenerating(true);
+    setGenerationMessage(null);
+    setGenerationError(null);
+    try {
+      const result = await createFabricationGanttFromWorkOrder(selectedWorkOrderId);
+      const message =
+        result.created > 0
+          ? `Programa generado para OT ${result.workOrderCode}: ${result.created} tareas creadas.`
+          : `La OT ${result.workOrderCode} ya tenia su programa de fabricacion generado.`;
+      setGenerationMessage(result.skipped > 0 ? `${message} ${result.skipped} tareas existentes no se duplicaron.` : message);
+      setFilterProject(result.projectId);
+      router.push(`/gantt?projectId=${result.projectId}`);
+      router.refresh();
+    } catch (err) {
+      setGenerationError(err instanceof Error ? err.message : "No se pudo generar la carta Gantt");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const filteredTasks = filterProject ? tasks.filter((t) => t.projectId === filterProject) : tasks;
@@ -439,6 +472,51 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
           </Button>
         </div>
       </div>
+
+      <Card className="p-4">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <Factory className="h-5 w-5 text-gold" />
+              <h2 className="font-heading text-lg font-semibold text-white">
+                Programa de fabricacion desde OT
+              </h2>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[minmax(220px,360px)_1fr] sm:items-center">
+              <Select value={selectedWorkOrderId} onChange={(event) => setSelectedWorkOrderId(event.target.value)}>
+                <option value="">Seleccionar OT</option>
+                {workOrders.map((order) => (
+                  <option key={order.id} value={order.id}>
+                    {order.code} — {order.title}
+                  </option>
+                ))}
+              </Select>
+              <p className="text-sm text-steel">
+                Genera una secuencia con {fabricationProcessGroups.join(", ")}.
+              </p>
+            </div>
+            {generationMessage && (
+              <div className="mt-3 rounded-md border border-emerald-400/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+                {generationMessage}
+              </div>
+            )}
+            {generationError && (
+              <div className="mt-3 rounded-md border border-fire/30 bg-fire/10 px-3 py-2 text-sm text-fire-bright">
+                {generationError}
+              </div>
+            )}
+          </div>
+          <Button
+            type="button"
+            onClick={handleGenerateFabricationGantt}
+            disabled={!selectedWorkOrderId || generating}
+            className="gap-2"
+          >
+            <Factory className="h-4 w-4" />
+            {generating ? "Generando..." : "Generar procesos"}
+          </Button>
+        </div>
+      </Card>
 
       {/* Gantt chart */}
       <Card className="overflow-hidden p-0">

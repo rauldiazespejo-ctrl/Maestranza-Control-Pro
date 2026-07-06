@@ -1,11 +1,19 @@
 import type { NextAuthConfig } from "next-auth";
 import { UserRole } from "@prisma/client";
 
+const trustHost =
+  process.env.NODE_ENV === "development" ||
+  Boolean(process.env.VERCEL) ||
+  process.env.RAILWAY_ENVIRONMENT === "production" ||
+  Boolean(process.env.RAILWAY_PUBLIC_DOMAIN) ||
+  process.env.AUTH_TRUST_HOST === "true";
+
 function isUserRole(value: unknown): value is UserRole {
   return typeof value === "string" && (Object.values(UserRole) as string[]).includes(value);
 }
 
 const authConfig = {
+  trustHost,
   providers: [],
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
   pages: {

@@ -1,16 +1,15 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-/** Base card — glass surface + hover lift + gold border on hover */
+/** Base card: glass surface, subtle lift, cyan operational focus on hover. */
 const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "surface-glass rounded-lg text-card-foreground",
-        /* Hover: lift -2px + gold border + deeper shadow */
-        "transition-all duration-200",
-        "hover:-translate-y-0.5 hover:border-[rgba(232,179,58,0.30)] hover:shadow-[var(--shadow-card-lg)]",
+        "surface-glass rounded-lg border border-border-subtle text-card-foreground",
+        "transition-all duration-200 will-change-transform",
+        "hover:-translate-y-1 hover:border-border-cyan hover:shadow-[0_20px_44px_rgba(0,0,0,0.35),0_0_26px_rgba(0,229,255,0.15)]",
         className
       )}
       {...props}

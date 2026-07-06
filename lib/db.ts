@@ -16,20 +16,28 @@ function createPrismaClient() {
     throw new Error("DATABASE_URL debe usar PostgreSQL");
   }
 
-  // Parsear DATABASE_URL para extraer parámetros de conexión si existen
+  // Parsear DATABASE_URL para extraer parametros de conexion y host.
   const url = new URL(databaseUrl);
   const sslMode = url.searchParams.get("sslmode") || url.searchParams.get("ssl");
+  const hostname = url.hostname.toLowerCase();
+
+  if (sslMode === "require" && !url.searchParams.has("uselibpqcompat")) {
+    url.searchParams.set("uselibpqcompat", "true");
+  }
+
+  // Railway/Neon proxy usa certificados que pueden fallar con cadena no confiable.
+  // En esos hosts se requiere SSL pero sin validacion estricta del certificado.
+  const isRailwayProxyHost = hostname.endsWith(".proxy.rlwy.net");
+  const shouldUseInsecureSsl =
+    sslMode === "require" || isRailwayProxyHost || Boolean(process.env.RAILWAY_ENVIRONMENT);
 
   const pool = new pg.Pool({
-    connectionString: databaseUrl,
-    ssl:
-      isProduction || sslMode === "require"
-        ? { rejectUnauthorized: true }
-        : { rejectUnauthorized: false },
+    connectionString: url.toString(),
+    ssl: shouldUseInsecureSsl ? { rejectUnauthorized: false } : undefined,
     connectionTimeoutMillis: 5000,
-    idleTimeoutMillis: 10000,
-    max: isProduction ? 5 : 10,
-    // Importante para serverless: cerrar conexiones inactivas rápidamente
+    idleTimeoutMillis: isProduction ? 5000 : 10000,
+    max: isProduction ? 1 : 10,
+    // Importante para serverless: cerrar conexiones inactivas rapidamente.
     allowExitOnIdle: true,
   });
 

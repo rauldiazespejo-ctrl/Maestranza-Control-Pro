@@ -9,10 +9,17 @@ function toDateOptional(value?: string) {
   return value ? new Date(value) : null;
 }
 
-export async function getWorkers(filters?: { status?: string; search?: string }) {
+export async function getWorkers(filters?: {
+  status?: string;
+  profile?: string;
+  engagement?: string;
+  search?: string;
+}) {
   await requireAuth(READ_ROLES);
   const where: import('@prisma/client').Prisma.WorkerWhereInput = {};
   if (filters?.status) where.status = filters.status;
+  if (filters?.profile) where.profile = filters.profile as WorkerFormData["profile"];
+  if (filters?.engagement) where.engagement = filters.engagement as WorkerFormData["engagement"];
   if (filters?.search) {
     where.OR = [
       { name: { contains: filters.search, mode: "insensitive" } },
@@ -43,6 +50,9 @@ export async function createWorker(data: WorkerFormData) {
     data: {
       ...parsed,
       criticalExpires: toDateOptional(parsed.criticalExpires),
+      canCreateWorkers: parsed.profile === "supervisor" ? true : Boolean(parsed.canCreateWorkers),
+      canAssignWorkOrders: parsed.profile === "supervisor" ? true : Boolean(parsed.canAssignWorkOrders),
+      spotDescription: parsed.engagement === "spot" ? parsed.spotDescription : null,
       companyId: (await prisma.company.findFirst({ orderBy: { createdAt: "asc" } }))?.id ?? "",
     },
   });
@@ -64,6 +74,9 @@ export async function updateWorker(id: string, data: WorkerFormData) {
     data: {
       ...parsed,
       criticalExpires: toDateOptional(parsed.criticalExpires),
+      canCreateWorkers: parsed.profile === "supervisor" ? true : Boolean(parsed.canCreateWorkers),
+      canAssignWorkOrders: parsed.profile === "supervisor" ? true : Boolean(parsed.canAssignWorkOrders),
+      spotDescription: parsed.engagement === "spot" ? parsed.spotDescription : null,
     },
   });
 

@@ -36,7 +36,7 @@ const statusBadgeMap: Record<string, "fire" | "gold" | "secondary" | "destructiv
 interface Props {
   orders: WorkOrderWithRelations[];
   clients: { id: string; name: string }[];
-  workers: { id: string; name: string }[];
+  workers: { id: string; name: string; position?: string; profile?: string }[];
   projects: { id: string; name: string }[];
 }
 
@@ -63,6 +63,10 @@ export function OrdenesClient({ orders, clients, workers, projects }: Props) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<WorkOrderWithRelations | null>(null);
   const [search, setSearch] = React.useState(searchParams.get("search") ?? "");
+  const supervisors = React.useMemo(
+    () => workers.filter((worker) => worker.profile === "supervisor"),
+    [workers]
+  );
 
   const {
     register,
@@ -101,8 +105,15 @@ export function OrdenesClient({ orders, clients, workers, projects }: Props) {
   }, [editing, reset]);
 
   const onSubmit = async (data: WorkOrderFormData) => {
-    if (editing) await updateWorkOrder(editing.id, data);
-    else await createWorkOrder(data);
+    if (editing) {
+      await updateWorkOrder(editing.id, data);
+    } else {
+      const order = await createWorkOrder(data);
+      setIsOpen(false);
+      setEditing(null);
+      router.push(`/ordenes/${order.id}`);
+      return;
+    }
     setIsOpen(false);
     setEditing(null);
     router.refresh();
@@ -236,8 +247,18 @@ export function OrdenesClient({ orders, clients, workers, projects }: Props) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label className="mb-2 block">Responsable</Label>
-              <Select {...register("responsibleId")}><option value="">Sin responsable</option>{workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</Select>
+              <Label className="mb-2 block">Supervisor OT</Label>
+              <Select {...register("responsibleId")}>
+                <option value="">Asignar despues</option>
+                {supervisors.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}{w.position ? ` · ${w.position}` : ""}
+                  </option>
+                ))}
+              </Select>
+              <p className="mt-1 text-xs text-steel/75">
+                Al crear la OT se abrira su ficha para asignar cuadrilla y horas.
+              </p>
             </div>
             <div>
               <Label className="mb-2 block">Avance (%)</Label>

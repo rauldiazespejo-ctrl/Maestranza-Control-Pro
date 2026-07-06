@@ -142,3 +142,36 @@ export async function updateWorkOrderStatus(id: string, status: string) {
   revalidatePath("/ordenes");
   return order;
 }
+
+export async function assignSupervisorToWorkOrder(id: string, supervisorId: string) {
+  const session = await requireAuth(OPERATIONS_ROLES);
+  const responsibleId = supervisorId || null;
+
+  if (responsibleId) {
+    const supervisor = await prisma.worker.findUnique({ where: { id: responsibleId } });
+    if (!supervisor) throw new Error("Supervisor no encontrado");
+    if (supervisor.status !== "activo") throw new Error("El supervisor no esta activo");
+    if (supervisor.profile !== "supervisor") {
+      throw new Error("Solo un trabajador con perfil supervisor puede quedar como supervisor de OT");
+    }
+  }
+
+  const order = await prisma.workOrder.update({
+    where: { id },
+    data: { responsibleId },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.user.id,
+      action: "ASSIGN_SUPERVISOR",
+      entity: "WorkOrder",
+      entityId: order.id,
+      metadata: JSON.stringify({ supervisorId: responsibleId }),
+    },
+  });
+
+  revalidatePath(`/ordenes/${id}`);
+  revalidatePath("/ordenes");
+  return order;
+}

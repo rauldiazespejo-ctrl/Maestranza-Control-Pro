@@ -28,6 +28,27 @@ function createPrisma() {
 const prisma = createPrisma();
 
 const DEMO_PASSWORD = "demo1234";
+const SUPERVISOR_RUTS = new Set([
+  "19.048.732-6",
+  "18.018.113-k",
+  "16.756.472-0",
+  "12.820.370-2",
+  "20.710.238-5",
+  "14.610.322-7",
+  "19.447.189-0",
+  "18.421.336-2",
+  "15.851.279-3",
+]);
+
+function workerOperationalProfile(rut: string) {
+  const isSupervisor = SUPERVISOR_RUTS.has(rut.toLowerCase());
+  return {
+    profile: isSupervisor ? "supervisor" : "empleado",
+    engagement: "permanente",
+    canCreateWorkers: isSupervisor,
+    canAssignWorkOrders: isSupervisor,
+  } as const;
+}
 
 function offsetDate(days: number) {
   const date = new Date();
@@ -123,9 +144,29 @@ async function main() {
     { rut: "22.199.718-2", name: "Jaime Andres Vargas Ibanez", position: "Ayudante", specialty: "Apoyo Operativo", certifications: "Trabajo en altura", phone: "+56 9 0000 0023", email: "jvargas@soldesp.cl" },
     { rut: "22.153.767-k", name: "Miguel Fernando Vergara Cisterna", position: "Maestro Primera", specialty: "Soldadura y Fabricacion", certifications: "ISO 9606-1, Soldadura estructural", phone: "+56 9 0000 0024", email: "mvergarac@soldesp.cl" },
   ];
-  for (const d of workersBC) { const w = await tx.worker.create({ data: { companyId: boilerComp.id, ...d, status: "activo" } }); workersAll.push(w); }
-  for (const d of workersSD) { const w = await tx.worker.create({ data: { companyId: soldesp.id, ...d, status: "activo" } }); workersAll.push(w); }
-  console.log(` ${workersAll.length} trabajadores (14 BC + 10 SD)\n`);
+  for (const d of workersBC) {
+    const w = await tx.worker.create({
+      data: {
+        companyId: boilerComp.id,
+        ...d,
+        ...workerOperationalProfile(d.rut),
+        status: "activo",
+      },
+    });
+    workersAll.push(w);
+  }
+  for (const d of workersSD) {
+    const w = await tx.worker.create({
+      data: {
+        companyId: soldesp.id,
+        ...d,
+        ...workerOperationalProfile(d.rut),
+        status: "activo",
+      },
+    });
+    workersAll.push(w);
+  }
+  console.log(` ${workersAll.length} trabajadores (9 supervisores + 15 empleados)\n`);
 
   // Proyectos
   console.log("Creando proyectos...");
@@ -303,6 +344,20 @@ async function main() {
   for (const u of users) {
     await tx.user.create({ data: { email: u.email, rut: u.rut, name: u.name, password: hashedPassword, role: u.role, active: true, companyId: u.companyId || undefined, clientId: u.clientId || undefined } });
     console.log(` ${u.role.padEnd(18)} | RUT: ${u.rut} | ${u.email}`);
+  }
+  for (const supervisor of workersAll.filter((w) => SUPERVISOR_RUTS.has(w.rut.toLowerCase()))) {
+    await tx.user.create({
+      data: {
+        email: supervisor.email,
+        rut: supervisor.rut,
+        name: supervisor.name,
+        password: hashedPassword,
+        role: UserRole.OPERATIONS,
+        active: true,
+        companyId: supervisor.companyId,
+      },
+    });
+    console.log(` ${UserRole.OPERATIONS.padEnd(18)} | RUT: ${supervisor.rut} | ${supervisor.email}`);
   }
   console.log("");
 

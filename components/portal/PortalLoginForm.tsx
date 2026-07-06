@@ -47,30 +47,54 @@ export function PortalLoginForm({ authError }: { authError?: string }) {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
+    <Card className="spotlight-panel w-full max-w-md border-border-cyan/40 bg-[linear-gradient(180deg,rgba(15,23,42,0.9),rgba(2,6,23,0.95))] shadow-industrial-lg">
+      <CardHeader className="pb-2">
         <div className="mb-3 flex justify-center">
           <BrandLockup variant="header" showProductName={false} />
         </div>
+        <div className="mx-auto mb-3 h-px w-24 industrial-divider" />
         <CardTitle className="text-center font-heading text-xl text-white">
-          Portal Cliente
+          Acceso Portal Cliente
         </CardTitle>
         <CardDescription className="text-center">
-          Seguimiento de órdenes, avances y documentos publicados.
+          Monitorea órdenes, hitos de avance y documentos en tiempo real.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <p className="text-sm text-fire-bright">{error}</p>}
+          {error && (
+            <p className="rounded-md border border-alert/40 bg-alert/15 px-3 py-2 text-sm text-red-300">
+              {error}
+            </p>
+          )}
           <div>
             <label className="mb-1 block text-xs font-medium text-steel">RUT</label>
-            <Input type="text" value={rut} onChange={handleRutChange} required placeholder="55.555.555-5" />
+            <Input
+              type="text"
+              value={rut}
+              onChange={handleRutChange}
+              required
+              placeholder="55.555.555-5"
+              className="border-border-cyan/40 bg-navy-dark/70 focus:border-cyan-bright"
+            />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-steel">Contraseña</label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="border-border-cyan/40 bg-navy-dark/70 focus:border-cyan-bright"
+            />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>{loading ? "Ingresando..." : "Ingresar"}</Button>
+          <Button
+            type="submit"
+            className="w-full border border-cyan-bright/30 bg-cyan text-navy-dark shadow-btn-primary transition-all hover:-translate-y-0.5 hover:bg-cyan-bright hover:shadow-btn-primary-hover"
+            disabled={loading}
+          >
+            {loading ? "Ingresando..." : "Ingresar al portal"}
+          </Button>
         </form>
       </CardContent>
     </Card>

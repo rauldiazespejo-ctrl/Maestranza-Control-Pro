@@ -54,6 +54,16 @@ enum HseqStatus {
   vencido
 }
 
+enum WorkerProfile {
+  empleado
+  supervisor
+}
+
+enum WorkerEngagement {
+  permanente
+  spot
+}
+
 model Company {
   id        String   @id @default(uuid())
   name      String
@@ -65,29 +75,29 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  clients  Client[]
-  projects Project[]
-  users    User[]
-  workers  Worker[]
+  clients   Client[]
+  projects  Project[]
+  users     User[]
+  workers   Worker[]
   equipment Equipment[]
   materials Material[]
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String?   @unique
-  rut           String?   @unique
-  name          String
-  password      String
-  role          UserRole
-  active        Boolean   @default(true)
-  companyId     String?
-  clientId      String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  rut       String?  @unique
+  name      String
+  password  String
+  role      UserRole
+  active    Boolean  @default(true)
+  companyId String?
+  clientId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  company       Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  client        Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  company       Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  client        Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
   sessions      Session[]
   auditLogs     AuditLog[]
   notifications Notification[]
@@ -124,23 +134,23 @@ model Client {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  contacts    Contact[]
-  workOrders  WorkOrder[]
-  projects    Project[]
-  users       User[]
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contacts   Contact[]
+  workOrders WorkOrder[]
+  projects   Project[]
+  users      User[]
 
   @@index([companyId])
 }
 
 model Contact {
-  id       String  @id @default(uuid())
-  clientId String
-  name     String
-  role     String?
-  email    String?
-  phone    String?
-  isMain   Boolean  @default(false)
+  id        String   @id @default(uuid())
+  clientId  String
+  name      String
+  role      String?
+  email     String?
+  phone     String?
+  isMain    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -150,7 +160,7 @@ model Contact {
 }
 
 model Project {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   companyId   String
   clientId    String?
   name        String
@@ -158,12 +168,12 @@ model Project {
   description String?
   startDate   DateTime?
   endDate     DateTime?
-  status      String   @default("activo")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String    @default("activo")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  company    Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  client     Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client     Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
   workOrders WorkOrder[]
   ganttTasks GanttTask[]
 
@@ -173,33 +183,33 @@ model Project {
 }
 
 model WorkOrder {
-  id                String          @id @default(uuid())
-  code              String          @unique
-  title             String
-  description       String?
-  status            WorkOrderStatus @default(nueva)
-  priority          Priority        @default(media)
-  startDate         DateTime?
-  dueDate           DateTime?
-  completedAt       DateTime?
+  id            String          @id @default(uuid())
+  code          String          @unique
+  title         String
+  description   String?
+  status        WorkOrderStatus @default(nueva)
+  priority      Priority        @default(media)
+  startDate     DateTime?
+  dueDate       DateTime?
+  completedAt   DateTime?
   /// @check (progress >= 0 AND progress <= 100)
-  progress          Float           @default(0)
-  responsibleId     String?
-  clientId          String?
-  projectId         String?
-  estimatedCost     Decimal?        @db.Decimal(19,4)
-  actualCost        Decimal?        @db.Decimal(19,4)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  progress      Float           @default(0)
+  responsibleId String?
+  clientId      String?
+  projectId     String?
+  estimatedCost Decimal?        @db.Decimal(19, 4)
+  actualCost    Decimal?        @db.Decimal(19, 4)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
-  client       Client?          @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  project      Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  responsible  Worker?          @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
-  tasks        WorkOrderTask[]
-  assignments  WorkerAssignment[]
-  documents    Document[]
-  auditLogs    AuditLog[]
-  ganttTasks   GanttTask[]
+  client      Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  project     Project?           @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  responsible Worker?            @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  tasks       WorkOrderTask[]
+  assignments WorkerAssignment[]
+  documents   Document[]
+  auditLogs   AuditLog[]
+  ganttTasks  GanttTask[]
 
   // ── Performance indexes for dashboard queries ──
   @@index([status])
@@ -212,15 +222,15 @@ model WorkOrder {
 }
 
 model WorkOrderTask {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   workOrderId String
   title       String
   description String?
-  progress    Float    @default(0)
-  completed   Boolean  @default(false)
+  progress    Float     @default(0)
+  completed   Boolean   @default(false)
   dueDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 
@@ -229,38 +239,45 @@ model WorkOrderTask {
 }
 
 model Worker {
-  id              String   @id @default(uuid())
-  companyId       String
-  name            String
-  rut             String   @unique
-  position        String
-  specialty       String?
-  status          String   @default("activo")
-  certifications  String?
-  criticalExpires DateTime?
-  phone           String?
-  email           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String           @id @default(uuid())
+  companyId           String
+  name                String
+  rut                 String           @unique
+  position            String
+  specialty           String?
+  status              String           @default("activo")
+  profile             WorkerProfile    @default(empleado)
+  engagement          WorkerEngagement @default(permanente)
+  canCreateWorkers    Boolean          @default(false)
+  canAssignWorkOrders Boolean          @default(false)
+  spotDescription     String?
+  certifications      String?
+  criticalExpires     DateTime?
+  phone               String?
+  email               String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 
-  company      Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  ledOrders    WorkOrder[]
-  assignments  WorkerAssignment[]
-  hseqRecords  HseqRecord[]
+  company     Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ledOrders   WorkOrder[]
+  assignments WorkerAssignment[]
+  hseqRecords HseqRecord[]
 
   @@index([companyId])
   @@index([status])
+  @@index([profile])
+  @@index([engagement])
 }
 
 model WorkerAssignment {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   workerId    String
   workOrderId String
   startDate   DateTime?
   endDate     DateTime?
   hours       Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   worker    Worker    @relation(fields: [workerId], references: [id], onDelete: Cascade)
   workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
@@ -271,21 +288,21 @@ model WorkerAssignment {
 }
 
 model GanttTask {
-  id          String   @id @default(uuid())
-  projectId   String
-  workOrderId String?
-  name        String
-  startDate   DateTime
-  endDate     DateTime
-  progress    Float    @default(0)
-  status      String   @default("pendiente")
+  id           String   @id @default(uuid())
+  projectId    String
+  workOrderId  String?
+  name         String
+  startDate    DateTime
+  endDate      DateTime
+  progress     Float    @default(0)
+  status       String   @default("pendiente")
   dependencies String?
-  responsible String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  responsible  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workOrder   WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
 
   @@index([projectId])
   @@index([workOrderId])
@@ -295,16 +312,16 @@ model GanttTask {
 }
 
 model Equipment {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   companyId   String
   name        String
-  code        String?  @unique
+  code        String?   @unique
   type        String?
-  status      String   @default("disponible")
+  status      String    @default("disponible")
   lastService DateTime?
   nextService DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -313,16 +330,16 @@ model Equipment {
 }
 
 model Material {
-  id          String   @id @default(uuid())
-  companyId   String
-  name        String
-  code        String?  @unique
-  unit        String?
-  stock       Float    @default(0)
-  minStock    Float?
-  cost        Decimal? @db.Decimal(19,4)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  companyId String
+  name      String
+  code      String?  @unique
+  unit      String?
+  stock     Float    @default(0)
+  minStock  Float?
+  cost      Decimal? @db.Decimal(19, 4)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -364,7 +381,7 @@ model HseqRecord {
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
 
-  responsible Worker?    @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  responsible Worker?      @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
   actions     HseqAction[]
   documents   Document[]
 
@@ -379,15 +396,15 @@ model HseqRecord {
 }
 
 model HseqAction {
-  id             String   @id @default(uuid())
-  hseqRecordId   String
-  description    String
-  responsible    String?
-  dueDate        DateTime?
-  completed      Boolean  @default(false)
-  completedAt    DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String    @id @default(uuid())
+  hseqRecordId String
+  description  String
+  responsible  String?
+  dueDate      DateTime?
+  completed    Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   hseqRecord HseqRecord @relation(fields: [hseqRecordId], references: [id], onDelete: Cascade)
 
@@ -397,17 +414,20 @@ model HseqAction {
 }
 
 model AuditLog {
-  id         String   @id @default(uuid())
-  userId     String?
-  action     String
-  entity     String
-  entityId   String?
-  metadata   String?
-  createdAt  DateTime @default(now())
+  id          String   @id @default(uuid())
+  userId      String?
+  workOrderId String?
+  action      String
+  entity      String
+  entityId    String?
+  metadata    String?
+  createdAt   DateTime @default(now())
 
-  user   User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([workOrderId])
   @@index([entityId])
   @@index([entity])
   @@index([action])

@@ -64,13 +64,13 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Fluid Typography Scale */
-  --text-xs:   clamp(0.7rem,  0.65rem + 0.25vw, 0.8rem);
-  --text-sm:   clamp(0.8rem,  0.75rem + 0.25vw, 0.875rem);
-  --text-base: clamp(0.9rem,  0.8rem  + 0.5vw,  1rem);
-  --text-lg:   clamp(1.1rem,  1rem    + 0.5vw,  1.25rem);
-  --text-xl:   clamp(1.4rem,  1.2rem  + 1vw,    1.75rem);
-  --text-2xl:  clamp(1.8rem,  1.5rem  + 1.5vw,  2.5rem);
-  --text-3xl:  clamp(2.4rem,  2rem    + 2vw,    3.5rem);
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
 
   /* Spacing Scale */
   --space-1:  4px;
@@ -213,10 +213,9 @@ button:disabled,
 /* ── App shell background ── */
 .app-shell-bg {
   background:
-    radial-gradient(circle at top left, rgba(0, 229, 255, 0.12), transparent 28rem),
-    linear-gradient(180deg, rgba(30, 41, 59, 0.22), transparent 260px),
-    linear-gradient(90deg, rgba(232, 179, 58, 0.07), transparent 38%),
-    repeating-linear-gradient(90deg, rgba(203, 213, 225, 0.028) 0 1px, transparent 1px 96px),
+    radial-gradient(circle at top left, rgba(0, 229, 255, 0.10), transparent 24rem),
+    linear-gradient(180deg, rgba(30, 41, 59, 0.18), transparent 220px),
+    repeating-linear-gradient(90deg, rgba(203, 213, 225, 0.022) 0 1px, transparent 1px 96px),
     var(--color-navy-dark);
 }
 
@@ -242,9 +241,9 @@ button:disabled,
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.075), transparent 34%),
-    linear-gradient(180deg, rgba(232, 179, 58, 0.045), transparent 42%);
-  opacity: 0.9;
+    linear-gradient(115deg, rgba(255, 255, 255, 0.055), transparent 34%),
+    linear-gradient(180deg, rgba(0, 229, 255, 0.035), transparent 42%);
+  opacity: 0.82;
 }
 
 .surface-glass > * {
@@ -282,7 +281,7 @@ button:disabled,
 }
 
 .metric-card:hover {
-  border-color: rgba(232, 179, 58, 0.32);
+  border-color: rgba(0, 229, 255, 0.34);
   box-shadow: var(--shadow-industrial-lg);
   transform: translateY(-2px);
 }
@@ -386,4 +385,119 @@ h1, h2, h3, h4, h5, h6 {
 :focus-visible {
   outline: 2px solid var(--color-ring);
   outline-offset: 2px;
+}
+
+/* ============================================================
+   IMPACT LAYER — Control Center UI Enhancements
+   ============================================================ */
+
+.control-center-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.control-center-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(0, 229, 255, 0.11), transparent 26rem),
+    radial-gradient(circle at 92% 14%, rgba(232, 179, 58, 0.11), transparent 28rem),
+    radial-gradient(circle at 52% 115%, rgba(0, 184, 212, 0.13), transparent 34rem);
+}
+
+.control-center-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 50% 45%, black 36%, transparent 95%);
+  opacity: 0.35;
+}
+
+.aurora-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  background:
+    linear-gradient(120deg, rgba(0, 229, 255, 0.10), transparent 42%),
+    linear-gradient(300deg, rgba(232, 179, 58, 0.10), transparent 45%),
+    var(--color-surface-glass);
+  box-shadow: var(--shadow-industrial-lg);
+  backdrop-filter: blur(14px);
+}
+
+.aurora-hero::before {
+  content: "";
+  position: absolute;
+  inset: -45% -10% auto;
+  height: 240px;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.26), transparent 60%);
+  filter: blur(22px);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.neon-surface {
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.84), rgba(2, 6, 23, 0.92));
+  box-shadow:
+    0 0 0 1px rgba(0, 229, 255, 0.06) inset,
+    0 18px 44px rgba(0, 0, 0, 0.36),
+    0 0 28px rgba(0, 229, 255, 0.11);
+}
+
+.neon-pill {
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  background: rgba(0, 229, 255, 0.1);
+  color: #a6f7ff;
+  box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.12) inset;
+}
+
+.gold-pill {
+  border: 1px solid rgba(232, 179, 58, 0.34);
+  background: rgba(232, 179, 58, 0.12);
+  color: #f7d995;
+  box-shadow: 0 0 0 1px rgba(232, 179, 58, 0.11) inset;
+}
+
+.spotlight-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-panel::after {
+  content: "";
+  position: absolute;
+  right: -18%;
+  top: -25%;
+  width: 230px;
+  height: 230px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.24), transparent 68%);
+  pointer-events: none;
+}
+
+.impact-hover {
+  transition:
+    transform 220ms var(--ease-industrial),
+    box-shadow 220ms var(--ease-industrial),
+    border-color 220ms var(--ease-industrial),
+    background-color 220ms var(--ease-industrial);
+}
+
+.impact-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 229, 255, 0.35);
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.35),
+    0 0 24px rgba(0, 229, 255, 0.18);
 }

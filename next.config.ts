@@ -15,13 +15,14 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
-  // CSP reforzado: script-src sin 'unsafe-eval' en produccion
+  // Next App Router emite scripts inline para hidratar la UI. Sin nonce real
+  // por request, bloquearlos deja formularios cliente sin JavaScript.
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
       isProd
-        ? "script-src 'self' 'strict-dynamic' 'nonce-${nonce}'"
+        ? "script-src 'self' 'unsafe-inline'"
         : "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",

@@ -39,7 +39,14 @@ export async function getActiveWorkersForAssignment() {
   await requireAuth(READ_ROLES);
   return prisma.worker.findMany({
     where: { status: "activo" },
-    select: { id: true, name: true, position: true, specialty: true },
+    select: {
+      id: true,
+      name: true,
+      position: true,
+      specialty: true,
+      profile: true,
+      engagement: true,
+    },
     orderBy: { name: "asc" },
   });
 }

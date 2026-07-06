@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Plus,
@@ -11,6 +11,7 @@ import {
   Mail,
   Phone,
   Shield,
+  UserCheck,
   AlertTriangle,
   CheckCircle2,
   Calendar,
@@ -113,6 +114,8 @@ function WorkerCard({
 }) {
   const initials = getInitials(worker.name);
   const isActive = worker.status === "activo";
+  const isSupervisor = worker.profile === "supervisor";
+  const isSpot = worker.engagement === "spot";
 
   return (
     <button
@@ -136,12 +139,13 @@ function WorkerCard({
           <p className="truncate text-sm text-steel">{worker.position}</p>
           <p className="mt-0.5 font-mono text-xs text-steel/70">{worker.rut}</p>
         </div>
-        <Badge
-          variant={isActive ? "default" : "secondary"}
-          className="shrink-0"
-        >
-          {isActive ? "Activo" : "Inactivo"}
-        </Badge>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <Badge variant={isActive ? "default" : "secondary"}>
+            {isActive ? "Activo" : "Inactivo"}
+          </Badge>
+          {isSupervisor && <Badge variant="gold">Supervisor</Badge>}
+          {isSpot && <Badge variant="secondary">Spot</Badge>}
+        </div>
       </div>
 
       {/* Meta */}
@@ -150,6 +154,18 @@ function WorkerCard({
           <div className="flex items-center gap-2">
             <Shield className="h-3.5 w-3.5 shrink-0 text-gold" />
             <span className="truncate text-xs text-steel">{worker.specialty}</span>
+          </div>
+        )}
+        {(worker.canCreateWorkers || worker.canAssignWorkOrders) && (
+          <div className="flex items-center gap-2">
+            <UserCheck className="h-3.5 w-3.5 shrink-0 text-gold" />
+            <span className="truncate text-xs text-steel">
+              {worker.canCreateWorkers && worker.canAssignWorkOrders
+                ? "Crea trabajadores y asigna OT"
+                : worker.canCreateWorkers
+                ? "Crea trabajadores"
+                : "Asigna OT"}
+            </span>
           </div>
         )}
         {worker.certifications && (
@@ -187,6 +203,8 @@ function WorkerDetailPanel({
 }) {
   const initials = worker ? getInitials(worker.name) : "";
   const isActive = worker?.status === "activo";
+  const isSupervisor = worker?.profile === "supervisor";
+  const isSpot = worker?.engagement === "spot";
 
   const now = new Date();
   const activeAssignments = worker?.assignments.filter(
@@ -230,6 +248,8 @@ function WorkerDetailPanel({
                 <Badge variant={isActive ? "default" : "secondary"}>
                   {isActive ? "Activo" : "Inactivo"}
                 </Badge>
+                {isSupervisor && <Badge variant="gold">Supervisor</Badge>}
+                {isSpot && <Badge variant="secondary">Spot</Badge>}
                 <span className="font-mono text-xs text-steel">{worker.rut}</span>
               </div>
             </div>
@@ -278,8 +298,33 @@ function WorkerDetailPanel({
                   </p>
                 </div>
               )}
+              <div className="rounded-md border border-border-subtle bg-surface-muted p-3">
+                <p className="text-xs text-steel">Perfil</p>
+                <p className="mt-0.5 font-medium text-white">
+                  {worker.profile === "supervisor" ? "Supervisor" : "Empleado"}
+                </p>
+              </div>
+              <div className="rounded-md border border-border-subtle bg-surface-muted p-3">
+                <p className="text-xs text-steel">Tipo</p>
+                <p className="mt-0.5 font-medium text-white">
+                  {worker.engagement === "spot" ? "Spot" : "Permanente"}
+                </p>
+              </div>
             </div>
           </section>
+
+          {(worker.canCreateWorkers || worker.canAssignWorkOrders || worker.spotDescription) && (
+            <section>
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-steel">
+                Alcance operativo
+              </h4>
+              <div className="space-y-2 rounded-md border border-border-subtle bg-surface-muted p-3 text-sm text-steel">
+                {worker.canCreateWorkers && <p>Puede crear trabajadores.</p>}
+                {worker.canAssignWorkOrders && <p>Puede asignar trabajos mediante OT.</p>}
+                {worker.spotDescription && <p>{worker.spotDescription}</p>}
+              </div>
+            </section>
+          )}
 
           {/* Certifications */}
           {certificationLines.length > 0 && (
@@ -393,11 +438,17 @@ export function TrabajadoresClient({ workers }: Props) {
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [search, setSearch] = React.useState(searchParams.get("search") ?? "");
   const [statusFilter, setStatusFilter] = React.useState(searchParams.get("status") ?? "");
+  const [profileFilter, setProfileFilter] = React.useState(searchParams.get("profile") ?? "");
+  const [engagementFilter, setEngagementFilter] = React.useState(
+    searchParams.get("engagement") ?? ""
+  );
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<WorkerFormData>({
     resolver: zodResolver(workerSchema),
@@ -407,12 +458,19 @@ export function TrabajadoresClient({ workers }: Props) {
       rut: "",
       position: "",
       specialty: "",
+      profile: "empleado",
+      engagement: "permanente",
+      canCreateWorkers: false,
+      canAssignWorkOrders: false,
+      spotDescription: "",
       certifications: "",
       criticalExpires: "",
       phone: "",
       email: "",
     },
   });
+  const profileValue = useWatch({ control, name: "profile" });
+  const engagementValue = useWatch({ control, name: "engagement" });
 
   React.useEffect(() => {
     if (editing) {
@@ -422,6 +480,11 @@ export function TrabajadoresClient({ workers }: Props) {
         position: editing.position,
         specialty: editing.specialty ?? "",
         status: editing.status as "activo" | "inactivo",
+        profile: editing.profile,
+        engagement: editing.engagement,
+        canCreateWorkers: editing.canCreateWorkers,
+        canAssignWorkOrders: editing.canAssignWorkOrders,
+        spotDescription: editing.spotDescription ?? "",
         certifications: editing.certifications ?? "",
         criticalExpires: editing.criticalExpires
           ? editing.criticalExpires.toISOString().slice(0, 10)
@@ -436,6 +499,11 @@ export function TrabajadoresClient({ workers }: Props) {
         position: "",
         specialty: "",
         status: "activo",
+        profile: "empleado",
+        engagement: "permanente",
+        canCreateWorkers: false,
+        canAssignWorkOrders: false,
+        spotDescription: "",
         certifications: "",
         criticalExpires: "",
         phone: "",
@@ -443,6 +511,13 @@ export function TrabajadoresClient({ workers }: Props) {
       });
     }
   }, [editing, reset]);
+
+  React.useEffect(() => {
+    if (profileValue === "supervisor") {
+      setValue("canCreateWorkers", true);
+      setValue("canAssignWorkOrders", true);
+    }
+  }, [profileValue, setValue]);
 
   const onSubmit = async (data: WorkerFormData) => {
     if (editing) await updateWorker(editing.id, data);
@@ -465,6 +540,10 @@ export function TrabajadoresClient({ workers }: Props) {
     else params.delete("search");
     if (statusFilter) params.set("status", statusFilter);
     else params.delete("status");
+    if (profileFilter) params.set("profile", profileFilter);
+    else params.delete("profile");
+    if (engagementFilter) params.set("engagement", engagementFilter);
+    else params.delete("engagement");
     router.push(`/trabajadores?${params.toString()}`);
   };
 
@@ -509,6 +588,24 @@ export function TrabajadoresClient({ workers }: Props) {
           <option value="">Todos los estados</option>
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
+        </Select>
+        <Select
+          value={profileFilter}
+          onChange={(e) => setProfileFilter(e.target.value)}
+          className="w-auto min-w-[150px]"
+        >
+          <option value="">Todos los perfiles</option>
+          <option value="supervisor">Supervisor</option>
+          <option value="empleado">Empleado</option>
+        </Select>
+        <Select
+          value={engagementFilter}
+          onChange={(e) => setEngagementFilter(e.target.value)}
+          className="w-auto min-w-[150px]"
+        >
+          <option value="">Todos los tipos</option>
+          <option value="permanente">Permanente</option>
+          <option value="spot">Spot</option>
         </Select>
         <Button type="submit" variant="secondary">
           Buscar
@@ -578,6 +675,57 @@ export function TrabajadoresClient({ workers }: Props) {
               )}
             </div>
           </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-steel">
+                Perfil
+              </label>
+              <Select {...register("profile")}>
+                <option value="empleado">Empleado</option>
+                <option value="supervisor">Supervisor</option>
+              </Select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-steel">
+                Tipo de dotación
+              </label>
+              <Select {...register("engagement")}>
+                <option value="permanente">Permanente</option>
+                <option value="spot">Spot / fabricación puntual</option>
+              </Select>
+            </div>
+          </div>
+          <div className="grid gap-3 rounded-md border border-border-subtle bg-surface-muted p-3 sm:grid-cols-2">
+            <label className="flex items-center gap-2 text-sm text-steel">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-border-subtle bg-navy-primary"
+                disabled={profileValue === "supervisor"}
+                {...register("canCreateWorkers")}
+              />
+              Puede crear trabajadores
+            </label>
+            <label className="flex items-center gap-2 text-sm text-steel">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-border-subtle bg-navy-primary"
+                disabled={profileValue === "supervisor"}
+                {...register("canAssignWorkOrders")}
+              />
+              Puede asignar trabajos por OT
+            </label>
+          </div>
+          {engagementValue === "spot" && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-steel">
+                Motivo / fabricación puntual
+              </label>
+              <Input
+                {...register("spotDescription")}
+                placeholder="Ej: apoyo temporal para fabricación específica"
+              />
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-medium text-steel">
