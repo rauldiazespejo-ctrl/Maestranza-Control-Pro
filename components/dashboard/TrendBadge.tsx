@@ -21,7 +21,7 @@ export function TrendBadge({ value, label, className }: TrendBadgeProps) {
         isNeutral
           ? "border-border-subtle bg-white/5 text-steel"
           : isPositive
-          ? "border-blue-400/30 bg-blue-500/12 text-blue-200"
+          ? "border-steel/35 bg-steel/12 text-steel"
           : "border-red-400/35 bg-red-500/12 text-red-200",
         className
       )}

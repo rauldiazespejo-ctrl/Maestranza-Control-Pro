@@ -47,7 +47,7 @@ export function PortalLoginForm({ authError }: { authError?: string }) {
   };
 
   return (
-    <Card className="spotlight-panel w-full max-w-md border-border-cyan/40 bg-[linear-gradient(180deg,rgba(15,23,42,0.9),rgba(2,6,23,0.95))] shadow-industrial-lg">
+    <Card className="spotlight-panel w-full max-w-md border-steel/25 shadow-industrial-lg">
       <CardHeader className="pb-2">
         <div className="mb-3 flex justify-center">
           <BrandLockup variant="header" showProductName={false} />
@@ -75,7 +75,7 @@ export function PortalLoginForm({ authError }: { authError?: string }) {
               onChange={handleRutChange}
               required
               placeholder="55.555.555-5"
-              className="border-border-cyan/40 bg-navy-dark/70 focus:border-cyan-bright"
+              className="border-steel/25 bg-navy-dark/70 focus:border-steel"
             />
           </div>
           <div>
@@ -85,12 +85,12 @@ export function PortalLoginForm({ authError }: { authError?: string }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="border-border-cyan/40 bg-navy-dark/70 focus:border-cyan-bright"
+              className="border-steel/25 bg-navy-dark/70 focus:border-steel"
             />
           </div>
           <Button
             type="submit"
-            className="w-full border border-cyan-bright/30 bg-cyan text-navy-dark shadow-btn-primary transition-all hover:-translate-y-0.5 hover:bg-cyan-bright hover:shadow-btn-primary-hover"
+            className="w-full border-steel/35 bg-steel text-navy-dark shadow-btn-primary transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-btn-primary-hover"
             disabled={loading}
           >
             {loading ? "Ingresando..." : "Ingresar al portal"}

@@ -496,7 +496,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
               </p>
             </div>
             {generationMessage && (
-              <div className="mt-3 rounded-md border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-sm text-blue-100">
+              <div className="mt-3 rounded-md border border-steel/25 bg-steel/10 px-3 py-2 text-sm text-steel">
                 {generationMessage}
               </div>
             )}

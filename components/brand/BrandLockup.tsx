@@ -24,12 +24,12 @@ export function BrandLockup({
     >
       <div
         className={cn(
-          "relative flex shrink-0 items-center justify-center overflow-hidden border border-cyan-bright/30 bg-slate-950/80 shadow-[0_0_28px_rgba(0,229,255,0.18)] backdrop-blur-md",
+          "metal-brushed metal-bevel relative flex shrink-0 items-center justify-center overflow-hidden border border-steel/25 bg-slate-950/80 backdrop-blur-md",
           isLogin ? "h-20 w-20 rounded-2xl p-3" : "h-11 w-11 rounded-xl p-2",
           isSidebar && "h-10 w-10 rounded-lg"
         )}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,229,255,0.24),transparent_45%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(223,175,59,0.20),transparent_45%)]" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/forgeops-mark.svg"
@@ -50,7 +50,7 @@ export function BrandLockup({
           </p>
           <p
             className={cn(
-              "truncate font-medium text-cyan-bright/85",
+              "truncate font-medium text-steel/85",
               isLogin ? "text-sm" : "text-[11px]"
             )}
           >

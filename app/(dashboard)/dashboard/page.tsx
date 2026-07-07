@@ -145,10 +145,10 @@ export default async function DashboardPage() {
                 {format(now, "dd MMM yyyy", { locale: es })}
               </p>
             </div>
-            <div className="rounded-lg border border-blue-400/25 bg-blue-500/10 p-3 shadow-industrial-sm">
-              <p className="text-xs uppercase text-blue-100">Estado</p>
-              <p className="mt-1 flex items-center gap-1.5 font-semibold text-blue-100">
-                <span className="h-1.5 w-1.5 rounded-full bg-blue-300 animate-pulse" />
+            <div className="rounded-lg border border-steel/25 bg-steel/10 p-3 shadow-industrial-sm">
+              <p className="text-xs uppercase text-steel">Estado</p>
+              <p className="mt-1 flex items-center gap-1.5 font-semibold text-steel">
+                <span className="h-1.5 w-1.5 rounded-full bg-steel animate-pulse" />
                 Operativo
               </p>
             </div>

@@ -26,12 +26,11 @@ const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
         aria-label={label ?? `Progreso: ${clamped}%`}
       >
         {/* Track */}
-        <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-navy-dark">
-          {/* Fill — gradient fire → fire-bright */}
+        <div className="relative h-1.5 w-full overflow-hidden rounded-full border border-border-subtle bg-navy-dark shadow-inner">
           <div
             className={cn(
               "absolute inset-y-0 left-0 rounded-full",
-              "bg-gradient-to-r from-fire to-fire-bright",
+              "bg-gradient-to-r from-steel-dark via-steel to-gold",
               "transition-[width] duration-500 ease-out"
             )}
             style={{ width: `${clamped}%` }}

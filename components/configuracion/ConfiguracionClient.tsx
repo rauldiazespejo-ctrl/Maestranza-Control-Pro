@@ -123,7 +123,7 @@ export function ConfiguracionClient({ users, company, clients }: Props) {
         <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-cyan-bright" />
+              <Building2 className="h-5 w-5 text-steel" />
               Datos de empresa
             </CardTitle>
             <p className="mt-1 text-sm text-steel">

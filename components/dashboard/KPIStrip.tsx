@@ -45,9 +45,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: CheckCircle2,
-      iconColor: "text-blue-200",
+      iconColor: "text-steel",
       iconGlow: false,
-      accentColor: "bg-blue-400/60",
+      accentColor: "bg-steel/55",
       label: "Completadas",
       value: completedOrders,
       trend: trends?.completedOrders,

@@ -52,7 +52,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           onClick?.(event);
         }}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap",
+          "inline-flex items-center justify-center gap-2 rounded-md border font-semibold whitespace-nowrap",
           "transition-all duration-200",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
           /* hover: scale(1.02) — disabled just dims, no transform */
@@ -63,17 +63,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50",
           {
             default:
-              "bg-navy-light text-white shadow-industrial-sm hover:enabled:bg-navy-light/95 hover:enabled:border hover:enabled:border-border-strong",
+              "border-border-strong metal-brushed text-white shadow-industrial-sm hover:enabled:border-steel/45 hover:enabled:bg-navy-light/95",
             secondary:
-              "border border-border-subtle bg-navy-light/85 text-white hover:enabled:border-border-strong hover:enabled:bg-navy-light hover:enabled:shadow-industrial-sm",
+              "border-border-subtle bg-navy-light/85 text-white hover:enabled:border-border-strong hover:enabled:bg-navy-light hover:enabled:shadow-industrial-sm",
             outline:
-              "border border-border-subtle bg-white/[0.03] text-steel hover:enabled:border-border-strong hover:enabled:bg-navy-light/80 hover:enabled:text-white hover:enabled:shadow-industrial-sm",
+              "border-border-subtle bg-white/[0.03] text-steel hover:enabled:border-border-strong hover:enabled:bg-navy-light/80 hover:enabled:text-white hover:enabled:shadow-industrial-sm",
             ghost:
-              "bg-transparent text-steel hover:enabled:bg-navy-light/80 hover:enabled:text-white",
+              "border-transparent bg-transparent text-steel hover:enabled:bg-navy-light/80 hover:enabled:text-white",
             destructive:
-              "bg-alert text-white shadow-industrial-sm hover:enabled:bg-alert-dark",
+              "border-alert/55 bg-alert text-white shadow-industrial-sm hover:enabled:bg-alert-dark",
             accent:
-              "bg-gold text-navy-dark shadow-industrial-sm hover:enabled:bg-gold/90",
+              "border-gold/55 bg-gold text-navy-dark shadow-industrial-sm hover:enabled:bg-gold/90",
           }[variant],
           {
             default: "min-h-10 px-6 py-3 text-sm",

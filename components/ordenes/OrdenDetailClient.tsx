@@ -289,19 +289,19 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
             </div>
           )}
           {globalSuccess && (
-            <div className="rounded-lg border border-blue-400/25 bg-blue-500/10 p-3 text-sm text-blue-100">
+            <div className="rounded-lg border border-steel/25 bg-steel/10 p-3 text-sm text-steel">
               {globalSuccess}
             </div>
           )}
 
           <form
             onSubmit={handleSupervisorSave}
-            className="rounded-lg border border-blue-400/20 bg-blue-500/10 p-4"
+            className="rounded-lg border border-steel/25 bg-steel/10 p-4"
           >
             <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
               <div>
                 <label className="mb-1 flex items-center gap-2 text-xs font-medium text-steel">
-                  <ShieldCheck className="h-4 w-4 text-blue-300" />
+                  <ShieldCheck className="h-4 w-4 text-steel" />
                   Supervisor responsable de la OT
                 </label>
                 <Select value={supervisorId} onChange={(event) => setSupervisorId(event.target.value)}>

@@ -40,6 +40,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         ref={ref}
         className={cn(
           "inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold shadow-sm transition-[background-color,border-color,color] duration-200",
+          "bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.035)_0_1px,transparent_1px_5px)]",
           {
             /* ── Base / generic ── */
             default:
@@ -53,7 +54,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             gold:
               "border-gold/45 bg-gold text-navy-dark",
             success:
-              "border-blue-400/35 bg-blue-500/20 text-blue-100",
+              "border-steel/40 bg-steel/15 text-steel",
             destructive:
               "border-alert/45 bg-alert text-white",
 
@@ -79,8 +80,8 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
               " [&_.badge-dot]:bg-gold"
             ),
             completada: (
-              "border-blue-400/35 bg-blue-500/15 text-blue-200" +
-              " [&_.badge-dot]:bg-blue-300"
+              "border-steel/40 bg-steel/15 text-steel" +
+              " [&_.badge-dot]:bg-steel"
             ),
             cerrada: (
               "border-border-subtle bg-navy-light/40 text-steel/60" +
@@ -111,7 +112,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             "hseq-en-revision":
               "border-border-gold/45 bg-gold/15 text-gold",
             "hseq-cerrado":
-              "border-blue-300/30 bg-blue-500/10 text-blue-100/80",
+              "border-steel/35 bg-steel/10 text-steel/90",
             "hseq-vencido":
               "border-alert/60 bg-alert/20 text-red-100",
           }[variant],

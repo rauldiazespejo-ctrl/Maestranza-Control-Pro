@@ -18,8 +18,8 @@ export default function PortalError({ error, reset }: PortalErrorProps) {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center px-4">
       <div className="mx-auto flex max-w-md flex-col items-center text-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-cyan/15">
-          <AlertTriangle className="h-8 w-8 text-cyan-bright" />
+        <div className="metal-brushed mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-steel/25">
+          <AlertTriangle className="h-8 w-8 text-steel" />
         </div>
 
         <h2 className="mb-2 text-xl font-semibold tracking-tight text-white">

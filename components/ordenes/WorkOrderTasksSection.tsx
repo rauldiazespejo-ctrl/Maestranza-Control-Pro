@@ -220,7 +220,7 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
                       }
                     >
                       {task.completed ? (
-                        <CheckSquare className="h-5 w-5 text-blue-300" />
+                        <CheckSquare className="h-5 w-5 text-steel" />
                       ) : (
                         <Square className="h-5 w-5" />
                       )}

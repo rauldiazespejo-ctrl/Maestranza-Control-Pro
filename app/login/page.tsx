@@ -34,9 +34,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <BrandLockup variant="login" />
         </div>
 
-        <Card className="login-panel mx-auto max-w-md border-cyan-bright/20 shadow-[0_24px_72px_rgba(2,6,23,0.52),0_0_44px_rgba(0,229,255,0.10)]">
+        <Card className="login-panel mx-auto max-w-md border-steel/20 shadow-[0_24px_72px_rgba(2,6,23,0.52)]">
           <CardHeader>
-            <div className="mx-auto mb-2 inline-flex items-center gap-2 rounded-full border border-cyan-bright/25 bg-cyan-bright/10 px-3 py-1 text-[11px] font-semibold uppercase text-cyan-200">
+            <div className="metal-brushed mx-auto mb-2 inline-flex items-center gap-2 rounded-full border border-steel/25 px-3 py-1 text-[11px] font-semibold uppercase text-steel">
               Centro seguro
             </div>
             <CardTitle className="text-center font-heading text-lg">

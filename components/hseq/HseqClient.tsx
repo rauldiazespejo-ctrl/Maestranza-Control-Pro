@@ -420,7 +420,7 @@ export function HseqClient({ records, workers, safety }: Props) {
             "rounded-lg border p-3 text-sm",
             workflowError
               ? "border-fire/30 bg-fire/10 text-fire-bright"
-              : "border-blue-400/25 bg-blue-500/10 text-blue-100"
+              : "border-steel/25 bg-steel/10 text-steel"
           )}
         >
           {workflowError ?? workflowSuccess}
@@ -539,7 +539,7 @@ export function HseqClient({ records, workers, safety }: Props) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-white">
-                  <FileCheck2 className="h-5 w-5 text-blue-300" />
+                  <FileCheck2 className="h-5 w-5 text-steel" />
                   PTW digital
                 </h2>
                 <p className="mt-1 text-xs text-steel">Permisos de trabajo asociados a AST aprobado y vigencia operacional.</p>
