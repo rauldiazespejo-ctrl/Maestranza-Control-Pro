@@ -25,9 +25,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
   const cards = [
     {
       icon: Wrench,
-      iconColor: "text-steel",
+      iconColor: "text-ink-muted",
       iconGlow: false,
-      accentColor: "bg-border-strong",
+      accentColor: "bg-hairline-strong",
       label: "Órdenes activas",
       value: activeOrders,
       trend: trends?.activeOrders,
@@ -35,9 +35,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: AlertTriangle,
-      iconColor: "text-red-300",
+      iconColor: "text-alert",
       iconGlow: false,
-      accentColor: "bg-alert/70",
+      accentColor: "bg-alert/60",
       label: "Órdenes atrasadas",
       value: delayedOrders,
       trend: trends?.delayedOrders,
@@ -45,9 +45,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: CheckCircle2,
-      iconColor: "text-steel",
+      iconColor: "text-success",
       iconGlow: false,
-      accentColor: "bg-steel/55",
+      accentColor: "bg-success/60",
       label: "Completadas",
       value: completedOrders,
       trend: trends?.completedOrders,
@@ -57,7 +57,7 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
       icon: TrendingUp,
       iconColor: "text-gold",
       iconGlow: false,
-      accentColor: "bg-gold/70",
+      accentColor: "bg-gold/60",
       label: "Avance promedio",
       value: Math.round(avgProgress),
       suffix: "%",
@@ -67,9 +67,9 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
     },
     {
       icon: ShieldAlert,
-      iconColor: hseqAlerts > 0 ? "text-red-300" : "text-steel",
+      iconColor: hseqAlerts > 0 ? "text-alert" : "text-ink-muted",
       iconGlow: false,
-      accentColor: hseqAlerts > 0 ? "bg-alert/70" : "bg-border-strong",
+      accentColor: hseqAlerts > 0 ? "bg-alert/60" : "bg-hairline-strong",
       label: "Alertas HSEQ",
       value: hseqAlerts,
       trend: trends?.hseqAlerts,
@@ -87,15 +87,15 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
           <Card
             key={card.label}
             className="metric-card kpi-card-enter relative overflow-hidden"
-            style={{ animationDelay: `${i * 80}ms` }}
+            style={{ animationDelay: `${i * 60}ms` }}
           >
             {/* Top accent line */}
             <div
-              className={`absolute inset-x-0 top-0 h-1 ${card.accentColor}`}
+              className={`absolute inset-x-0 top-0 h-0.5 ${card.accentColor}`}
               aria-hidden="true"
             />
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-steel">
+              <CardTitle className="text-sm font-medium text-ink-subtle">
                 {card.label}
               </CardTitle>
               <div
@@ -109,21 +109,21 @@ export function KPIStrip({ activeOrders, delayedOrders, completedOrders, avgProg
                 <AnimatedKPIValue
                   value={card.value}
                   suffix={card.suffix ?? ""}
-                  className="font-heading text-3xl font-bold text-white"
+                  className="font-heading text-3xl font-bold tracking-[-0.02em] text-white tabular-nums"
                 />
                 {card.trend !== undefined && (
                   <TrendBadge value={card.trend} />
                 )}
               </div>
               {card.progress !== undefined && (
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-navy-light shadow-inner">
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-3">
                   <div
-                    className="h-full rounded-full bg-gold transition-[width] duration-700"
+                    className="h-full rounded-full bg-gold transition-[width] duration-700 ease-out"
                     style={{ width: `${card.progress}%` }}
                   />
                 </div>
               )}
-              <p className="mt-1 text-xs text-steel">{card.subtitle}</p>
+              <p className="mt-1 text-xs text-ink-subtle">{card.subtitle}</p>
             </CardContent>
           </Card>
         );

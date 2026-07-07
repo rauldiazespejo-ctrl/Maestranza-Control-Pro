@@ -39,22 +39,21 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       <span
         ref={ref}
         className={cn(
-          "inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold shadow-sm transition-[background-color,border-color,color] duration-200",
-          "bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.035)_0_1px,transparent_1px_5px)]",
+          "inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold shadow-xs transition-[background-color,border-color,color] duration-200",
           {
             /* ── Base / generic ── */
             default:
-              "border-border-subtle bg-navy-light text-white",
+              "border-hairline bg-surface-2 text-white",
             secondary:
-              "border-steel/40 bg-steel text-navy-dark",
+              "border-ink-muted/30 bg-ink-muted/10 text-ink-muted",
             outline:
-              "border border-border-subtle bg-transparent text-steel",
+              "border border-hairline bg-transparent text-ink-subtle",
             fire:
               "border-alert/40 bg-alert/85 text-white",
             gold:
-              "border-gold/45 bg-gold text-navy-dark",
+              "border-gold/45 bg-gold text-canvas",
             success:
-              "border-steel/40 bg-steel/15 text-steel",
+              "border-success/40 bg-success/12 text-success",
             destructive:
               "border-alert/45 bg-alert text-white",
 
@@ -64,28 +63,28 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
               " [&_.badge-dot]:bg-red-300"
             ),
             planificada: (
-              "border-border-gold bg-gold-muted text-gold" +
+              "border-gold/30 bg-gold-muted text-gold" +
               " [&_.badge-dot]:bg-gold"
             ),
             en_proceso: (
-              "border-steel/50 bg-navy-light text-steel" +
-              " [&_.badge-dot]:bg-steel [&_.badge-dot]:animate-[pulse-dot_2s_ease-in-out_infinite]"
+              "border-ink-muted/40 bg-surface-3 text-ink-muted" +
+              " [&_.badge-dot]:bg-ink-muted [&_.badge-dot]:animate-[pulse-dot_2s_ease-in-out_infinite]"
             ),
             detenida: (
               "border-alert/45 bg-alert/15 text-red-200" +
               " [&_.badge-dot]:bg-red-300"
             ),
             revision: (
-              "border-border-gold/50 bg-gold-muted text-gold" +
+              "border-gold/40 bg-gold-muted text-gold" +
               " [&_.badge-dot]:bg-gold"
             ),
             completada: (
-              "border-steel/40 bg-steel/15 text-steel" +
-              " [&_.badge-dot]:bg-steel"
+              "border-success/35 bg-success/12 text-success" +
+              " [&_.badge-dot]:bg-success"
             ),
             cerrada: (
-              "border-border-subtle bg-navy-light/40 text-steel/60" +
-              " [&_.badge-dot]:bg-steel/40"
+              "border-hairline bg-surface-1/50 text-ink-tertiary" +
+              " [&_.badge-dot]:bg-ink-tertiary"
             ),
 
             /* ── Priority ── */
@@ -98,21 +97,21 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
               " [&_.badge-dot]:bg-red-300"
             ),
             media: (
-              "border-border-gold bg-gold-muted text-gold" +
+              "border-gold/30 bg-gold-muted text-gold" +
               " [&_.badge-dot]:bg-gold"
             ),
             baja: (
-              "border-border-subtle bg-navy-light text-steel" +
-              " [&_.badge-dot]:bg-steel"
+              "border-hairline bg-surface-2 text-ink-subtle" +
+              " [&_.badge-dot]:bg-ink-subtle"
             ),
 
             /* ── HSEQ states ── */
             "hseq-abierto":
               "border-alert/35 bg-alert/12 text-red-200",
             "hseq-en-revision":
-              "border-border-gold/45 bg-gold/15 text-gold",
+              "border-gold/40 bg-gold/15 text-gold",
             "hseq-cerrado":
-              "border-steel/35 bg-steel/10 text-steel/90",
+              "border-success/30 bg-success/10 text-success/90",
             "hseq-vencido":
               "border-alert/60 bg-alert/20 text-red-100",
           }[variant],

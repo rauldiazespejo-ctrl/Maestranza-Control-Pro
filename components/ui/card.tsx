@@ -1,15 +1,15 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-/** Base card: glass surface with sober industrial hover feedback. */
+/** Base card: clean surface with sober industrial hover feedback. */
 const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "surface-glass metal-bevel rounded-lg border border-border-subtle text-card-foreground",
-        "transition-all duration-200 will-change-transform",
-        "hover:-translate-y-0.5 hover:border-border-strong hover:shadow-industrial",
+        "surface-glass rounded-xl border border-hairline text-card-foreground",
+        "transition-[border-color,box-shadow,transform,background-color] duration-200 will-change-transform",
+        "hover:-translate-y-0.5 hover:border-gold/22 hover:shadow-card-hover",
         className
       )}
       {...props}
@@ -37,7 +37,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "font-heading text-base font-semibold leading-tight tracking-normal text-white sm:text-lg",
+      "font-heading text-base font-semibold leading-tight tracking-[-0.01em] text-white sm:text-lg",
       className
     )}
     {...props}
@@ -49,7 +49,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.ComponentProps<"p">
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn("text-sm leading-6 text-steel", className)} {...props} />
+  <p ref={ref} className={cn("text-sm leading-6 text-ink-muted", className)} {...props} />
 ));
 CardDescription.displayName = "CardDescription";
 

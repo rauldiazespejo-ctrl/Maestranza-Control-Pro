@@ -52,9 +52,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           onClick?.(event);
         }}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-md border font-semibold whitespace-nowrap",
-          "transition-all duration-200",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
+          "inline-flex items-center justify-center gap-2 rounded-lg border font-semibold whitespace-nowrap",
+          "transition-[background-color,border-color,box-shadow,transform] duration-200",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
           /* hover: scale(1.02) — disabled just dims, no transform */
           "hover:enabled:scale-[1.02]",
           /* active: scale(0.98) */
@@ -63,22 +63,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50",
           {
             default:
-              "border-border-strong metal-brushed text-white shadow-industrial-sm hover:enabled:border-steel/45 hover:enabled:bg-navy-light/95",
+              "border-hairline bg-surface-2 text-white shadow-sm hover:enabled:border-hairline-strong hover:enabled:bg-surface-3",
             secondary:
-              "border-border-subtle bg-navy-light/85 text-white hover:enabled:border-border-strong hover:enabled:bg-navy-light hover:enabled:shadow-industrial-sm",
+              "border-hairline bg-surface-1 text-white hover:enabled:border-hairline-strong hover:enabled:bg-surface-2",
             outline:
-              "border-border-subtle bg-white/[0.03] text-steel hover:enabled:border-border-strong hover:enabled:bg-navy-light/80 hover:enabled:text-white hover:enabled:shadow-industrial-sm",
+              "border-hairline bg-white/[0.02] text-ink-muted hover:enabled:border-hairline-strong hover:enabled:bg-surface-2 hover:enabled:text-white",
             ghost:
-              "border-transparent bg-transparent text-steel hover:enabled:bg-navy-light/80 hover:enabled:text-white",
+              "border-transparent bg-transparent text-ink-muted hover:enabled:bg-surface-2 hover:enabled:text-white",
             destructive:
-              "border-alert/55 bg-alert text-white shadow-industrial-sm hover:enabled:bg-alert-dark",
+              "border-alert/55 bg-alert text-white shadow-sm hover:enabled:bg-alert-dark",
             accent:
-              "border-gold/55 bg-gold text-navy-dark shadow-industrial-sm hover:enabled:bg-gold/90",
+              "border-gold/55 bg-gold text-canvas shadow-sm hover:enabled:bg-gold-hover",
           }[variant],
           {
-            default: "min-h-10 px-6 py-3 text-sm",
+            default: "min-h-10 px-5 py-2.5 text-sm",
             sm: "min-h-9 px-3 py-2 text-xs",
-            lg: "min-h-11 px-8 py-3 text-base",
+            lg: "min-h-11 px-7 py-3 text-base",
             icon: "h-10 w-10 shrink-0",
           }[size],
           className

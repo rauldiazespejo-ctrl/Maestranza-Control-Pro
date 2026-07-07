@@ -10,10 +10,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         ref={ref}
         className={cn(
-          "metal-brushed flex min-h-11 w-full rounded-lg border border-border-subtle px-3 py-2 text-sm text-white shadow-sm transition-[border-color,background-color,box-shadow,transform] duration-200",
-          "placeholder:text-muted-foreground",
-          "hover:border-border-strong hover:bg-navy-light/65 focus-visible:border-border-gold focus-visible:bg-navy-light/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark",
-          "disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-alert aria-[invalid=true]:ring-alert/50",
+          "flex min-h-11 w-full rounded-lg border border-hairline bg-surface-2 px-3.5 py-2.5 text-sm text-white shadow-xs",
+          "transition-[border-color,background-color,box-shadow,transform] duration-200",
+          "placeholder:text-ink-tertiary",
+          "hover:border-hairline-strong hover:bg-surface-3 focus-visible:border-gold/50 focus-visible:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/20 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
+          "disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-alert aria-[invalid=true]:ring-alert/30",
           className
         )}
         {...props}
