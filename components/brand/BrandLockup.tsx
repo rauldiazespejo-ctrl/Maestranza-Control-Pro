@@ -15,7 +15,14 @@ function PartnerMarks({ expanded }: { expanded: boolean }) {
       </div>
       <span className={cn("bg-hairline-strong", expanded ? "h-10 w-px" : "h-5 w-px")} aria-hidden="true" />
       <div className={cn("flex items-center justify-center", expanded ? "h-14 w-32" : "h-7 w-14")}>
-        <Image src="/brand/partners/logo-soldesp-full.png" alt="Soldesp" width={743} height={429} className="h-full w-full object-contain" priority={expanded} />
+        <Image
+          src="/brand/partners/logo-soldesp-full.png"
+          alt="Soldesp"
+          width={743}
+          height={429}
+          className="h-full w-full object-contain brightness-0 invert"
+          priority={expanded}
+        />
       </div>
     </div>
   );

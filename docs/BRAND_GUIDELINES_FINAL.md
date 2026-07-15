@@ -24,7 +24,9 @@
 - `public/brand/partners/logo-boilercomp-horizontal.jpg`
 - `public/brand/partners/logo-soldesp-full.png`
 
-Los logos deben conservar relación de aspecto, colores y área de seguridad. No aplicar sombras, transparencias, rotaciones ni recoloración. En fondos oscuros, Boiler Comp se presenta sobre su placa blanca original y Soldesp mantiene su transparencia.
+En fondos oscuros, el logo Soldesp se presenta en blanco monocromatico para asegurar contraste y legibilidad. El archivo original se conserva sin modificaciones para favicon, metadatos y futuros usos sobre fondos claros.
+
+Los logos deben conservar relación de aspecto y área de seguridad. No aplicar sombras, transparencias ni rotaciones. En fondos oscuros, Boiler Comp se presenta sobre su placa blanca original y Soldesp utiliza su tratamiento blanco monocromático.
 
 ## Firma conjunta
 
