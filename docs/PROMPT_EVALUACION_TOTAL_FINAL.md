@@ -1,4 +1,4 @@
-# Prompt final — Evaluación integral y evolución de ForgeOps
+# Prompt final — Evaluación integral y evolución de Maestranza Modelo PRO
 
 ## Rol
 
@@ -6,7 +6,7 @@ Actúa como un equipo senior integrado por especialistas en operación de maestr
 
 ## Contexto
 
-ForgeOps es el centro de control operacional de BOILER COMP S.A. y SOLDESP S.A. Debe resolver la trazabilidad completa de órdenes de trabajo, trabajadores, horas-hombre, fabricación, Carta Gantt, avance desde terreno, documentos y controles HSEQ bajo ISO 9001, ISO 14001, ISO 45001 y normativa chilena aplicable.
+Maestranza Modelo PRO es el centro de control operacional de BOILER COMP S.A. y SOLDESP S.A. Debe resolver la trazabilidad completa de órdenes de trabajo, trabajadores, horas-hombre, fabricación, Carta Gantt, avance desde terreno, documentos y controles HSEQ bajo ISO 9001, ISO 14001, ISO 45001 y normativa chilena aplicable.
 
 ## Misión
 

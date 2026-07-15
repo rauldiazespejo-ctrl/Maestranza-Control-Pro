@@ -4,7 +4,7 @@ import { getWorkers } from "@/lib/actions/workers";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Trabajadores · ForgeOps",
+  title: "Trabajadores",
 };
 
 export default async function TrabajadoresPage({

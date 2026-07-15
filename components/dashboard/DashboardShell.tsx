@@ -97,7 +97,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             <Link
               href="/dashboard"
               className="min-w-0"
-              aria-label="Ir al dashboard de ForgeOps"
+              aria-label="Ir al dashboard de Maestranza Modelo PRO"
             >
               <BrandLockup showProductName />
             </Link>

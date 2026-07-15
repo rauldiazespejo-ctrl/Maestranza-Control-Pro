@@ -5,7 +5,7 @@ import { getWorkers } from "@/lib/actions/workers";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "HSEQ · ForgeOps",
+  title: "HSEQ",
 };
 
 export default async function HseqPage({

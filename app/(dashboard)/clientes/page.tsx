@@ -4,7 +4,7 @@ import { getClients } from "@/lib/actions/clients";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Clientes · ForgeOps",
+  title: "Clientes",
 };
 
 export default async function ClientesPage({

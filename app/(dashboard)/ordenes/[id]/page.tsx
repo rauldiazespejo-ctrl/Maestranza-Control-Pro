@@ -4,7 +4,7 @@ import { getWorkOrderById } from "@/lib/actions/workorders";
 import { getActiveWorkersForAssignment } from "@/lib/actions/worker-assignments";
 
 export const metadata = {
-  title: "Detalle de OT · ForgeOps",
+  title: "Detalle de OT",
 };
 
 export default async function OrdenDetallePage({

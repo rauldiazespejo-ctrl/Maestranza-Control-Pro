@@ -127,7 +127,7 @@ function OrdersPDFDocument({ orders }: OrdersPDFProps) {
         ))}
 
         <Text style={styles.footer}>
-          ForgeOps | {new Date().toLocaleDateString("es-CL")}
+          Maestranza Modelo PRO | {new Date().toLocaleDateString("es-CL")}
         </Text>
       </Page>
     </Document>
@@ -188,7 +188,7 @@ function WorkersPDFDocument({ workers }: WorkersPDFProps) {
         ))}
 
         <Text style={styles.footer}>
-          ForgeOps | {new Date().toLocaleDateString("es-CL")}
+          Maestranza Modelo PRO | {new Date().toLocaleDateString("es-CL")}
         </Text>
       </Page>
     </Document>
@@ -239,7 +239,7 @@ function ReportPDFDocument({ data }: ReportPDFProps) {
       <Page style={styles.page}>
         <Text style={styles.title}>Reporte Operacional</Text>
         <Text style={styles.subtitle}>
-          ForgeOps | {new Date().toLocaleDateString("es-CL")}
+          Maestranza Modelo PRO | {new Date().toLocaleDateString("es-CL")}
         </Text>
 
         <View style={styles.section}>
@@ -292,7 +292,7 @@ function ReportPDFDocument({ data }: ReportPDFProps) {
         ))}
 
         <Text style={styles.footer}>
-          ForgeOps | {new Date().toLocaleDateString("es-CL")}
+          Maestranza Modelo PRO | {new Date().toLocaleDateString("es-CL")}
         </Text>
       </Page>
     </Document>

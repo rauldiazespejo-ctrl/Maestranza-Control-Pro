@@ -1,4 +1,4 @@
-# MAESTRANZA Control Pro
+# Maestranza Modelo PRO
 
 Aplicación fullstack para gestión operacional, HSEQ, documental y comercial de maestranza industrial para **BOILER COMP S.A.** y **SOLDESP S.A.**.
 
@@ -102,7 +102,7 @@ prisma/
 2. Planificar HH en `/planificacion` por trabajador, fecha, OT, tarea y turno.
 3. Generar la Carta Gantt; cada proceso queda vinculado con una tarea de la OT.
 4. Reportar avance desde el detalle de la tarea, incluyendo HH reales y bloqueos.
-5. ForgeOps sincroniza el avance de la tarea, la barra Gantt y el porcentaje general de la OT.
+5. Maestranza Modelo PRO sincroniza el avance de la tarea, la barra Gantt y el porcentaje general de la OT.
 
 La planificación diaria advierte jornadas sobre 10 HH. Las tareas críticas no pueden incrementar avance sin AST aprobado y, cuando corresponda, PTW vigente.
 

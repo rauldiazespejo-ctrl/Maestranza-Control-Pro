@@ -1,7 +1,7 @@
 import { getLaborCalendar } from "@/lib/actions/labor";
 import { LaborCalendarClient } from "@/components/planificacion/LaborCalendarClient";
 
-export const metadata = { title: "Planificación HH · ForgeOps" };
+export const metadata = { title: "Planificación HH" };
 
 export default async function PlanificacionPage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
   const params = await searchParams;
