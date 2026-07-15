@@ -5,7 +5,7 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.ComponentProps<"table">
 >(({ className, ...props }, ref) => (
-  <div className="w-full overflow-auto rounded-xl border border-hairline bg-surface-1/40 shadow-sm">
+  <div className="metal-panel w-full overflow-auto rounded-xl border bg-surface-1/40 shadow-sm">
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm tabular-nums", className)}
@@ -21,7 +21,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn("sticky top-0 z-10 bg-surface-1/95 backdrop-blur-md", className)}
+    className={cn("metal-header sticky top-0 z-10 backdrop-blur-md", className)}
     {...props}
   />
 ));

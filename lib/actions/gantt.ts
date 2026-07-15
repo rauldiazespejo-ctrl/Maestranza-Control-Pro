@@ -26,9 +26,31 @@ function daysBetween(start: Date, end: Date) {
   return Math.max(1, Math.round((endUtc - startUtc) / 86_400_000) + 1);
 }
 
-function scaleProcessDuration(defaultDays: number, plannedDays: number) {
-  const ratio = plannedDays / totalFabricationProcessDays;
-  return Math.max(1, Math.round(defaultDays * ratio));
+const legacyFabricationProcessCodes: Record<string, string> = {
+  "01": "DET-01",
+  "02": "DET-02",
+  "03": "MAT-01",
+  "04": "MAT-01",
+  "05": "MAT-02",
+  "06": "MAT-02",
+  "07": "ENS-01",
+  "08": "ENS-02",
+  "09": "SOL-02",
+  "10": "DES-01",
+  "11": "DES-02",
+  "12": "DES-02",
+  "13": "QA-01",
+  "14": "QA-02",
+  "15": "QA-03",
+  "16": "ING-03",
+};
+
+function fabricationProcessCode(task: { name: string; processCode?: string | null }) {
+  if (task.processCode) return task.processCode.toUpperCase();
+  const currentCode = task.name.match(/^([A-Z]{2,3}-\d{2})\s*[·-]/i)?.[1];
+  if (currentCode) return currentCode.toUpperCase();
+  const legacyCode = task.name.match(/^(\d{2})\s*[·-]/)?.[1];
+  return legacyCode ? legacyFabricationProcessCodes[legacyCode] ?? null : null;
 }
 
 export async function getGanttTasks(filters?: { projectId?: string; status?: string }) {
@@ -162,36 +184,86 @@ export async function createFabricationGanttFromWorkOrder(workOrderId: string) {
         });
       }
 
+      // Include legacy tasks without workOrderId: older generators only linked the project.
       const existingTasks = await tx.ganttTask.findMany({
-        where: { workOrderId: workOrder.id },
+        where: { OR: [{ workOrderId: workOrder.id }, { projectId }] },
         orderBy: { startDate: "asc" },
       });
 
-      const existingNames = new Set(existingTasks.map((task) => task.name));
+      const existingByProcess = new Map<string, typeof existingTasks>();
+      for (const task of existingTasks) {
+        const code = fabricationProcessCode(task);
+        if (!code) continue;
+        existingByProcess.set(code, [...(existingByProcess.get(code) ?? []), task]);
+      }
       const plannedStart = workOrder.startDate ?? new Date();
       const plannedEnd = workOrder.dueDate ?? addCalendarDays(plannedStart, totalFabricationProcessDays - 1);
       const plannedDays = daysBetween(plannedStart, plannedEnd);
-      let cursor = new Date(plannedStart);
-      let previousTaskId = existingTasks.at(-1)?.id ?? null;
+      let previousTaskId: string | null = null;
       let created = 0;
-      let skipped = 0;
+      let updated = 0;
+      let removed = 0;
+      let cumulativeDefaultDays = 0;
 
       for (const process of fabricationProcessDefinitions) {
         const taskName = `${process.code} · ${process.group} · ${process.name}`;
-        const duration = scaleProcessDuration(process.defaultDays, plannedDays);
-        const startDate = new Date(cursor);
-        const endDate = addCalendarDays(startDate, duration - 1);
+        const startOffset = Math.round((cumulativeDefaultDays / totalFabricationProcessDays) * plannedDays);
+        cumulativeDefaultDays += process.defaultDays;
+        const nextOffset = Math.round((cumulativeDefaultDays / totalFabricationProcessDays) * plannedDays);
+        const startDate = addCalendarDays(plannedStart, Math.min(startOffset, plannedDays - 1));
+        const endDate = addCalendarDays(plannedStart, Math.max(startOffset, nextOffset - 1));
+        const candidates = existingByProcess.get(process.code) ?? [];
+        const existing = candidates.find((task) => task.workOrderId === workOrder.id) ?? candidates[0];
 
-        if (existingNames.has(taskName)) {
-          skipped += 1;
-          cursor = addCalendarDays(endDate, 1);
+        if (existing) {
+          const duplicateIds = candidates.filter((task) => task.id !== existing.id).map((task) => task.id);
+          if (duplicateIds.length > 0) {
+            const deletion = await tx.ganttTask.deleteMany({ where: { id: { in: duplicateIds } } });
+            removed += deletion.count;
+          }
+          const updatedTask = await tx.ganttTask.update({
+            where: { id: existing.id },
+            data: {
+              projectId,
+              workOrderId: workOrder.id,
+              processCode: process.code,
+              name: taskName,
+              startDate,
+              endDate,
+              responsible: workOrder.responsible?.name ?? process.responsibleRole,
+              dependencies: previousTaskId && previousTaskId !== existing.id ? previousTaskId : null,
+            },
+          });
+          let operationalTaskId = updatedTask.workOrderTaskId;
+          if (!operationalTaskId) {
+            const operationalTask = await tx.workOrderTask.findFirst({
+              where: { workOrderId: workOrder.id, processArea: process.code },
+              select: { id: true },
+            }) ?? await tx.workOrderTask.create({
+              data: {
+                workOrderId: workOrder.id,
+                title: process.name,
+                description: `Proceso de fabricación ${process.group}`,
+                processArea: process.code,
+                dueDate: endDate,
+              },
+              select: { id: true },
+            });
+            operationalTaskId = operationalTask.id;
+            await tx.ganttTask.update({ where: { id: updatedTask.id }, data: { workOrderTaskId: operationalTaskId } });
+          } else {
+            await tx.workOrderTask.update({ where: { id: operationalTaskId }, data: { title: process.name, processArea: process.code, dueDate: endDate } });
+          }
+          previousTaskId = existing.id;
+          updated += 1;
           continue;
         }
 
-        const task = await tx.ganttTask.create({
+        const createdTask: { id: string } = await tx.ganttTask.create({
           data: {
             projectId,
             workOrderId: workOrder.id,
+            processCode: process.code,
             name: taskName,
             startDate,
             endDate,
@@ -202,9 +274,20 @@ export async function createFabricationGanttFromWorkOrder(workOrderId: string) {
           },
         });
 
-        previousTaskId = task.id;
+        const operationalTask = await tx.workOrderTask.create({
+          data: {
+            workOrderId: workOrder.id,
+            title: process.name,
+            description: `Proceso de fabricación ${process.group}`,
+            processArea: process.code,
+            dueDate: endDate,
+          },
+          select: { id: true },
+        });
+        await tx.ganttTask.update({ where: { id: createdTask.id }, data: { workOrderTaskId: operationalTask.id } });
+
+        previousTaskId = createdTask.id;
         created += 1;
-        cursor = addCalendarDays(endDate, 1);
       }
 
       await tx.auditLog.create({
@@ -214,12 +297,12 @@ export async function createFabricationGanttFromWorkOrder(workOrderId: string) {
           action: "GENERATE_FABRICATION_GANTT",
           entity: "WorkOrder",
           entityId: workOrder.id,
-          metadata: JSON.stringify({ created, skipped, projectId }),
+          metadata: JSON.stringify({ created, updated, removed, projectId }),
         },
       });
 
-      return { created, skipped, projectId, workOrderCode: workOrder.code, workOrderId: workOrder.id };
-    });
+      return { created, updated, removed, projectId, workOrderCode: workOrder.code, workOrderId: workOrder.id };
+    }, { maxWait: 10_000, timeout: 30_000 });
 
     revalidatePath("/gantt");
     revalidatePath("/ordenes");
@@ -227,7 +310,8 @@ export async function createFabricationGanttFromWorkOrder(workOrderId: string) {
 
     return {
       created: result.created,
-      skipped: result.skipped,
+      updated: result.updated,
+      removed: result.removed,
       projectId: result.projectId,
       workOrderCode: result.workOrderCode,
     };

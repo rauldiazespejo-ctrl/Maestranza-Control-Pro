@@ -18,10 +18,12 @@ import {
   LogOut,
   Circle,
   User,
+  CalendarRange,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { BrandLockup } from "@/components/brand/BrandLockup";
+import { GlobalSearch } from "@/components/ui/GlobalSearch";
 
 interface DashboardShellProps {
   user: {
@@ -38,6 +40,7 @@ const navItems = [
   { label: "Órdenes", href: "/ordenes", icon: ClipboardList },
   { label: "Clientes", href: "/clientes", icon: Users },
   { label: "Trabajadores", href: "/trabajadores", icon: HardHat },
+  { label: "Planificación HH", href: "/planificacion", icon: CalendarRange },
   { label: "Gantt", href: "/gantt", icon: BarChart3 },
   { label: "Reportes", href: "/reportes", icon: FileText },
   { label: "HSEQ", href: "/hseq", icon: ShieldAlert },
@@ -77,7 +80,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       </a>
 
       {/* Header */}
-      <header className="fixed inset-x-0 top-0 z-50 h-16 border-b border-hairline bg-surface-1/90 shadow-sm backdrop-blur-xl">
+      <header className="metal-header fixed inset-x-0 top-0 z-50 h-16 border-b border-hairline backdrop-blur-xl">
         <div className="flex h-full items-center justify-between gap-3 px-3 sm:px-4 lg:px-5">
           <div className="flex min-w-0 items-center gap-3">
             <Button
@@ -101,6 +104,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <GlobalSearch />
             <span className="hidden min-h-9 items-center gap-2 rounded-full border border-hairline-strong bg-surface-2 px-3 text-xs font-semibold text-ink-muted shadow-xs sm:inline-flex">
               <Circle className="h-2 w-2 fill-current animate-pulse text-success" aria-hidden="true" />
               Sistema operacional
@@ -133,7 +137,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       </header>
 
       {/* Sidebar desktop */}
-      <aside className="fixed inset-y-0 left-0 top-16 z-40 hidden w-64 flex-col border-r border-hairline bg-surface-1/80 shadow-xs backdrop-blur-xl lg:flex">
+      <aside className="metal-sidebar fixed inset-y-0 left-0 top-16 z-40 hidden w-64 flex-col border-r border-hairline backdrop-blur-xl lg:flex">
         <div className="border-b border-hairline p-3">
           <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-subtle">
             Panel operacional
@@ -206,7 +210,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         aria-label="Menú principal móvil"
         aria-hidden={!mobileOpen}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[min(20rem,86vw)] transform border-r border-hairline bg-surface-1/96 shadow-lg backdrop-blur-xl transition-transform duration-200 ease-in-out lg:hidden",
+          "metal-sidebar fixed inset-y-0 left-0 z-50 w-[min(20rem,86vw)] transform border-r border-hairline shadow-lg backdrop-blur-xl transition-transform duration-200 ease-in-out lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

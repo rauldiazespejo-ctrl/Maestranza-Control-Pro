@@ -83,7 +83,7 @@ export function LoginForm({ authError, errorCode }: LoginFormProps) {
           className="flex items-start gap-2 rounded-md border border-red-400/35 bg-red-500/15 p-3 text-sm text-white shadow-sm"
           role="alert"
         >
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" aria-hidden="true" />
           <span>{displayError}</span>
         </div>
       )}
@@ -93,7 +93,7 @@ export function LoginForm({ authError, errorCode }: LoginFormProps) {
           RUT
         </label>
         <div className="relative">
-          <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
+          <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" aria-hidden="true" />
           <Input
             id="rut"
             name="rut"
@@ -101,7 +101,7 @@ export function LoginForm({ authError, errorCode }: LoginFormProps) {
             required
             autoComplete="username"
             inputMode="text"
-            placeholder="12.345.678-9"
+            placeholder="Ej.: 12.345.678-9"
             value={rut}
             onChange={handleRutChange}
             aria-invalid={Boolean(displayError)}
@@ -118,7 +118,7 @@ export function LoginForm({ authError, errorCode }: LoginFormProps) {
           <span className="text-xs text-steel/60 italic">Requerida</span>
         </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" />
+          <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-steel" aria-hidden="true" />
           <Input
             id="password"
             name="password"
@@ -142,7 +142,7 @@ export function LoginForm({ authError, errorCode }: LoginFormProps) {
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Ingresando...
+            Ingresando…
           </>
         ) : (
           "Ingresar"

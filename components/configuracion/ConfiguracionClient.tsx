@@ -16,6 +16,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { createUser, toggleUserActive } from "@/lib/actions/users";
 import { saveCompany } from "@/lib/actions/company";
 import { companySchema, type CompanyFormData } from "@/lib/validations/company";
+import { rutSchema } from "@/lib/validations/rut";
 import type { Prisma } from "@prisma/client";
 
 type User = Prisma.UserGetPayload<{ select: { id: true; email: true; name: true; role: true; active: true; clientId: true; companyId: true } }>;
@@ -28,11 +29,16 @@ interface Props {
 }
 
 const userSchema = z.object({
+  rut: rutSchema,
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(4),
+  password: z.string().min(12, "La contraseña debe tener al menos 12 caracteres"),
   role: z.enum(["ADMIN", "HSEQ_MANAGER", "OPERATIONS", "CLIENT", "VIEWER"]),
   clientId: z.string().optional(),
+}).superRefine((data, context) => {
+  if (data.role === "CLIENT" && !data.clientId) {
+    context.addIssue({ code: "custom", path: ["clientId"], message: "Selecciona el cliente asociado" });
+  }
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -58,7 +64,7 @@ export function ConfiguracionClient({ users, company, clients }: Props) {
     formState: { errors, isSubmitting },
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
-    defaultValues: { name: "", email: "", password: "", role: "VIEWER" },
+    defaultValues: { rut: "", name: "", email: "", password: "", role: "VIEWER" },
   });
 
   const {
@@ -211,6 +217,11 @@ export function ConfiguracionClient({ users, company, clients }: Props) {
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} title="Nuevo usuario">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
+            <label className="mb-1 block text-xs font-medium text-steel" htmlFor="new-user-rut">RUT</label>
+            <Input id="new-user-rut" autoComplete="username" placeholder="Ej.: 12.345.678-9" {...register("rut")} />
+            {errors.rut && <p className="mt-1 text-xs text-fire-bright" role="alert">{errors.rut.message}</p>}
+          </div>
+          <div>
             <label className="mb-1 block text-xs font-medium text-steel">Nombre</label>
             <Input {...register("name")} />
             {errors.name && <p className="mt-1 text-xs text-fire-bright">{errors.name.message}</p>}
@@ -233,6 +244,7 @@ export function ConfiguracionClient({ users, company, clients }: Props) {
             <div>
               <label className="mb-1 block text-xs font-medium text-steel">Cliente asociado</label>
               <Select {...register("clientId")}><option value="">Seleccionar cliente</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
+              {errors.clientId && <p className="mt-1 text-xs text-fire-bright" role="alert">{errors.clientId.message}</p>}
             </div>
           )}
           <div className="flex justify-end gap-2 pt-2">

@@ -19,6 +19,15 @@ export const HSEQ_ROLES:        Role[] = ["ADMIN", "HSEQ_MANAGER"];
 export const OPERATIONS_ROLES:  Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"];
 export const WRITE_ROLES:       Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS"];
 export const READ_ROLES:        Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS", "CLIENT", "VIEWER"];
+export const INTERNAL_READ_ROLES: Role[] = ["ADMIN", "HSEQ_MANAGER", "OPERATIONS", "VIEWER"];
+
+/** Devuelve el cliente asociado o falla de forma cerrada para sesiones CLIENT. */
+export function requireClientId(role: Role | undefined, clientId: string | null | undefined) {
+  if (role === "CLIENT" && !clientId) {
+    throw new Error("La cuenta cliente no tiene una empresa asociada");
+  }
+  return clientId;
+}
 
 /** Array derivado del enum de Prisma — siempre sincronizado */
 const ALL_ROLES: readonly string[] = Object.values(UserRole);

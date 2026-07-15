@@ -17,6 +17,9 @@ import {
   TrendingUp,
   ArrowRight,
   Factory,
+  AlertTriangle,
+  CheckCircle2,
+  ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,15 +64,23 @@ interface Props {
 const statusLabels: Record<string, string> = {
   pendiente: "Pendiente",
   en_progreso: "En progreso",
+  en_proceso: "En progreso",
   completada: "Completada",
   retrasada: "Retrasada",
+  detenida: "Detenida",
 };
+
+function normalizedStatus(status: string) {
+  if (status === "en_proceso") return "en_progreso";
+  if (status === "detenida") return "retrasada";
+  return status;
+}
 
 type ZoomLevel = "day" | "week" | "month";
 
 // Derive visual priority from status
 function getBarGradient(status: string): string {
-  switch (status) {
+  switch (normalizedStatus(status)) {
     case "retrasada":
       return "linear-gradient(90deg, #950A10, #D92930)";
     case "en_progreso":
@@ -82,7 +93,7 @@ function getBarGradient(status: string): string {
 }
 
 function getBarOpacity(status: string): number {
-  switch (status) {
+  switch (normalizedStatus(status)) {
     case "retrasada": return 0.95;
     case "en_progreso": return 0.90;
     case "completada": return 0.85;
@@ -121,9 +132,9 @@ function GanttTooltip({ data, containerW }: { data: TooltipData; containerW: num
         <div className="flex items-center gap-1.5 text-xs text-steel">
           <Badge
             variant={
-              task.status === "retrasada"
+              normalizedStatus(task.status) === "retrasada"
                 ? "fire"
-                : task.status === "en_progreso"
+                : normalizedStatus(task.status) === "en_progreso"
                 ? "gold"
                 : task.status === "completada"
                 ? "success"
@@ -131,7 +142,7 @@ function GanttTooltip({ data, containerW }: { data: TooltipData; containerW: num
             }
             className="text-[10px]"
           >
-            {statusLabels[task.status]}
+            {statusLabels[task.status] ?? task.status}
           </Badge>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-steel">
@@ -161,9 +172,9 @@ function GanttTooltip({ data, containerW }: { data: TooltipData; containerW: num
           className="h-full rounded-full transition-all duration-500"
           style={{
             width: `${task.progress}%`,
-            background: task.status === "completada"
+            background: normalizedStatus(task.status) === "completada"
               ? "linear-gradient(90deg, #2563eb, #60a5fa)"
-              : task.status === "retrasada"
+              : normalizedStatus(task.status) === "retrasada"
               ? "linear-gradient(90deg, #950A10, #D92930)"
               : "linear-gradient(90deg, #E8B33A, #F0C860)",
           }}
@@ -179,6 +190,8 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<GanttTaskWithRelations | null>(null);
   const [filterProject, setFilterProject] = React.useState(searchParams.get("projectId") ?? "");
+  const [filterWorkOrder, setFilterWorkOrder] = React.useState("");
+  const [filterStatus, setFilterStatus] = React.useState("");
   const [zoom, setZoom] = React.useState<ZoomLevel>("week");
   const [viewStart, setViewStart] = React.useState(() => {
     const today = new Date();
@@ -276,8 +289,10 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
       const message =
         result.created > 0
           ? `Programa generado para OT ${result.workOrderCode}: ${result.created} tareas creadas.`
-          : `La OT ${result.workOrderCode} ya tenia su programa de fabricacion generado.`;
-      setGenerationMessage(result.skipped > 0 ? `${message} ${result.skipped} tareas existentes no se duplicaron.` : message);
+          : `Programa sincronizado para OT ${result.workOrderCode}.`;
+      const updatedMessage = result.updated > 0 ? ` ${result.updated} tareas actualizadas.` : "";
+      const repairedMessage = result.removed > 0 ? ` ${result.removed} duplicados heredados consolidados.` : "";
+      setGenerationMessage(`${message}${updatedMessage}${repairedMessage}`);
       setFilterProject(result.projectId);
       router.push(`/gantt?projectId=${result.projectId}`);
       router.refresh();
@@ -288,7 +303,19 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
     }
   };
 
-  const filteredTasks = filterProject ? tasks.filter((t) => t.projectId === filterProject) : tasks;
+  const filteredTasks = tasks.filter((task) =>
+    (!filterProject || task.projectId === filterProject) &&
+    (!filterWorkOrder || task.workOrderId === filterWorkOrder) &&
+    (!filterStatus || normalizedStatus(task.status) === filterStatus)
+  );
+  const ganttStats = React.useMemo(() => {
+    const now = new Date();
+    const total = filteredTasks.length;
+    const average = total ? Math.round(filteredTasks.reduce((sum, task) => sum + task.progress, 0) / total) : 0;
+    const overdue = filteredTasks.filter((task) => task.endDate < now && task.progress < 100).length;
+    const completed = filteredTasks.filter((task) => task.progress >= 100).length;
+    return { total, average, overdue, completed };
+  }, [filteredTasks]);
 
   // Determine date range for timeline
   const viewEnd = React.useMemo(() => {
@@ -302,6 +329,8 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
   );
 
   const totalDays = differenceInDays(viewEnd, viewStart) || 1;
+  const pixelsPerDay = zoom === "day" ? 32 : zoom === "week" ? 14 : 5;
+  const timelineWidth = totalDays * pixelsPerDay;
 
   // Build timeline columns based on zoom
   const timelineCols = React.useMemo(() => {
@@ -311,7 +340,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
         label: format(d, "dd"),
         sublabel: format(d, "EEE"),
         isToday: isToday(d),
-        width: 32,
+        width: pixelsPerDay,
       }));
     } else if (zoom === "week") {
       return eachWeekOfInterval({ start: viewStart, end: viewEnd }, { weekStartsOn: 1 }).map((d) => ({
@@ -319,7 +348,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
         label: format(d, "dd"),
         sublabel: format(d, "MMM"),
         isToday: isToday(d) || (d <= new Date() && addDays(d, 7) > new Date()),
-        width: 100,
+        width: pixelsPerDay * 7,
       }));
     } else {
       // month
@@ -331,13 +360,13 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
           label: format(cur, "MMM yyyy"),
           sublabel: "",
           isToday: isToday(cur),
-          width: 140,
+          width: pixelsPerDay * Math.min(differenceInDays(addDays(endOfMonth(cur), 1), cur), differenceInDays(viewEnd, cur) + 1),
         });
         cur = addDays(endOfMonth(cur), 1);
       }
       return months;
     }
-  }, [viewStart, viewEnd, zoom]);
+  }, [viewStart, viewEnd, zoom, pixelsPerDay]);
 
   const rowHeight = 44;
 
@@ -374,6 +403,13 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
         </Button>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Card className="flex items-center gap-3 p-4"><ListChecks className="h-5 w-5 text-gold" /><div><p className="text-xs text-steel">Procesos visibles</p><p className="text-xl font-bold text-white">{ganttStats.total}</p></div></Card>
+        <Card className="flex items-center gap-3 p-4"><TrendingUp className="h-5 w-5 text-gold" /><div><p className="text-xs text-steel">Avance promedio</p><p className="text-xl font-bold text-white">{ganttStats.average}%</p></div></Card>
+        <Card className="flex items-center gap-3 p-4"><AlertTriangle className={`h-5 w-5 ${ganttStats.overdue ? "text-alert" : "text-success"}`} /><div><p className="text-xs text-steel">Procesos atrasados</p><p className="text-xl font-bold text-white">{ganttStats.overdue}</p></div></Card>
+        <Card className="flex items-center gap-3 p-4"><CheckCircle2 className="h-5 w-5 text-success" /><div><p className="text-xs text-steel">Completados</p><p className="text-xl font-bold text-white">{ganttStats.completed}</p></div></Card>
+      </div>
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Project filter */}
@@ -388,6 +424,15 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
               {p.name}
             </option>
           ))}
+        </Select>
+
+        <Select value={filterWorkOrder} onChange={(e) => setFilterWorkOrder(e.target.value)} className="w-auto min-w-[170px]">
+          <option value="">Todas las OT</option>
+          {workOrders.map((order) => <option key={order.id} value={order.id}>{order.code}</option>)}
+        </Select>
+
+        <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-auto min-w-[150px]">
+          <option value="">Todos los estados</option><option value="pendiente">Pendiente</option><option value="en_progreso">En progreso</option><option value="retrasada">Retrasada</option><option value="completada">Completada</option>
         </Select>
 
         <Button
@@ -513,7 +558,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
             className="gap-2"
           >
             <Factory className="h-4 w-4" />
-            {generating ? "Generando..." : "Generar procesos"}
+            {generating ? "Sincronizando..." : "Sincronizar y reparar procesos"}
           </Button>
         </div>
       </Card>
@@ -531,12 +576,12 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
               className="overflow-x-auto"
               style={{ maxHeight: "calc(100vh - 320px)" }}
             >
-              <div style={{ minWidth: `${timelineCols.reduce((s, c) => s + c.width, 0) + 220}px` }}>
+              <div style={{ minWidth: `${timelineWidth + 288}px` }}>
                 {/* Sticky row label column + timeline header */}
                 <div className="sticky left-0 z-20 flex bg-navy-primary">
                   {/* Task name column header */}
                   <div
-                    className="sticky left-0 z-30 flex h-10 w-48 shrink-0 items-center border-b border-r border-border-subtle bg-navy-primary px-4 text-xs font-semibold uppercase tracking-wider text-steel"
+                    className="sticky left-0 z-30 flex h-10 w-72 shrink-0 items-center border-b border-r border-border-subtle bg-navy-primary px-4 text-xs font-semibold uppercase tracking-wider text-steel"
                   >
                     Tarea
                   </div>
@@ -572,7 +617,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
                     <div
                       className="pointer-events-none absolute top-0 z-10 border-l-2 border-dashed border-gold"
                       style={{
-                        left: 192 + (todayIndex / totalDays) * (timelineCols.reduce((s, c) => s + c.width, 0)),
+                        left: 288 + todayIndex * pixelsPerDay,
                         height: "100%",
                       }}
                       title={`Hoy: ${format(new Date(), "dd MMM yyyy")}`}
@@ -585,8 +630,9 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
                       differenceInDays(task.endDate, task.startDate) + 1,
                       1
                     );
-                    const taskStartPct = (offset / totalDays) * 100;
-                    const taskWidthPct = (duration / totalDays) * 100;
+                    const visibleStart = Math.max(0, offset);
+                    const visibleEnd = Math.min(totalDays, offset + duration);
+                    const barWidth = Math.max(0, visibleEnd - visibleStart) * pixelsPerDay;
 
                     return (
                       <div
@@ -596,7 +642,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
                         onMouseLeave={handleMouseLeave}
                       >
                         {/* Task label */}
-                        <div className="sticky left-0 z-10 flex h-full w-48 shrink-0 items-center gap-2 border-r border-border-subtle bg-navy-primary/90 px-3">
+                        <div className="group sticky left-0 z-10 flex h-full w-72 shrink-0 items-center gap-2 border-r border-border-subtle bg-navy-primary/95 px-3">
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-medium text-white">{task.name}</p>
                             <p className="truncate text-[10px] text-steel">
@@ -618,21 +664,21 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
                         {/* Timeline bar area */}
                         <div className="relative flex-1">
                           {/* Grid lines */}
-                          {timelineCols.map((_, i) => (
+                          {timelineCols.map((col, i) => (
                             <div
                               key={i}
                               className="absolute top-0 h-full border-r border-border-subtle/30"
-                              style={{ left: `${(i / timelineCols.length) * 100}%` }}
+                              style={{ left: timelineCols.slice(0, i + 1).reduce((sum, item) => sum + item.width, 0) }}
                             />
                           ))}
 
                           {/* Task bar */}
-                          {taskStartPct >= -100 && taskStartPct <= 100 && (
+                          {barWidth > 0 && (
                             <div
-                              className="absolute top-1/2 -translate-y-1/2 cursor-pointer rounded-md transition-all duration-150 hover:brightness-110 hover:shadow-md"
+                              className="absolute top-1/2 h-7 -translate-y-1/2 cursor-pointer rounded-md transition-[filter,box-shadow] duration-150 hover:brightness-110 hover:shadow-md"
                               style={{
-                                left: `${Math.max(0, taskStartPct)}%`,
-                                width: `${Math.min(100 - Math.max(0, taskStartPct), taskWidthPct)}%`,
+                                left: visibleStart * pixelsPerDay,
+                                width: barWidth,
                                 minWidth: "8px",
                               }}
                               onClick={() => {
@@ -659,7 +705,7 @@ export function GanttClient({ tasks, projects, workOrders }: Props) {
                                 />
                               </div>
                               {/* Progress text inside bar */}
-                              {taskWidthPct > 8 && (
+                              {barWidth > 42 && (
                                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                                   <span className="truncate px-1.5 text-[10px] font-semibold text-white/90">
                                     {task.progress}%

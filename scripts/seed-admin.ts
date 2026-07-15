@@ -2,6 +2,10 @@ import { prisma } from "../lib/db";
 import bcrypt from "bcryptjs";
 
 async function main() {
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (!adminPassword || adminPassword.length < 12) {
+    throw new Error("SEED_ADMIN_PASSWORD debe estar definido y tener al menos 12 caracteres");
+  }
   // Verificar si el usuario ya existe
   const existing = await prisma.user.findFirst({
     where: {
@@ -25,7 +29,7 @@ async function main() {
   });
 
   // Hashear contraseña
-  const passwordHash = await bcrypt.hash("Soldesp2026", 10);
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   // Crear superadmin
   const user = await prisma.user.create({

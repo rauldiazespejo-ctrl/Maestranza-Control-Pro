@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { requireAuth, READ_ROLES } from "@/lib/auth";
+import { requireAuth, INTERNAL_READ_ROLES } from "@/lib/auth";
 
 /**
  * Resultado de busqueda global agrupado por entidad.
@@ -36,7 +36,7 @@ export interface GlobalSearchResult {
  * @throws {Error} Si el usuario no esta autenticado o el query es muy corto.
  */
 export async function globalSearch(query: string): Promise<GlobalSearchResult> {
-  const session = await requireAuth(READ_ROLES);
+  await requireAuth(INTERNAL_READ_ROLES);
 
   const trimmed = query.trim();
   if (trimmed.length < 2) {
@@ -45,15 +45,9 @@ export async function globalSearch(query: string): Promise<GlobalSearchResult> {
 
   const searchTerm = trimmed;
 
-  const clientFilter =
-    session.user.role === "CLIENT" && session.user.clientId
-      ? { clientId: session.user.clientId }
-      : {};
-
   const [workOrders, workers, clients] = await Promise.all([
     prisma.workOrder.findMany({
       where: {
-        ...clientFilter,
         OR: [
           { code: { contains: searchTerm, mode: "insensitive" } },
           { title: { contains: searchTerm, mode: "insensitive" } },

@@ -39,7 +39,7 @@ export function Dialog({ open, onClose, title, description, children, className 
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         className={cn(
-          "surface-glass relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg p-5 sm:p-6",
+          "surface-glass metal-panel metal-calibration relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-lg p-5 sm:p-6",
           className
         )}
       >

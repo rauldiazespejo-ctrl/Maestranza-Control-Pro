@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { workerSchema, type WorkerFormData } from "@/lib/validations/worker";
-import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, INTERNAL_READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : null;
@@ -15,7 +15,7 @@ export async function getWorkers(filters?: {
   engagement?: string;
   search?: string;
 }) {
-  await requireAuth(READ_ROLES);
+  await requireAuth(INTERNAL_READ_ROLES);
   const where: import('@prisma/client').Prisma.WorkerWhereInput = {};
   if (filters?.status) where.status = filters.status;
   if (filters?.profile) where.profile = filters.profile as WorkerFormData["profile"];
@@ -35,7 +35,7 @@ export async function getWorkers(filters?: {
 }
 
 export async function getWorkerById(id: string) {
-  await requireAuth(READ_ROLES);
+  await requireAuth(INTERNAL_READ_ROLES);
   return prisma.worker.findUnique({
     where: { id },
     include: { assignments: { include: { workOrder: true } }, ledOrders: true },

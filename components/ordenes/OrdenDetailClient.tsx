@@ -34,6 +34,7 @@ type WorkOrderDetail = Prisma.WorkOrderGetPayload<{
       include: {
         asts: { select: { id: true; status: true; riskLevel: true; approvedAt: true } };
         permits: { select: { id: true; type: true; status: true; startAt: true; endAt: true } };
+        progressUpdates: { include: { worker: { select: { id: true; name: true } } } };
       };
     };
     assignments: { include: { worker: true } };
@@ -189,8 +190,8 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
       const message =
         result.created > 0
           ? `Carta Gantt generada: ${result.created} procesos creados para la OT ${result.workOrderCode}.`
-          : `La OT ${result.workOrderCode} ya tenia carta Gantt de fabricacion.`;
-      setGlobalSuccess(result.skipped > 0 ? `${message} ${result.skipped} procesos existentes no se duplicaron.` : message);
+          : `Carta Gantt sincronizada para la OT ${result.workOrderCode}.`;
+      setGlobalSuccess(result.updated > 0 ? `${message} ${result.updated} procesos existentes actualizados.` : message);
       router.refresh();
       router.push(`/gantt?projectId=${result.projectId}`);
     } catch (err) {
@@ -394,7 +395,7 @@ export function OrdenDetailClient({ order, activeWorkers }: Props) {
         </CardContent>
       </Card>
 
-      <WorkOrderTasksSection workOrderId={order.id} tasks={order.tasks} />
+      <WorkOrderTasksSection workOrderId={order.id} tasks={order.tasks} workers={order.assignments.map((item) => item.worker)} />
     </div>
   );
 }

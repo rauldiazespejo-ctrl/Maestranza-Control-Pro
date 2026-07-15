@@ -237,16 +237,17 @@ model WorkOrder {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
-  client      Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  project     Project?           @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  responsible Worker?            @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
-  tasks       WorkOrderTask[]
-  assignments WorkerAssignment[]
-  documents   Document[]
-  auditLogs   AuditLog[]
-  ganttTasks  GanttTask[]
-  asts        Ast[]
-  permits     WorkPermit[]
+  client       Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  project      Project?           @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  responsible  Worker?            @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  tasks        WorkOrderTask[]
+  assignments  WorkerAssignment[]
+  laborEntries LaborEntry[]
+  documents    Document[]
+  auditLogs    AuditLog[]
+  ganttTasks   GanttTask[]
+  asts         Ast[]
+  permits      WorkPermit[]
 
   // ── Performance indexes for dashboard queries ──
   @@index([status])
@@ -272,9 +273,12 @@ model WorkOrderTask {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  workOrder WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
-  asts      Ast[]
-  permits   WorkPermit[]
+  workOrder       WorkOrder            @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  asts            Ast[]
+  permits         WorkPermit[]
+  laborEntries    LaborEntry[]
+  progressUpdates TaskProgressUpdate[]
+  ganttTask       GanttTask?
 
   @@index([workOrderId])
   @@index([completed])
@@ -302,11 +306,13 @@ model Worker {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  company      Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  ledOrders    WorkOrder[]
-  assignments  WorkerAssignment[]
-  hseqRecords  HseqRecord[]
-  competencies Competency[]
+  company         Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ledOrders       WorkOrder[]
+  assignments     WorkerAssignment[]
+  hseqRecords     HseqRecord[]
+  competencies    Competency[]
+  laborEntries    LaborEntry[]
+  progressUpdates TaskProgressUpdate[]
 
   @@index([companyId])
   @@index([status])
@@ -324,31 +330,83 @@ model WorkerAssignment {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  worker    Worker    @relation(fields: [workerId], references: [id], onDelete: Cascade)
-  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  worker       Worker       @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  workOrder    WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  laborEntries LaborEntry[]
 
   @@unique([workerId, workOrderId])
   @@index([workerId])
   @@index([workOrderId])
 }
 
-model GanttTask {
+model LaborEntry {
   id           String   @id @default(uuid())
-  projectId    String
-  workOrderId  String?
-  name         String
-  startDate    DateTime
-  endDate      DateTime
-  progress     Float    @default(0)
-  status       String   @default("pendiente")
-  dependencies String?
-  responsible  String?
+  assignmentId String
+  workerId     String
+  workOrderId  String
+  taskId       String?
+  workDate     DateTime @db.Date
+  plannedHours Float    @default(0)
+  actualHours  Float    @default(0)
+  shift        String   @default("dia")
+  notes        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  assignment WorkerAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  worker     Worker           @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  workOrder  WorkOrder        @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  task       WorkOrderTask?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
+  @@unique([assignmentId, workDate, shift, taskId])
+  @@index([workerId, workDate])
+  @@index([workOrderId, workDate])
+  @@index([taskId])
+}
+
+model TaskProgressUpdate {
+  id          String   @id @default(uuid())
+  taskId      String
+  workerId    String?
+  progress    Float
+  actualHours Float    @default(0)
+  comment     String
+  blocked     Boolean  @default(false)
+  blocker     String?
+  evidenceUrl String?
+  reportedBy  String?
+  reportedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  task   WorkOrderTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  worker Worker?       @relation(fields: [workerId], references: [id], onDelete: SetNull)
+
+  @@index([taskId, reportedAt])
+  @@index([workerId])
+  @@index([blocked])
+}
+
+model GanttTask {
+  id              String   @id @default(uuid())
+  projectId       String
+  workOrderId     String?
+  workOrderTaskId String?  @unique
+  processCode     String?
+  name            String
+  startDate       DateTime
+  endDate         DateTime
+  progress        Float    @default(0)
+  status          String   @default("pendiente")
+  dependencies    String?
+  responsible     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workOrder     WorkOrder?     @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  workOrderTask WorkOrderTask? @relation(fields: [workOrderTaskId], references: [id], onDelete: SetNull)
+
+  @@unique([workOrderId, processCode])
   @@index([projectId])
   @@index([workOrderId])
   @@index([status])

@@ -4,14 +4,15 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { clientSchema, type ClientFormData } from "@/lib/validations/client";
 import { normalizeRut } from "@/lib/validations/rut";
-import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, requireClientId, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getClients(search?: string) {
   const session = await requireAuth(READ_ROLES);
   const where: import('@prisma/client').Prisma.ClientWhereInput = {};
   
-  if (session.user.role === "CLIENT" && session.user.clientId) {
-    where.id = session.user.clientId;
+  const scopedClientId = requireClientId(session.user.role, session.user.clientId);
+  if (session.user.role === "CLIENT") {
+    where.id = scopedClientId!;
   }
 
   if (search) {
@@ -26,7 +27,8 @@ export async function getClients(search?: string) {
 
 export async function getClientById(id: string) {
   const session = await requireAuth(READ_ROLES);
-  if (session.user.role === "CLIENT" && session.user.clientId !== id) {
+  const scopedClientId = requireClientId(session.user.role, session.user.clientId);
+  if (session.user.role === "CLIENT" && scopedClientId !== id) {
     throw new Error("No tienes permisos para ver este cliente");
   }
 

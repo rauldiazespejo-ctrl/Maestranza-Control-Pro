@@ -9,9 +9,11 @@ export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth?.user;
   const role = req.auth?.user?.role;
 
-  const isPublic = ["/login", "/portal/login", "/api/auth", "/api/health"].some((path) =>
-    nextUrl.pathname.startsWith(path)
-  );
+  const isPublic =
+    nextUrl.pathname === "/login" ||
+    nextUrl.pathname === "/portal/login" ||
+    nextUrl.pathname.startsWith("/api/auth/") ||
+    nextUrl.pathname === "/api/health";
 
   if (isPublic) return NextResponse.next();
 
@@ -26,8 +28,8 @@ export const proxy = auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
-  const isDashboard = nextUrl.pathname.startsWith("/dashboard");
-  if (isDashboard && role === "CLIENT") {
+  const isInternalArea = !isPortal && !nextUrl.pathname.startsWith("/api/");
+  if (isInternalArea && role === "CLIENT") {
     return NextResponse.redirect(new URL("/portal/dashboard", nextUrl));
   }
 

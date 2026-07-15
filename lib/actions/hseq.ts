@@ -10,7 +10,7 @@ import {
   type HseqRecordFormData,
   type PermitFormData,
 } from "@/lib/validations/hseq";
-import { requireAuth, HSEQ_ROLES, MANAGEABLE_ROLES, READ_ROLES } from "@/lib/auth";
+import { requireAuth, HSEQ_ROLES, MANAGEABLE_ROLES, INTERNAL_READ_ROLES } from "@/lib/auth";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
@@ -30,7 +30,7 @@ function toPermitStatus(startAt: Date, endAt: Date) {
 }
 
 export async function getHseqRecords(filters?: { type?: string; norm?: string; status?: string }) {
-  await requireAuth(READ_ROLES);
+  await requireAuth(INTERNAL_READ_ROLES);
   const where: import('@prisma/client').Prisma.HseqRecordWhereInput = {};
   if (filters?.type) where.type = filters.type as HseqRecordFormData["type"];
   if (filters?.norm) where.norm = filters.norm as HseqRecordFormData["norm"];
@@ -43,7 +43,7 @@ export async function getHseqRecords(filters?: { type?: string; norm?: string; s
 }
 
 export async function getHseqRecordById(id: string) {
-  await requireAuth(READ_ROLES);
+  await requireAuth(INTERNAL_READ_ROLES);
   return prisma.hseqRecord.findUnique({
     where: { id },
     include: { responsible: true, actions: true, documents: true },
@@ -51,7 +51,7 @@ export async function getHseqRecordById(id: string) {
 }
 
 export async function getSafetyWorkflows() {
-  await requireAuth(READ_ROLES);
+  await requireAuth(INTERNAL_READ_ROLES);
   const [asts, permits, workOrders, equipment] = await Promise.all([
     prisma.ast.findMany({
       include: {

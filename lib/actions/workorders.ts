@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { workOrderSchema, type WorkOrderFormData } from "@/lib/validations/workorder";
-import { requireAuth, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, requireClientId, READ_ROLES, OPERATIONS_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { WorkOrderStatus } from "@prisma/client";
 
 function toDateOptional(value?: string) {
   return value ? new Date(value) : undefined;
@@ -18,8 +19,9 @@ export async function getWorkOrders(filters?: {
   const session = await requireAuth(READ_ROLES);
   const where: import('@prisma/client').Prisma.WorkOrderWhereInput = {};
 
-  if (session.user.role === "CLIENT" && session.user.clientId) {
-    where.clientId = session.user.clientId;
+  const scopedClientId = requireClientId(session.user.role, session.user.clientId);
+  if (session.user.role === "CLIENT") {
+    where.clientId = scopedClientId!;
   } else if (filters?.clientId) {
     where.clientId = filters.clientId;
   }
@@ -44,8 +46,9 @@ export async function getWorkOrderById(id: string) {
   const session = await requireAuth(READ_ROLES);
   const where: import('@prisma/client').Prisma.WorkOrderWhereInput = { id };
   
-  if (session.user.role === "CLIENT" && session.user.clientId) {
-    where.clientId = session.user.clientId;
+  const scopedClientId = requireClientId(session.user.role, session.user.clientId);
+  if (session.user.role === "CLIENT") {
+    where.clientId = scopedClientId!;
   }
 
   const workOrder = await prisma.workOrder.findFirst({
@@ -58,6 +61,7 @@ export async function getWorkOrderById(id: string) {
         include: {
           asts: { select: { id: true, status: true, riskLevel: true, approvedAt: true } },
           permits: { select: { id: true, type: true, status: true, startAt: true, endAt: true } },
+          progressUpdates: { include: { worker: { select: { id: true, name: true } } }, orderBy: { reportedAt: "desc" }, take: 5 },
         },
         orderBy: { createdAt: "desc" },
       },
@@ -162,9 +166,11 @@ export async function deleteWorkOrder(id: string) {
 
 export async function updateWorkOrderStatus(id: string, status: string) {
   await requireAuth(OPERATIONS_ROLES);
+  const parsedStatus = WorkOrderStatus[status as keyof typeof WorkOrderStatus];
+  if (!parsedStatus) throw new Error("Estado de orden inválido");
   const order = await prisma.workOrder.update({
     where: { id },
-    data: { status: status as WorkOrderFormData["status"] },
+    data: { status: parsedStatus },
   });
   revalidatePath("/ordenes");
   return order;
