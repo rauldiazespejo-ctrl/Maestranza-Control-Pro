@@ -1,9 +1,13 @@
+DROP TABLE IF EXISTS "TaskProgressUpdate" CASCADE;
+DROP TABLE IF EXISTS "LaborEntry" CASCADE;
+ALTER TABLE "GanttTask" DROP COLUMN IF EXISTS "workOrderTaskId";
+
 CREATE TABLE "LaborEntry" (
-  "id" TEXT NOT NULL,
-  "assignmentId" TEXT NOT NULL,
-  "workerId" TEXT NOT NULL,
-  "workOrderId" TEXT NOT NULL,
-  "taskId" TEXT,
+  "id" UUID NOT NULL,
+  "assignmentId" UUID NOT NULL,
+  "workerId" UUID NOT NULL,
+  "workOrderId" UUID NOT NULL,
+  "taskId" UUID,
   "workDate" DATE NOT NULL,
   "plannedHours" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "actualHours" DOUBLE PRECISION NOT NULL DEFAULT 0,
@@ -14,9 +18,9 @@ CREATE TABLE "LaborEntry" (
   CONSTRAINT "LaborEntry_pkey" PRIMARY KEY ("id")
 );
 CREATE TABLE "TaskProgressUpdate" (
-  "id" TEXT NOT NULL,
-  "taskId" TEXT NOT NULL,
-  "workerId" TEXT,
+  "id" UUID NOT NULL,
+  "taskId" UUID NOT NULL,
+  "workerId" UUID,
   "progress" DOUBLE PRECISION NOT NULL,
   "actualHours" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "comment" TEXT NOT NULL,
@@ -41,6 +45,6 @@ ALTER TABLE "LaborEntry" ADD CONSTRAINT "LaborEntry_workOrderId_fkey" FOREIGN KE
 ALTER TABLE "LaborEntry" ADD CONSTRAINT "LaborEntry_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "WorkOrderTask"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "TaskProgressUpdate" ADD CONSTRAINT "TaskProgressUpdate_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "WorkOrderTask"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "TaskProgressUpdate" ADD CONSTRAINT "TaskProgressUpdate_workerId_fkey" FOREIGN KEY ("workerId") REFERENCES "Worker"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-ALTER TABLE "GanttTask" ADD COLUMN "workOrderTaskId" TEXT;
+ALTER TABLE "GanttTask" ADD COLUMN "workOrderTaskId" UUID;
 CREATE UNIQUE INDEX "GanttTask_workOrderTaskId_key" ON "GanttTask"("workOrderTaskId");
 ALTER TABLE "GanttTask" ADD CONSTRAINT "GanttTask_workOrderTaskId_fkey" FOREIGN KEY ("workOrderTaskId") REFERENCES "WorkOrderTask"("id") ON DELETE SET NULL ON UPDATE CASCADE;
