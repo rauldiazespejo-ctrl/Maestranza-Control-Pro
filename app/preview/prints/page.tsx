@@ -20,8 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 export const metadata: Metadata = {
-  title: "Prints de despliegue | ForgeOps",
-  description: "Pantallas demo para capturas de despliegue de ForgeOps.",
+  title: "Prints de despliegue | Maestranza Modelo PRO",
+  description: "Pantallas demo para capturas de despliegue de Maestranza Modelo PRO.",
   robots: {
     index: false,
     follow: false,
@@ -55,7 +55,7 @@ function ShellFrame({ children }: { children: React.ReactNode }) {
     <div className="app-shell-bg min-h-dvh text-white">
       <header className="sticky top-0 z-20 h-20 border-b border-border-subtle bg-navy-primary/82 shadow-industrial-sm backdrop-blur-xl">
         <div className="flex h-full items-center justify-between gap-4 px-5">
-          <Link href="/preview/prints" aria-label="ForgeOps preview">
+          <Link href="/preview/prints" aria-label="Vista previa de Maestranza Modelo PRO">
             <BrandLockup />
           </Link>
           <div className="hidden items-center gap-3 md:flex">
@@ -134,7 +134,7 @@ export default function PrintsPreviewPage() {
                 <Activity className="h-3.5 w-3.5" />
                 Centro de control
               </div>
-              <h1 className="font-heading text-3xl font-bold text-white sm:text-4xl">ForgeOps</h1>
+              <h1 className="font-heading text-3xl font-bold text-white sm:text-4xl">Maestranza Modelo PRO</h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-steel sm:text-base">
                 Operaciones, trazabilidad documental, avance de ordenes y alertas criticas en una sola vista.
               </p>

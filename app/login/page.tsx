@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Activity, FileCheck2, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Iniciar sesión | ForgeOps",
-  description: "Acceso a ForgeOps para control operacional, trazabilidad y gestión documental.",
+  title: "Iniciar sesión",
+  description: "Acceso a Maestranza Modelo PRO para control operacional, trazabilidad y gestión documental.",
 };
 
 interface LoginPageProps {
@@ -65,7 +65,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
 
           <p className="relative z-10 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-tertiary">
-            ForgeOps / Control operacional integrado
+            Maestranza Modelo PRO / Boiler Comp + Soldesp
           </p>
         </section>
 
@@ -94,7 +94,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </Card>
 
             <p className="mt-6 text-center text-xs text-ink-tertiary">
-              © {new Date().getFullYear()} ForgeOps · Acceso exclusivo autorizado
+              © {new Date().getFullYear()} Maestranza Modelo PRO · Boiler Comp + Soldesp
             </p>
           </div>
         </section>

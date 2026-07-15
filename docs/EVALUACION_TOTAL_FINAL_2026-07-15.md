@@ -1,4 +1,4 @@
-# Evaluación total final — ForgeOps
+# Evaluación total final — Maestranza Modelo PRO
 
 Fecha de consolidación: 2026-07-15.
 

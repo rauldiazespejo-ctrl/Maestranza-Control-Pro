@@ -4,7 +4,7 @@ import { getOperationalReport } from "@/lib/actions/reports";
 import { LoadingState } from "@/components/ui/LoadingState";
 
 export const metadata = {
-  title: "Reportes · ForgeOps",
+  title: "Reportes",
 };
 
 export default async function ReportesPage({

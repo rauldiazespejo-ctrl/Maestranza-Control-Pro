@@ -2,7 +2,7 @@
 
 @theme inline {
   /* ════════════════════════════════════════════════════════════
-     FORGEOPS DESIGN SYSTEM v2 — Modernized 2026
+     MAESTRANZA MODELO PRO — Design System 2026
      Surface ladder · Single gold accent · Stacked subtle shadows
      ════════════════════════════════════════════════════════════ */
 
@@ -12,6 +12,11 @@
   --color-surface-2: #161F33;
   --color-surface-3: #1E293B;
   --color-surface-4: #273244;
+
+  /* ── Identidad corporativa Boiler Comp + Soldesp ── */
+  --color-brand-soldesp: #071E5B;
+  --color-brand-soldesp-orange: #F15A37;
+  --color-brand-boiler: #9E0B0F;
 
   /* ── Acento cromático único: dorado ── */
   --color-gold: #E8B33A;

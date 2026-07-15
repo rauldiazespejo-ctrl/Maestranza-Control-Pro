@@ -137,7 +137,7 @@ export function GlobalSearch() {
                 name="global-search"
                 autoComplete="off"
                 placeholder="Buscar órdenes, trabajadores o clientes…"
-                aria-label="Buscar en ForgeOps"
+                aria-label="Buscar en Maestranza Modelo PRO"
                 className="border-0 bg-transparent text-sm shadow-none focus-visible:ring-0"
               />
               {query && (

@@ -19,11 +19,14 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "ForgeOps",
+  title: {
+    default: "Maestranza Modelo PRO",
+    template: "%s | Maestranza Modelo PRO",
+  },
   description:
-    "Plataforma de control operacional, HSEQ, documental y trazabilidad industrial.",
+    "Plataforma de Boiler Comp y Soldesp para control operacional, planificación, HSEQ y trazabilidad industrial.",
   icons: {
-    icon: "/brand/forgeops-mark.svg",
+    icon: "/brand/partners/logo-soldesp-full.png",
   },
 };
 

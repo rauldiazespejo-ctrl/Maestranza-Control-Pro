@@ -1,7 +1,7 @@
 ---
 version: final-2026-07-15
-name: ForgeOps
-description: "Centro de control operacional industrial — oscuro, preciso y sobrio. El sistema prioriza lectura rápida de datos, estados visibles y densidad organizada. Acento dorado único sobre una escala navy de 4 niveles. Inspirado en la economía cromática de Linear y la calma tipográfica de Vercel/Geist."
+name: Maestranza Modelo PRO
+description: "Centro de control operacional compartido de Boiler Comp y Soldesp — oscuro, preciso y sobrio. Navy Soldesp como base, placas corporativas con rojo Boiler y naranja Soldesp, y dorado reservado para decisiones operacionales."
 
 colors:
   # ── Surface ladder (jerarquía por color, no por sombra) ──
@@ -300,7 +300,7 @@ components:
 
 ## Overview
 
-ForgeOps es un centro de control operacional industrial. El sistema prioriza lectura rápida, estados visibles y densidad organizada para turnos largos. La interfaz usa un fondo navy profundo con una **escala de superficies de 4 niveles** (canvas → surface-1 → surface-2 → surface-3 → surface-4) que crea jerarquía visual sin depender de sombras pesadas.
+Maestranza Modelo PRO es el centro de control operacional conjunto de Boiler Comp y Soldesp. El sistema prioriza lectura rápida, estados visibles y densidad organizada para turnos largos. La interfaz usa un fondo navy profundo con una **escala de superficies de 4 niveles** (canvas → surface-1 → surface-2 → surface-3 → surface-4) que crea jerarquía visual sin depender de sombras pesadas.
 
 El acento cromático es **dorado (#E8B33A)** — reservado para acciones primarias, navegación activa, foco y énfasis de decisión. No se usa dorado como fondo decorativo. Los estados semánticos (alerta roja, éxito verde) aparecen solo en badges y estados de error, nunca como atmósfera.
 
