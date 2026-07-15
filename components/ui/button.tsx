@@ -52,7 +52,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           onClick?.(event);
         }}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-lg border font-semibold whitespace-nowrap",
+          "metal-control inline-flex items-center justify-center gap-2 rounded-lg border font-semibold whitespace-nowrap",
           "transition-[background-color,border-color,box-shadow,transform] duration-200",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-canvas",
           /* hover: scale(1.02) — disabled just dims, no transform */
@@ -73,7 +73,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             destructive:
               "border-alert/55 bg-alert text-white shadow-sm hover:enabled:bg-alert-dark",
             accent:
-              "border-gold/55 bg-gold text-canvas shadow-sm hover:enabled:bg-gold-hover",
+              "border-gold/70 !bg-gold text-canvas shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_2px_8px_rgba(2,6,23,0.35)] hover:enabled:!bg-gold-hover",
           }[variant],
           {
             default: "min-h-10 px-5 py-2.5 text-sm",

@@ -12,6 +12,8 @@ import {
   CheckSquare,
   Square,
   ClipboardList,
+  HardHat,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,7 @@ import {
   deleteWorkOrderTask,
   toggleWorkOrderTask,
 } from "@/lib/actions/workorder-tasks";
+import { reportFieldProgress } from "@/lib/actions/field-progress";
 import type { Prisma } from "@prisma/client";
 
 interface Props {
@@ -37,8 +40,10 @@ interface Props {
     include: {
       asts: { select: { id: true; status: true; riskLevel: true; approvedAt: true } };
       permits: { select: { id: true; type: true; status: true; startAt: true; endAt: true } };
+      progressUpdates: { include: { worker: { select: { id: true; name: true } } } };
     };
   }>[];
+  workers: { id: string; name: string }[];
 }
 
 type TaskWithSafety = Props["tasks"][number];
@@ -48,11 +53,19 @@ function formatDate(date?: Date | null) {
   return date.toLocaleDateString("es-CL");
 }
 
-export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
+export function WorkOrderTasksSection({ workOrderId, tasks, workers }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<TaskWithSafety | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [fieldTask, setFieldTask] = React.useState<TaskWithSafety | null>(null);
+  const [fieldSaving, setFieldSaving] = React.useState(false);
+  const [fieldProgress, setFieldProgress] = React.useState("0");
+  const [fieldHours, setFieldHours] = React.useState("0");
+  const [fieldWorker, setFieldWorker] = React.useState("");
+  const [fieldComment, setFieldComment] = React.useState("");
+  const [fieldBlocked, setFieldBlocked] = React.useState(false);
+  const [fieldBlocker, setFieldBlocker] = React.useState("");
 
   const {
     register,
@@ -165,6 +178,21 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
     setEditing(task);
     setError(null);
     setIsOpen(true);
+  };
+
+  const openFieldReport = (task: TaskWithSafety) => {
+    setFieldTask(task); setFieldProgress(String(task.progress)); setFieldHours("0"); setFieldWorker(""); setFieldComment(""); setFieldBlocked(false); setFieldBlocker(""); setError(null);
+  };
+
+  const submitFieldReport = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!fieldTask) return;
+    setFieldSaving(true); setError(null);
+    try {
+      await reportFieldProgress({ taskId: fieldTask.id, workerId: fieldWorker, progress: fieldProgress, actualHours: fieldHours, comment: fieldComment, blocked: fieldBlocked, blocker: fieldBlocker, evidenceUrl: "" });
+      setFieldTask(null); router.refresh();
+    } catch (err) { setError(err instanceof Error ? err.message : "No se pudo reportar el avance"); }
+    finally { setFieldSaving(false); }
   };
 
   return (
@@ -287,6 +315,14 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
                       <Button
                         variant="ghost"
                         size="icon"
+                        onClick={() => openFieldReport(task)}
+                        title="Reportar avance desde terreno"
+                      >
+                        <HardHat className="h-4 w-4 text-gold" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => openEdit(task)}
                       >
                         <Pencil className="h-4 w-4" />
@@ -306,6 +342,19 @@ export function WorkOrderTasksSection({ workOrderId, tasks }: Props) {
           </table>
         </div>
       </CardContent>
+
+      <Dialog open={Boolean(fieldTask)} onClose={() => setFieldTask(null)} title="Reporte de avance en terreno" className="max-w-lg">
+        <form onSubmit={submitFieldReport} className="space-y-4">
+          <div className="rounded-lg border border-gold/25 bg-gold/10 p-3"><p className="text-xs uppercase tracking-wider text-gold">{fieldTask?.processArea || "Tarea OT"}</p><p className="font-semibold text-white">{fieldTask?.title}</p></div>
+          {error && <div className="rounded-lg border border-fire/30 bg-fire/10 p-3 text-sm text-fire-bright">{error}</div>}
+          <div className="grid gap-3 sm:grid-cols-2"><div><label className="mb-1 block text-xs text-steel">Avance acumulado (%)</label><Input type="number" min="0" max="100" value={fieldProgress} onChange={e => setFieldProgress(e.target.value)} /></div><div><label className="mb-1 block text-xs text-steel">HH reales de esta jornada</label><Input type="number" min="0" max="24" step="0.5" value={fieldHours} onChange={e => setFieldHours(e.target.value)} /></div></div>
+          <div><label className="mb-1 block text-xs text-steel">Trabajador que reporta</label><select value={fieldWorker} onChange={e => setFieldWorker(e.target.value)} className="h-10 w-full rounded-md border border-border-subtle bg-navy-dark px-3 text-sm text-white"><option value="">No especificado</option>{workers.map(worker => <option key={worker.id} value={worker.id}>{worker.name}</option>)}</select></div>
+          <div><label className="mb-1 block text-xs text-steel">Trabajo ejecutado / novedad</label><textarea required minLength={3} rows={3} value={fieldComment} onChange={e => setFieldComment(e.target.value)} className="w-full rounded-md border border-border-subtle bg-navy-dark px-3 py-2 text-sm text-white" placeholder="Ej.: se completó armado y punteo del conjunto..." /></div>
+          <label className="flex items-center gap-2 rounded-lg border border-border-subtle p-3 text-sm text-steel"><input type="checkbox" checked={fieldBlocked} onChange={e => setFieldBlocked(e.target.checked)} className="accent-gold" /><AlertTriangle className="h-4 w-4 text-gold" />La tarea quedó bloqueada</label>
+          {fieldBlocked && <div><label className="mb-1 block text-xs text-steel">Causa y apoyo requerido</label><Input required value={fieldBlocker} onChange={e => setFieldBlocker(e.target.value)} placeholder="Material faltante, equipo detenido..." /></div>}
+          <div className="flex justify-end gap-2"><Button type="button" variant="ghost" onClick={() => setFieldTask(null)}>Cancelar</Button><Button disabled={fieldSaving}>{fieldSaving ? "Enviando..." : "Registrar avance"}</Button></div>
+        </form>
+      </Dialog>
 
       <Dialog
         open={isOpen}

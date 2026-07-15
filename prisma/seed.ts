@@ -17,7 +17,7 @@ function createPrisma() {
   if (databaseUrl.startsWith("postgresql://") || databaseUrl.startsWith("postgres://")) {
     const pool = new pg.Pool({
       connectionString: databaseUrl,
-      ssl: { rejectUnauthorized: false },
+      ssl: { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false" },
       connectionTimeoutMillis: 30000,
     });
     return new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -27,7 +27,10 @@ function createPrisma() {
 
 const prisma = createPrisma();
 
-const DEMO_PASSWORD = "demo1234";
+const DEMO_PASSWORD = process.env.SEED_DEMO_PASSWORD;
+if (!DEMO_PASSWORD || DEMO_PASSWORD.length < 12) {
+  throw new Error("SEED_DEMO_PASSWORD debe estar definido y tener al menos 12 caracteres");
+}
 const SUPERVISOR_RUTS = new Set([
   "19.048.732-6",
   "18.018.113-k",

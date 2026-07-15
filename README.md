@@ -84,6 +84,7 @@ components/
   dashboard/
   ordenes/
   hseq/
+  planificacion/      Calendario mensual de HH por trabajador y OT
 lib/
   auth.ts             Auth.js, RBAC y helpers de sesión
   db.ts               Prisma Client PostgreSQL
@@ -94,6 +95,22 @@ prisma/
   migrations/
   seed.ts
 ```
+
+## Flujo Operacional Integrado
+
+1. Crear la OT y asignar supervisor y trabajadores.
+2. Planificar HH en `/planificacion` por trabajador, fecha, OT, tarea y turno.
+3. Generar la Carta Gantt; cada proceso queda vinculado con una tarea de la OT.
+4. Reportar avance desde el detalle de la tarea, incluyendo HH reales y bloqueos.
+5. ForgeOps sincroniza el avance de la tarea, la barra Gantt y el porcentaje general de la OT.
+
+La planificación diaria advierte jornadas sobre 10 HH. Las tareas críticas no pueden incrementar avance sin AST aprobado y, cuando corresponda, PTW vigente.
+
+## Documentación Vigente
+
+- `DESIGN.md`: sistema visual.
+- `docs/PROMPT_EVALUACION_TOTAL_FINAL.md`: prompt canónico de evaluación y evolución.
+- `docs/EVALUACION_TOTAL_FINAL_2026-07-15.md`: estado, riesgos y roadmap.
 
 ## Migraciones
 

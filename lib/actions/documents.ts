@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { documentSchema, type DocumentFormData } from "@/lib/validations/document";
-import { requireAuth, READ_ROLES, WRITE_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
+import { requireAuth, requireClientId, READ_ROLES, WRITE_ROLES, MANAGEABLE_ROLES } from "@/lib/auth";
 
 export async function getDocuments(filters?: {
   workOrderId?: string;
@@ -14,8 +14,9 @@ export async function getDocuments(filters?: {
   const session = await requireAuth(READ_ROLES);
   const where: import('@prisma/client').Prisma.DocumentWhereInput = {};
   
-  if (session.user.role === "CLIENT" && session.user.clientId) {
-    where.workOrder = { clientId: session.user.clientId };
+  const scopedClientId = requireClientId(session.user.role, session.user.clientId);
+  if (session.user.role === "CLIENT") {
+    where.workOrder = { clientId: scopedClientId! };
   }
 
   if (filters?.workOrderId) where.workOrderId = filters.workOrderId;
@@ -41,8 +42,9 @@ export async function getDocuments(filters?: {
 export async function getDocumentsByWorkOrder(workOrderId: string) {
   const session = await requireAuth(READ_ROLES);
   const where: import('@prisma/client').Prisma.DocumentWhereInput = { workOrderId };
-  if (session.user.role === "CLIENT" && session.user.clientId) {
-    where.workOrder = { clientId: session.user.clientId };
+  const scopedClientId = requireClientId(session.user.role, session.user.clientId);
+  if (session.user.role === "CLIENT") {
+    where.workOrder = { clientId: scopedClientId! };
   }
 
   return prisma.document.findMany({

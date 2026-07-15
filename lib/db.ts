@@ -29,11 +29,15 @@ function createPrismaClient() {
   // En esos hosts se requiere SSL pero sin validacion estricta del certificado.
   const isRailwayProxyHost = hostname.endsWith(".proxy.rlwy.net");
   const shouldUseInsecureSsl =
-    sslMode === "require" || isRailwayProxyHost || Boolean(process.env.RAILWAY_ENVIRONMENT);
+    process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === "false" &&
+    (isRailwayProxyHost || Boolean(process.env.RAILWAY_ENVIRONMENT));
 
   const pool = new pg.Pool({
     connectionString: url.toString(),
-    ssl: shouldUseInsecureSsl ? { rejectUnauthorized: false } : undefined,
+    ssl:
+      sslMode === "require" || isRailwayProxyHost
+        ? { rejectUnauthorized: !shouldUseInsecureSsl }
+        : undefined,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: isProduction ? 5000 : 10000,
     max: isProduction ? 1 : 10,

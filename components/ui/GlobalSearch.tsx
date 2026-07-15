@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ClipboardList, HardHat, Users } from "lucide-react";
+import { Search, X, ClipboardList, HardHat, Users, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { globalSearch } from "@/lib/actions/search";
@@ -31,7 +31,7 @@ export function GlobalSearch() {
   // Shortcut Ctrl+K para abrir/cerrar busqueda
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "k") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
@@ -86,6 +86,14 @@ export function GlobalSearch() {
     return () => clearTimeout(timer);
   }, [query]);
 
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    if (value.trim().length < 2) {
+      setResults(null);
+      setLoading(false);
+    }
+  };
+
   const handleNavigate = (path: string) => {
     closeSearch();
     router.push(path);
@@ -106,12 +114,12 @@ export function GlobalSearch() {
         size="sm"
         className="h-9 gap-2 text-steel hover:text-white"
         onClick={() => setOpen(true)}
-        aria-label="Busqueda global (Ctrl+K)"
+        aria-label="Búsqueda global (Control o Comando + K)"
       >
-        <Search className="h-4 w-4" />
-        <span className="hidden text-xs sm:inline">Buscar...</span>
+        <Search className="h-4 w-4" aria-hidden="true" />
+        <span className="hidden text-xs sm:inline">Buscar…</span>
         <kbd className="hidden rounded border border-border-subtle bg-navy-dark px-1.5 py-0.5 text-[10px] font-mono text-steel md:inline">
-          Ctrl+K
+          ⌘ K
         </kbd>
       </Button>
 
@@ -121,12 +129,15 @@ export function GlobalSearch() {
           <div className="overflow-hidden rounded-xl border border-border-subtle bg-navy-primary shadow-industrial-lg">
             {/* Input */}
             <div className="flex items-center gap-2 border-b border-border-subtle px-3 py-2">
-              <Search className="h-4 w-4 shrink-0 text-steel" />
+              <Search className="h-4 w-4 shrink-0 text-steel" aria-hidden="true" />
               <Input
                 ref={inputRef}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar ordenes, trabajadores, clientes..."
+                onChange={(e) => handleQueryChange(e.target.value)}
+                name="global-search"
+                autoComplete="off"
+                placeholder="Buscar órdenes, trabajadores o clientes…"
+                aria-label="Buscar en ForgeOps"
                 className="border-0 bg-transparent text-sm shadow-none focus-visible:ring-0"
               />
               {query && (
@@ -138,8 +149,9 @@ export function GlobalSearch() {
                     setQuery("");
                     setResults(null);
                   }}
+                  aria-label="Limpiar búsqueda"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" aria-hidden="true" />
                 </Button>
               )}
             </div>
@@ -148,7 +160,7 @@ export function GlobalSearch() {
             <div className="max-h-80 overflow-y-auto">
               {loading && (
                 <div className="px-4 py-6 text-center text-xs text-steel">
-                  Buscando...
+                  Buscando…
                 </div>
               )}
 
@@ -168,7 +180,7 @@ export function GlobalSearch() {
                 <div className="border-b border-border-subtle">
                   <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase text-steel">
                     <ClipboardList className="h-3 w-3" />
-                    Ordenes
+                  Órdenes
                   </div>
                   {results.workOrders.map((o) => (
                     <button
@@ -183,6 +195,7 @@ export function GlobalSearch() {
                       <span className="ml-auto shrink-0 text-[10px] text-steel">
                         {o.status}
                       </span>
+                      <ArrowRight className="h-3.5 w-3.5 text-ink-tertiary" aria-hidden="true" />
                     </button>
                   ))}
                 </div>
@@ -249,7 +262,7 @@ export function GlobalSearch() {
                   (results?.clients.length ?? 0)}{" "}
                 resultados
               </span>
-              <span>ESC para cerrar</span>
+              <span>Esc para cerrar</span>
             </div>
           </div>
         </div>

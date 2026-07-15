@@ -1,5 +1,5 @@
 ---
-version: alpha
+version: final-2026-07-15
 name: ForgeOps
 description: "Centro de control operacional industrial — oscuro, preciso y sobrio. El sistema prioriza lectura rápida de datos, estados visibles y densidad organizada. Acento dorado único sobre una escala navy de 4 niveles. Inspirado en la economía cromática de Linear y la calma tipográfica de Vercel/Geist."
 
