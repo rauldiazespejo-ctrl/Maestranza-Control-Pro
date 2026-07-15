@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { BrandLockup } from "@/components/brand/BrandLockup";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,7 +19,7 @@ interface LoginPageProps {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const session = await auth();
+  const session = await getSession();
   const params = await searchParams;
   const authError = Array.isArray(params?.error) ? params.error[0] : params?.error;
   const errorCode = Array.isArray(params?.code) ? params.code[0] : params?.code;

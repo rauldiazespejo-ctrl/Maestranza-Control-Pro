@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { getDashboardStats } from "@/lib/actions/dashboard";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +93,7 @@ function getGreeting(): string {
 }
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user) {
     redirect("/login");
     return; // unreachable

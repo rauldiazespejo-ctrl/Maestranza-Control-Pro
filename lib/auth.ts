@@ -9,6 +9,7 @@ import { checkRateLimit, recordFailedAttempt, resetRateLimit } from "@/lib/rate-
 import { validateRut, normalizeRut } from "@/lib/validations/rut";
 import { headers } from "next/headers";
 import authConfig from "@/auth.config";
+import { cache } from "react";
 
 // ── RBAC roles ──────────────────────────────────────────────────────
 export type Role = UserRole;
@@ -69,7 +70,7 @@ export function requireRole(role: Role | undefined, allowed: Role[]): void {
  * @throws {Error} Si no hay sesion activa o el rol no tiene permisos.
  */
 export async function requireAuth(requiredRoles: Role[] = READ_ROLES) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user) throw new Error("No autenticado");
   const role = isValidRole(session.user.role) ? session.user.role : undefined;
   requireRole(role, requiredRoles);
@@ -215,3 +216,6 @@ export const {
     }),
   ],
 });
+
+/** Deduplica la verificacion JWT entre layout, pagina y consultas del mismo request. */
+export const getSession = cache(auth);

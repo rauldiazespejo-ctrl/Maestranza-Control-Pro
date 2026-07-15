@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { PortalLoginForm } from "@/components/portal/PortalLoginForm";
 
 interface PortalLoginPageProps {
@@ -9,7 +9,7 @@ interface PortalLoginPageProps {
 }
 
 export default async function PortalLoginPage({ searchParams }: PortalLoginPageProps) {
-  const session = await auth();
+  const session = await getSession();
   const params = await searchParams;
   const authError = Array.isArray(params?.error) ? params.error[0] : params?.error;
 

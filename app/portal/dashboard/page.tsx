@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { getWorkOrders } from "@/lib/actions/workorders";
 import { redirect } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function PortalDashboardPage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.clientId) redirect("/portal/login");
 
   const orders = await getWorkOrders();

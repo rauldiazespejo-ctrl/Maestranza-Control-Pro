@@ -20,6 +20,13 @@ function createPrismaClient() {
   const url = new URL(databaseUrl);
   const sslMode = url.searchParams.get("sslmode") || url.searchParams.get("ssl");
   const hostname = url.hostname.toLowerCase();
+  const isPooledHost = /(?:pooler|pool|proxy)/.test(hostname);
+  const configuredPoolMax = Number.parseInt(process.env.DATABASE_POOL_MAX ?? "", 10);
+  const poolMax = Number.isFinite(configuredPoolMax) && configuredPoolMax > 0
+    ? configuredPoolMax
+    : isProduction
+      ? (isPooledHost ? 5 : 2)
+      : 10;
 
   if (sslMode === "require" && !url.searchParams.has("uselibpqcompat")) {
     url.searchParams.set("uselibpqcompat", "true");
@@ -40,7 +47,9 @@ function createPrismaClient() {
         : undefined,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: isProduction ? 5000 : 10000,
-    max: isProduction ? 1 : 10,
+    // Un unico socket serializaba todas las consultas Promise.all del dashboard.
+    // Los hosts con pooler soportan mas concurrencia; conexiones directas quedan acotadas.
+    max: poolMax,
     // Importante para serverless: cerrar conexiones inactivas rapidamente.
     allowExitOnIdle: true,
   });
